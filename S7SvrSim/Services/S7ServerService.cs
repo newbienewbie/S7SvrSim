@@ -48,7 +48,7 @@ namespace S7Svr.Simulator.ViewModels
                         DBSize = db.DBSize,
                         Bytes  = buffer,
                     });
-                    this.S7Server.RegisterArea(FutureTech.Snap7.S7Server.S7AreaDB, db.DBNumber, ref buffer, db.DBSize);
+                    this.S7Server.RegisterArea(FutureTech.Snap7.S7Server.srvAreaDB, db.DBNumber, ref buffer, db.DBSize);
                 }
                 this.S7Server.StartTo(vm.IpAddress);
             }
