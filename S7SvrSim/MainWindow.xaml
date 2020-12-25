@@ -135,11 +135,36 @@
                                     </GroupBox>
                                 </StackPanel>
                             </TabItem>
-                            <TabItem Header="Int操作">
+                            <TabItem Header="Short操作">
                                 <StackPanel>
                                     <GroupBox Header="读操作">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+
+                                            <Button Content="读取" Command="{Binding OperationVM.CmdReadShort}" HorizontalAlignment="Left" Grid.Column="0">
+                                            </Button>
+                                            <TextBlock Text="{Binding OperationVM.ShortRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                                            </TextBlock>
+                                        </Grid>
                                     </GroupBox>
                                     <GroupBox Header="写操作">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+                                            <TextBox Text="{Binding OperationVM.ShortToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
+                                            <Button Content="写入" Command="{Binding OperationVM.CmdWriteShort}" HorizontalAlignment="Center" Grid.Column="1"></Button>
+                                        </Grid>
                                     </GroupBox>
                                 </StackPanel>
                             </TabItem>

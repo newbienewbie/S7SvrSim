@@ -108,6 +108,37 @@ namespace S7Svr.Simulator.ViewModels
         }
         #endregion
 
+        #region Short
+        public short ReadShort(RunningSnap7ServerVM vm, int dbNumber, int pos)
+        {
+            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
+                return default;
+            }
+
+            var buffer = config.Bytes;
+
+            var val = S7.GetIntAt(buffer, pos);
+            return (short) val;
+        }
+
+
+        public void WriteShort(RunningSnap7ServerVM vm, int dbNumber, int pos, short value)
+        {
+            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
+                return;
+            }
+            var buffer = config.Bytes;
+
+            S7.SetIntAt(buffer, pos, value);
+        }
+        #endregion
+
 
         #region Bit
         public bool ReadBit(RunningSnap7ServerVM vm, int dbNumber, int offset, byte bit)

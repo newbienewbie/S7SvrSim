@@ -39,6 +39,24 @@ namespace S7Server.Simulator.ViewModels
             );
             #endregion
 
+            #region Short
+            this.CmdWriteShort = new AsyncRelayCommand<object>(
+                o =>
+                {
+                    this._s7ServerService.WriteShort(this._vm, this.TargetDBNumber, this.TargetPos, this.ShortToBeWritten);
+                    return Task.CompletedTask;
+                },
+                o => true
+            );
+            this.CmdReadShort = new AsyncRelayCommand<object>(
+                o => {
+                    var val = this._s7ServerService.ReadShort(this._vm, this.TargetDBNumber, this.TargetPos);
+                    this.ShortRead = val;
+                    return Task.CompletedTask;
+                },
+                o => true
+            );
+            #endregion
 
             #region Bit
             this.CmdWriteBit = new AsyncRelayCommand<object>(
@@ -124,6 +142,41 @@ namespace S7Server.Simulator.ViewModels
                 }
             }
         }
+
+        #region Short Read And Write
+        private short _shortToBeWritten;
+        public short ShortToBeWritten
+        {
+            get => _shortToBeWritten;
+            set
+            {
+                if (this._shortToBeWritten != value)
+                {
+                    _shortToBeWritten = value;
+                    this.OnPropertyChanged(nameof(ShortToBeWritten));
+                }
+            }
+        }
+
+
+        private short _shortRead;
+        public short ShortRead
+        {
+            get => _shortRead;
+            set
+            {
+                if (this._shortRead != value)
+                {
+                    this._shortRead = value;
+                    this.OnPropertyChanged(nameof(ShortRead));
+                }
+            }
+        }
+
+        public ICommand CmdWriteShort{ get; }
+        public ICommand CmdReadShort{ get; }
+        #endregion
+
 
 
         #region Byte Read And Write
