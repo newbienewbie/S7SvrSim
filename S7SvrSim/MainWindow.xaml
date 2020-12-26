@@ -394,11 +394,11 @@
                                             <TextBlock Text="{Binding DBSize,StringFormat={}\, DBSize\={0}}"></TextBlock>
                                         </StackPanel>
                                     </Expander.Header>
-                                    <uc:HexoCtrl 
+                                    <!--<uc:HexoCtrl 
                                         DBNumber="{Binding DBNumber}" 
                                         DBSize="{Binding DBSize}" 
                                         Bytes="{Binding Bytes}">
-                                    </uc:HexoCtrl>
+                                    </uc:HexoCtrl>-->
                                 </Expander>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
