@@ -28,15 +28,5 @@ namespace S7Svr.Simulator
             this.DataContext = vm;
         }
 
-        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
-        {
-            var vm = this.DataContext as MainVM;
-            vm.CmdStartServer.Execute(null);
-        }
-
-        private void ToggleButton_Unchecked(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }
