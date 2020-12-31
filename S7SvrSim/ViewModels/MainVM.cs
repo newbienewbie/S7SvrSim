@@ -24,6 +24,7 @@ namespace S7Svr.Simulator.ViewModels
                         this.RunningVM.DBConfigs.Add(config);
                     }
                     await this._s7ServerService.StartServerAsync(this.RunningVM);
+                    this.RunningVM.RunningStatus = true;
                 },
                 o => true
             );
@@ -33,6 +34,7 @@ namespace S7Svr.Simulator.ViewModels
                     this.RunningVM.IpAddress = string.Empty;
                     this.RunningVM.DBConfigs.Clear();
                     await this._s7ServerService.StopServerAsync();
+                    this.RunningVM.RunningStatus = false;
                 },
                 o => true
             );

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:S7Svr.Simulator"
         xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Siemens PLC 通讯模拟器" Height="450" Width="800">
 
     <TabControl>
         <TabItem Header="DB配置">
@@ -25,11 +25,13 @@
                     <ColumnDefinition Width="132*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
 
-                <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Margin="31,0,0,0"  />
+                <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,0"  />
                 <TextBox Text="{Binding ConfigVM.IpAddress}" VerticalAlignment="Center" Grid.Column="1" Grid.ColumnSpan="3" Margin="35,0,132,0" />
-                <Button Content="启动" Command="{Binding CmdStartServer}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="5"/>
-                <Button Content="停止" Command="{Binding CmdStopServer}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="6"/>
+                <Button Content="启动" IsEnabled="{Binding RunningVM.IsNotRunning}"  Command="{Binding CmdStartServer}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="5"/>
+                <Button Content="停止" IsEnabled="{Binding RunningVM.RunningStatus}" Command="{Binding CmdStopServer}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="6"/>
+
                 <DataGrid ItemsSource="{Binding ConfigVM.DBConfigs}" 
+                     IsEnabled="{Binding RunningVM.IsNotRunning}"
                           CanUserDeleteRows="True"  
                           CanUserAddRows="True" Grid.Column="0" Grid.ColumnSpan="7" Margin="0,25,0,0" Grid.RowSpan="2" >
                     <DataGrid.Columns>
@@ -55,28 +57,81 @@
                 <Label Content="IpAddress" Grid.Row="0" Grid.Column="0" ></Label>
                 <TextBlock Text="{Binding ConfigVM.IpAddress}" Grid.Row="0" Grid.Column="1"></TextBlock>
 
-                <Expander Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
-                    <Grid>
+                <Grid  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
 
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition Height="Auto"></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
 
-                        <Label Content="DBNumber" Grid.Row="0" Grid.Column="0"></Label>
-                        <TextBox Text="{Binding OperationVM.TargetDBNumber}" Grid.Row="0" Grid.Column="1" ></TextBox>
-                        <Label Content="Position" Grid.Row="1" Grid.Column="0"></Label>
-                        <TextBox Text="{Binding OperationVM.TargetPos}"  Grid.Row="1" Grid.Column="1" ></TextBox>
+                    <Label Content="DBNumber" Grid.Row="0" Grid.Column="0"></Label>
+                    <TextBox Text="{Binding OperationVM.TargetDBNumber}" Grid.Row="0" Grid.Column="1" ></TextBox>
+                    <Label Content="Position" Grid.Row="1" Grid.Column="0"></Label>
+                    <TextBox Text="{Binding OperationVM.TargetPos}"  Grid.Row="1" Grid.Column="1" ></TextBox>
 
-                        <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-                            <TabItem Header="Bit操作">
+                    <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+                        <TabItem Header="Bit操作">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <TextBox Text="{Binding OperationVM.TargetBitPos}" Grid.Row="0" Grid.Column="1"></TextBox>
+                                    <TextBlock Text="第Nth位"></TextBlock>
+                                </Grid>
                                 <StackPanel>
+                                    <GroupBox Header="读操作">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+
+                                            <Button Content="读取" Command="{Binding OperationVM.CmdReadBit}" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0">
+                                            </Button>
+
+                                            <CheckBox IsChecked="{Binding OperationVM.BitRead}" IsEnabled="False" Grid.Row="1" Grid.Column="1"></CheckBox>
+                                        </Grid>
+                                    </GroupBox>
+                                    <GroupBox Header="写操作">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition></ColumnDefinition>
+                                                <ColumnDefinition></ColumnDefinition>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition></RowDefinition>
+                                                <RowDefinition></RowDefinition>
+                                            </Grid.RowDefinitions>
+
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="真"></TextBlock>
+                                                <CheckBox IsChecked="{Binding OperationVM.BitToBeWritten}"  Grid.Row="0" Grid.Column="0"></CheckBox>
+                                            </StackPanel>
+                                            <Button Content="写入" Command="{Binding OperationVM.CmdWriteBit}" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"></Button>
+                                        </Grid>
+                                    </GroupBox>
+                                </StackPanel>
+                            </StackPanel>
+                        </TabItem>
+
+                        <TabItem Header="Byte操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition></ColumnDefinition>
@@ -85,301 +140,246 @@
                                         <Grid.RowDefinitions>
                                             <RowDefinition></RowDefinition>
                                         </Grid.RowDefinitions>
-                                        <TextBox Text="{Binding OperationVM.TargetBitPos}" Grid.Row="0" Grid.Column="1"></TextBox>
-                                        <TextBlock Text="第Nth位"></TextBlock>
+
+                                        <Button Content="读取" Command="{Binding OperationVM.CmdReadByte}" HorizontalAlignment="Left" Grid.Column="0">
+                                        </Button>
+                                        <TextBlock Text="{Binding OperationVM.ByteRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                                        </TextBlock>
                                     </Grid>
-                                    <StackPanel>
-                                        <GroupBox Header="读操作">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition></ColumnDefinition>
-                                                    <ColumnDefinition></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition></RowDefinition>
-                                                    <RowDefinition></RowDefinition>
-                                                </Grid.RowDefinitions>
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBox Text="{Binding OperationVM.ByteToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
+                                        <Button Content="写入" Command="{Binding OperationVM.CmdWriteByte}" HorizontalAlignment="Center" Grid.Column="1"></Button>
+                                    </Grid>
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                                                <Button Content="读取" Command="{Binding OperationVM.CmdReadBit}" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0">
-                                                </Button>
+                        <TabItem Header="Short操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
 
-                                                <CheckBox IsChecked="{Binding OperationVM.BitRead}" IsEnabled="False" Grid.Row="1" Grid.Column="1"></CheckBox>
-                                            </Grid>
-                                        </GroupBox>
-                                        <GroupBox Header="写操作">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition></ColumnDefinition>
-                                                    <ColumnDefinition></ColumnDefinition>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition></RowDefinition>
-                                                    <RowDefinition></RowDefinition>
-                                                </Grid.RowDefinitions>
+                                        <Button Content="读取" Command="{Binding OperationVM.CmdReadShort}" HorizontalAlignment="Left" Grid.Column="0">
+                                        </Button>
+                                        <TextBlock Text="{Binding OperationVM.ShortRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                                        </TextBlock>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBox Text="{Binding OperationVM.ShortToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
+                                        <Button Content="写入" Command="{Binding OperationVM.CmdWriteShort}" HorizontalAlignment="Center" Grid.Column="1"></Button>
+                                    </Grid>
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="真"></TextBlock>
-                                                    <CheckBox IsChecked="{Binding OperationVM.BitToBeWritten}"  Grid.Row="0" Grid.Column="0"></CheckBox>
-                                                </StackPanel>
-                                                <Button Content="写入" Command="{Binding OperationVM.CmdWriteBit}" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"></Button>
-                                            </Grid>
-                                        </GroupBox>
-                                    </StackPanel>
-                                </StackPanel>
-                            </TabItem>
+                        <TabItem Header="Real操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
 
-                            <TabItem Header="Byte操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
+                                        <Button Content="读取" Command="{Binding OperationVM.CmdReadReal}" HorizontalAlignment="Left" Grid.Column="0">
+                                        </Button>
+                                        <TextBlock Text="{Binding OperationVM.RealRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                                        </TextBlock>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBox Text="{Binding OperationVM.RealToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
+                                        <Button Content="写入" Command="{Binding OperationVM.CmdWriteReal}" HorizontalAlignment="Center" Grid.Column="1"></Button>
+                                    </Grid>
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                                            <Button Content="读取" Command="{Binding OperationVM.CmdReadByte}" HorizontalAlignment="Left" Grid.Column="0">
-                                            </Button>
-                                            <TextBlock Text="{Binding OperationVM.ByteRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                                            </TextBlock>
-                                        </Grid>
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <TextBox Text="{Binding OperationVM.ByteToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
-                                            <Button Content="写入" Command="{Binding OperationVM.CmdWriteByte}" HorizontalAlignment="Center" Grid.Column="1"></Button>
-                                        </Grid>
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
+                        <TabItem Header="String操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
 
-                            <TabItem Header="Short操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
+                                        <Button Content="读取" Command="{Binding OperationVM.CmdReadString}" HorizontalAlignment="Left" Grid.Column="0">
+                                        </Button>
+                                        <TextBlock Text="{Binding OperationVM.StrRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                                        </TextBlock>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition></ColumnDefinition>
+                                            <ColumnDefinition></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <TextBox Text="{Binding OperationVM.StrToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
+                                        <Button Content="写入" Command="{Binding OperationVM.CmdWriteString}" HorizontalAlignment="Center" Grid.Column="1"></Button>
+                                    </Grid>
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                                            <Button Content="读取" Command="{Binding OperationVM.CmdReadShort}" HorizontalAlignment="Left" Grid.Column="0">
-                                            </Button>
-                                            <TextBlock Text="{Binding OperationVM.ShortRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                                            </TextBlock>
-                                        </Grid>
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <TextBox Text="{Binding OperationVM.ShortToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
-                                            <Button Content="写入" Command="{Binding OperationVM.CmdWriteShort}" HorizontalAlignment="Center" Grid.Column="1"></Button>
-                                        </Grid>
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
+                        <TabItem Header="SInt操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                            <TabItem Header="Real操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
+                        <TabItem Header="DInt操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="LInt操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="USInt操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="UInt操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="UDInt操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Header="ULInt操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                                            <Button Content="读取" Command="{Binding OperationVM.CmdReadReal}" HorizontalAlignment="Left" Grid.Column="0">
-                                            </Button>
-                                            <TextBlock Text="{Binding OperationVM.RealRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                                            </TextBlock>
-                                        </Grid>
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <TextBox Text="{Binding OperationVM.RealToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
-                                            <Button Content="写入" Command="{Binding OperationVM.CmdWriteReal}" HorizontalAlignment="Center" Grid.Column="1"></Button>
-                                        </Grid>
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
+                        <TabItem Header="Word操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                            <TabItem Header="String操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
+                        <TabItem Header="DWord操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                                            <Button Content="读取" Command="{Binding OperationVM.CmdReadString}" HorizontalAlignment="Left" Grid.Column="0">
-                                            </Button>
-                                            <TextBlock Text="{Binding OperationVM.StrRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                                            </TextBlock>
-                                        </Grid>
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition></RowDefinition>
-                                            </Grid.RowDefinitions>
-                                            <TextBox Text="{Binding OperationVM.StrToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
-                                            <Button Content="写入" Command="{Binding OperationVM.CmdWriteString}" HorizontalAlignment="Center" Grid.Column="1"></Button>
-                                        </Grid>
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-
-                            <TabItem Header="SInt操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-
-                            <TabItem Header="DInt操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-                            <TabItem Header="LInt操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-                            <TabItem Header="USInt操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-                            <TabItem Header="UInt操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-                            <TabItem Header="UDInt操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-                            <TabItem Header="ULInt操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-
-                            <TabItem Header="Word操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-
-                            <TabItem Header="DWord操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-
-                            <TabItem Header="LWord操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
+                        <TabItem Header="LWord操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
 
-                            <TabItem Header="LReal操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
+                        <TabItem Header="LReal操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                            <TabItem Header="DateTime操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
+                        <TabItem Header="DateTime操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
 
-                            <TabItem Header="Date操作">
-                                <StackPanel>
-                                    <GroupBox Header="读操作">
-                                    </GroupBox>
-                                    <GroupBox Header="写操作">
-                                    </GroupBox>
-                                </StackPanel>
-                            </TabItem>
-                        </TabControl>
+                        <TabItem Header="Date操作">
+                            <StackPanel>
+                                <GroupBox Header="读操作">
+                                </GroupBox>
+                                <GroupBox Header="写操作">
+                                </GroupBox>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
 
-                    </Grid>
-                </Expander>
+                </Grid>
 
 
 
