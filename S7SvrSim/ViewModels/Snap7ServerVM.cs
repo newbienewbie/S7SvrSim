@@ -85,6 +85,23 @@ namespace S7Svr.Simulator.ViewModels
             }
         }
 
+        #region 运行状态
+        private bool _runningStatus = false;
+        public bool RunningStatus
+        {
+            get => _runningStatus;
+            set
+            {
+                if (this._runningStatus != value)
+                {
+                    this._runningStatus = value;
+                    this.OnPropertyChanged(nameof(RunningStatus));
+                }
+            }
+        }
+        #endregion
+
+
         /// <summary>
         /// 正在运行的
         /// </summary>

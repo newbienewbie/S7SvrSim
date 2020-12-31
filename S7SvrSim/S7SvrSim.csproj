@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CalcBinding" Version="2.5.2" />
     <PackageReference Include="FutureTech.Mvvm" Version="0.1.1" />
     <PackageReference Include="FutureTech.Snap7" Version="0.3.7" />
     <PackageReference Include="MediatR" Version="9.0.0" />
