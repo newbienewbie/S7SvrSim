@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace S7Server.Simulator.UserControls
+namespace S7Svr.Simulator.UserControls
 {
     /// <summary>
     /// Interaction logic for OperationsCtrl.xaml
