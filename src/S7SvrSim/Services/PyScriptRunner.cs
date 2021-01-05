@@ -13,7 +13,6 @@ namespace S7SvrSim.Services
     public class PyScriptRunner
     {
         private readonly S7ServerService _s7ServerSvc;
-        private readonly RunningSnap7ServerVM _runningVM;
         private readonly ILogger<PyScriptRunner> _logger;
         private ScriptEngine pyEngine = null;
         private ScriptScope pyScope = null;

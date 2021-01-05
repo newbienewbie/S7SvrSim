@@ -33,6 +33,7 @@ namespace S7Server.Simulator.ViewModels
                             var filename = fileDialog.FileName;
                             this._scriptRunner.RunFile(filename);
                         }
+                        MessageBox.Show("脚本执行完成！");
                     }
                     catch(Exception ex) {
                         MessageBox.Show($"执行脚本出错！{ex.Message}");
