@@ -44,3 +44,7 @@ s7_server_svc.WriteReal(6, 3036, 3545.2)
 s7_server_svc.WriteReal(6, 3040, 68.3)
 s7_server_svc.WriteReal(6, 3040, 4.8)
 ```
+
+## 已知问题
+
+- [ ] 目前由于[`IronPython`](https://ironpython.net/)的限制，发布时无法生成单个文件。参见[IronPython #762](https://github.com/IronLanguages/ironpython2/issues/762)。故发布项目时请不要使用`-p:PublishSingleFile=true`
