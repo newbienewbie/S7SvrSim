@@ -14,35 +14,36 @@ namespace S7Svr.Simulator.ViewModels
 {
     public class S7ServerService 
     {
-
+        private readonly RunningSnap7ServerVM _runningVM;
         private readonly ILogger<S7ServerService> _logger;
         protected virtual IMediator _mediator { get; set; }
         protected virtual FutureTech.Snap7.S7Server S7Server { get; set; } = new FutureTech.Snap7.S7Server();
 
-        public S7ServerService(IMediator mediator, ILogger<S7ServerService> logger)
+        public S7ServerService(IMediator mediator, RunningSnap7ServerVM runningVM, ILogger<S7ServerService> logger)
         {
             this._mediator = mediator;
+            this._runningVM = runningVM;
             this._logger = logger;
         }
 
 
-        public async Task StartServerAsync(RunningSnap7ServerVM vm)
+        public async Task StartServerAsync()
         {
             try
             {
-                if (vm.DBConfigs == null)
+                if (_runningVM.DBConfigs == null)
                 {
                     var msg = new MessageNotification() { Message = "当前 DBConfigs 为 NULL !" };
                     await this._mediator.Publish(msg);
                     return;
                 }
 
-                vm.RunningsItems.Clear();
+                _runningVM.RunningsItems.Clear();
 
-                foreach (var db in vm.DBConfigs)
+                foreach (var db in _runningVM.DBConfigs)
                 {
                     var buffer = new byte[db.DBSize];
-                    vm.RunningsItems.Add(new RunningSnap7ServerVM.RunningServerItem
+                    _runningVM.RunningsItems.Add(new RunningSnap7ServerVM.RunningServerItem
                     {
                         DBNumber = db.DBNumber,
                         DBSize = db.DBSize,
@@ -50,7 +51,7 @@ namespace S7Svr.Simulator.ViewModels
                     });
                     this.S7Server.RegisterArea(FutureTech.Snap7.S7Server.srvAreaDB, db.DBNumber, ref buffer, db.DBSize);
                 }
-                this.S7Server.StartTo(vm.IpAddress);
+                this.S7Server.StartTo(_runningVM.IpAddress);
             }
             catch (Exception ex)
             {
@@ -78,9 +79,9 @@ namespace S7Svr.Simulator.ViewModels
         }
 
         #region Byte
-        public byte ReadByte(RunningSnap7ServerVM vm, int dbNumber, int pos)
+        public byte ReadByte(int dbNumber, int pos)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -94,9 +95,9 @@ namespace S7Svr.Simulator.ViewModels
         }
 
 
-        public void WriteByte(RunningSnap7ServerVM vm, int dbNumber, int pos, byte value)
+        public void WriteByte(int dbNumber, int pos, byte value)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -109,9 +110,9 @@ namespace S7Svr.Simulator.ViewModels
         #endregion
 
         #region Short
-        public short ReadShort(RunningSnap7ServerVM vm, int dbNumber, int pos)
+        public short ReadShort(int dbNumber, int pos)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -125,9 +126,9 @@ namespace S7Svr.Simulator.ViewModels
         }
 
 
-        public void WriteShort(RunningSnap7ServerVM vm, int dbNumber, int pos, short value)
+        public void WriteShort(int dbNumber, int pos, short value)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -141,9 +142,9 @@ namespace S7Svr.Simulator.ViewModels
 
 
         #region Bit
-        public bool ReadBit(RunningSnap7ServerVM vm, int dbNumber, int offset, byte bit)
+        public bool ReadBit(int dbNumber, int offset, byte bit)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！"});
@@ -157,9 +158,9 @@ namespace S7Svr.Simulator.ViewModels
         }
 
 
-        public void WriteBit(RunningSnap7ServerVM vm, int dbNumber, int offset, byte bit, bool flag)
+        public void WriteBit(int dbNumber, int offset, byte bit, bool flag)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！"});
@@ -172,9 +173,9 @@ namespace S7Svr.Simulator.ViewModels
         #endregion
 
         #region String
-        public void WriteString(RunningSnap7ServerVM vm, int dbNumber, int offset, string str)
-        { 
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+        public void WriteString(int dbNumber, int offset, string str)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！"});
@@ -184,9 +185,9 @@ namespace S7Svr.Simulator.ViewModels
             S7.SetStringAt(buffer, offset, 256, str);
         }
 
-        public string ReadString(RunningSnap7ServerVM vm, int dbNumber, int offset)
+        public string ReadString(int dbNumber, int offset)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -199,9 +200,9 @@ namespace S7Svr.Simulator.ViewModels
         #endregion
 
         #region Real
-        public void WriteReal(RunningSnap7ServerVM vm, int dbNumber, int pos, float real)
+        public void WriteReal(int dbNumber, int pos, float real)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -211,9 +212,9 @@ namespace S7Svr.Simulator.ViewModels
             S7.SetRealAt(buffer, pos, real);
         }
 
-        public float ReadReal(RunningSnap7ServerVM vm, int dbNumber, int pos)
+        public float ReadReal(int dbNumber, int pos)
         {
-            var config = vm.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });

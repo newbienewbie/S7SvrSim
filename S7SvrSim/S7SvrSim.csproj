@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="FutureTech.Mvvm" Version="0.1.1" />
     <PackageReference Include="FutureTech.Snap7" Version="0.3.7" />
+    <PackageReference Include="IronPython" Version="2.7.11" />
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />

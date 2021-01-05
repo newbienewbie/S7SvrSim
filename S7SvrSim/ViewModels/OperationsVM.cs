@@ -1,37 +1,60 @@
 ﻿using FutureTech.Mvvm;
+using Microsoft.Win32;
 using S7Svr.Simulator.ViewModels;
+using S7SvrSim.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace S7Server.Simulator.ViewModels
 {
     public class OperationVM : ViewModelBase
     {
-        private readonly RunningSnap7ServerVM _vm;
         private S7ServerService _s7ServerService;
+        private readonly PyScriptRunner _scriptRunner;
 
-        public OperationVM(RunningSnap7ServerVM vm, S7ServerService s7ServerService)
+        public OperationVM(S7ServerService s7ServerService, PyScriptRunner scriptRunner)
         {
-            this._vm = vm;
             this._s7ServerService = s7ServerService;
+            this._scriptRunner = scriptRunner;
+
+            this.CmdRunScript = new AsyncRelayCommand<object>(
+                o => {
+                    try
+                    {
+                        var fileDialog = new OpenFileDialog();
+                        var result = fileDialog.ShowDialog();
+                        if (result == true)
+                        {
+                            var filename = fileDialog.FileName;
+                            this._scriptRunner.RunFile(filename);
+                        }
+                    }
+                    catch(Exception ex) {
+                        MessageBox.Show($"执行脚本出错！{ex.Message}");
+                    }
+                    return Task.CompletedTask;
+                },
+                o => true
+            );
 
 
             #region Byte
             this.CmdWriteByte = new AsyncRelayCommand<object>(
                 o =>
                 {
-                    this._s7ServerService.WriteByte(this._vm, this.TargetDBNumber, this.TargetPos, this.ByteToBeWritten);
+                    this._s7ServerService.WriteByte(this.TargetDBNumber, this.TargetPos, this.ByteToBeWritten);
                     return Task.CompletedTask;
                 },
                 o => true
             );
             this.CmdReadByte = new AsyncRelayCommand<object>(
                 o => {
-                    var val = this._s7ServerService.ReadByte(this._vm, this.TargetDBNumber, this.TargetPos);
+                    var val = this._s7ServerService.ReadByte(this.TargetDBNumber, this.TargetPos);
                     this.ByteRead= val;
                     return Task.CompletedTask;
                 },
@@ -43,14 +66,14 @@ namespace S7Server.Simulator.ViewModels
             this.CmdWriteShort = new AsyncRelayCommand<object>(
                 o =>
                 {
-                    this._s7ServerService.WriteShort(this._vm, this.TargetDBNumber, this.TargetPos, this.ShortToBeWritten);
+                    this._s7ServerService.WriteShort(this.TargetDBNumber, this.TargetPos, this.ShortToBeWritten);
                     return Task.CompletedTask;
                 },
                 o => true
             );
             this.CmdReadShort = new AsyncRelayCommand<object>(
                 o => {
-                    var val = this._s7ServerService.ReadShort(this._vm, this.TargetDBNumber, this.TargetPos);
+                    var val = this._s7ServerService.ReadShort(this.TargetDBNumber, this.TargetPos);
                     this.ShortRead = val;
                     return Task.CompletedTask;
                 },
@@ -62,14 +85,14 @@ namespace S7Server.Simulator.ViewModels
             this.CmdWriteBit = new AsyncRelayCommand<object>(
                 o =>
                 {
-                    this._s7ServerService.WriteBit(this._vm, this.TargetDBNumber, this.TargetPos, this.TargetBitPos, this.BitToBeWritten);
+                    this._s7ServerService.WriteBit(this.TargetDBNumber, this.TargetPos, this.TargetBitPos, this.BitToBeWritten);
                     return Task.CompletedTask;
                 },
                 o => true
             );
             this.CmdReadBit = new AsyncRelayCommand<object>(
                 o => {
-                    var val = this._s7ServerService.ReadBit(this._vm, this.TargetDBNumber, this.TargetPos, this.TargetBitPos);
+                    var val = this._s7ServerService.ReadBit(this.TargetDBNumber, this.TargetPos, this.TargetBitPos);
                     this.BitRead= val;
                     return Task.CompletedTask;
                 },
@@ -81,14 +104,14 @@ namespace S7Server.Simulator.ViewModels
             this.CmdWriteString = new AsyncRelayCommand<object>(
                 o =>
                 {
-                    this._s7ServerService.WriteString(this._vm, this.TargetDBNumber, this.TargetPos, this.StrToBeWritten);
+                    this._s7ServerService.WriteString(this.TargetDBNumber, this.TargetPos, this.StrToBeWritten);
                     return Task.CompletedTask;
                 },
                 o => true
             );
             this.CmdReadString = new AsyncRelayCommand<object>(
                 o => {
-                    var str = this._s7ServerService.ReadString(this._vm, this.TargetDBNumber, this.TargetPos);
+                    var str = this._s7ServerService.ReadString(this.TargetDBNumber, this.TargetPos);
                     this.StrRead = str;
                     return Task.CompletedTask;
                 },
@@ -100,14 +123,14 @@ namespace S7Server.Simulator.ViewModels
             this.CmdWriteReal = new AsyncRelayCommand<object>(
                 o =>
                 {
-                    this._s7ServerService.WriteReal(this._vm, this.TargetDBNumber, this.TargetPos, this.RealToBeWritten);
+                    this._s7ServerService.WriteReal(this.TargetDBNumber, this.TargetPos, this.RealToBeWritten);
                     return Task.CompletedTask;
                 },
                 o => true
             );
             this.CmdReadReal = new AsyncRelayCommand<object>(
                 o => {
-                    var real = this._s7ServerService.ReadReal(this._vm, this.TargetDBNumber, this.TargetPos);
+                    var real = this._s7ServerService.ReadReal(this.TargetDBNumber, this.TargetPos);
                     this.RealRead= real;
                     return Task.CompletedTask;
                 },
@@ -142,6 +165,8 @@ namespace S7Server.Simulator.ViewModels
                 }
             }
         }
+
+        public ICommand CmdRunScript { get; }
 
         #region Short Read And Write
         private short _shortToBeWritten;

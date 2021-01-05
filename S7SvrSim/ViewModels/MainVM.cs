@@ -8,12 +8,12 @@ namespace S7Svr.Simulator.ViewModels
     {
         private readonly S7ServerService _s7ServerService;
 
-        public MainVM(S7ServerService s7ServerService)
+        public MainVM(S7ServerService s7ServerService, RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
         {
             this._s7ServerService = s7ServerService;
-            this.ConfigVM = new ConfigSnap7ServerVM();
-            this.RunningVM = new RunningSnap7ServerVM();
-            this.OperationVM = new OperationVM(this.RunningVM, this._s7ServerService);
+            this.RunningVM = runningVM;
+            this.OperationVM = operationVM;
+            this.ConfigVM = configVM;
 
             this.CmdStartServer = new AsyncRelayCommand<object>(
                 async o => {
@@ -23,7 +23,7 @@ namespace S7Svr.Simulator.ViewModels
                     { 
                         this.RunningVM.DBConfigs.Add(config);
                     }
-                    await this._s7ServerService.StartServerAsync(this.RunningVM);
+                    await this._s7ServerService.StartServerAsync();
                     this.RunningVM.RunningStatus = true;
                 },
                 o => true

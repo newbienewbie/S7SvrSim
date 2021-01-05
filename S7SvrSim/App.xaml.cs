@@ -3,8 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using S7Server.Simulator.ViewModels;
 using S7Svr.Simulator.MessageHandlers;
 using S7Svr.Simulator.ViewModels;
+using S7SvrSim.Services;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -56,6 +58,10 @@ namespace S7Svr.Simulator
         private void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
         {
             services.AddMediatR(typeof(MessageNotificationHandler).Assembly);
+            services.AddSingleton<RunningSnap7ServerVM>();
+            services.AddSingleton<OperationVM>();
+            services.AddSingleton<ConfigSnap7ServerVM>();
+            services.AddSingleton<PyScriptRunner>();
             services.AddSingleton<MainWindow>();
             services.AddSingleton<S7ServerService>();
             services.AddSingleton<MainVM>();

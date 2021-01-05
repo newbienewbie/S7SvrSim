@@ -11,7 +11,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="Auto"></RowDefinition>
-            <RowDefinition></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -19,12 +19,15 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <Label Content="DBNumber" Grid.Row="0" Grid.Column="0"></Label>
-        <TextBox Text="{Binding TargetDBNumber}" Grid.Row="0" Grid.Column="1" ></TextBox>
-        <Label Content="Position" Grid.Row="1" Grid.Column="0"></Label>
-        <TextBox Text="{Binding TargetPos}"  Grid.Row="1" Grid.Column="1" ></TextBox>
+        <Label Content="批量执行" Grid.Row="0" Grid.Column="0"></Label>
+        <Button Content="导入Python脚本" Command="{Binding CmdRunScript}"  Grid.Row="0" Grid.Column="1" ></Button>
 
-        <TabControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+        <Label Content="DBNumber" Grid.Row="1" Grid.Column="0"></Label>
+        <TextBox Text="{Binding TargetDBNumber}" Grid.Row="1" Grid.Column="1" ></TextBox>
+        <Label Content="Position" Grid.Row="2" Grid.Column="0"></Label>
+        <TextBox Text="{Binding TargetPos}"  Grid.Row="2" Grid.Column="1" ></TextBox>
+
+        <TabControl Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
             <TabItem Header="Bit操作">
                 <StackPanel>
                     <Grid>
