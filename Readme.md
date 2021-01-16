@@ -7,10 +7,10 @@
 
 之所以有这样一个小项目，主要是为了缓解上位机开发人员想随时测试和`S7`系列PLC通讯的尴尬：
 
-- 手头没有特定型号的物理`PLC`
+- 没有特定型号的物理`PLC`；或者有相关型号的`PLC`，却没带在手边
 - 没钱购买博图，又不屑于使用盗版
 - 有钱购买博图，但是这个软件超大，还会自动安装了一堆WinCC/SQL Server之类服务。偏偏自己对电脑还有洁癖。
-- 有钱买了博图，然后废了老大劲安装好了，却拿不到电气部门的`PLC`程序。
+- 有钱买了博图，然后废了老大劲安装好了，却不一定有权限拿到电气部门的`PLC`程序。
 
 回过头来想，上位机开发人员真的需要物理PLC或者博图吗？我们只需要一个`PLC`**通讯模拟器**而已！我们甚至不需要模拟完整的`PLC`程序，我们仅仅只需要根据和电气部门的通讯规约操作点表！对，只需要**模拟通讯**。
 
@@ -19,6 +19,13 @@
 ## 这个程序不能干什么
 
 我不打算、也没能力做一个完整的软`PLC`。像画各种梯形图、执行ST程序这种事，压根不是这个项目的目标。要是真有这种需求，还是去购买倍福之类的商用产品吧。
+
+## 如何使用
+
+由于前端是使用 `WPF`开发的，故目前只能在Windows上使用（后期可能会考虑做成跨平台的，但是暂时没有这个动力）。使用该工具最简单的方法是使用`ClickOnce`技术来安装，只需打开如下`URL`即可（需要Windows操作系统）：
+
+https://assets.chiyiqian.net/S7SvrSim/S7SvrSim.application
+
 
 ## 操作方式
 
@@ -47,5 +54,5 @@ s7_server_svc.WriteReal(6, 3040, 4.8)
 
 ## 已知问题
 
+- [X] <del>由于[#44602](https://github.com/dotnet/runtime/issues/44602#issuecomment-726472185) 这个问题，目前没法使用`ClickOnce`发布</del>。2021-01-16：#44602 号问题已在 *VS16.8.4* 中修复，参见[VS Developer Community](https://developercommunity2.visualstudio.com/t/A-NET-Core-31-or-NET-50-application-/1248873)
 - [ ] 目前由于[`IronPython`](https://ironpython.net/)的限制，发布时无法生成单个文件。参见[IronPython #762](https://github.com/IronLanguages/ironpython2/issues/762)。故发布项目时请不要使用`-p:PublishSingleFile=true`。
-- [X] <del>由于[#44602](https://github.com/dotnet/runtime/issues/44602#issuecomment-726472185) 这个问题，目前没法使用`ClickOnce`发布</del>。2021-01-16：#44602 号问题已在VS的 *16.8.4* 中修复，参见[VS Developer Community](https://developercommunity2.visualstudio.com/t/A-NET-Core-31-or-NET-50-application-/1248873)
