@@ -12,12 +12,12 @@ using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
 {
-    public class S7ServerService 
+    public class S7ServerService : IDisposable
     {
         private readonly RunningSnap7ServerVM _runningVM;
         private readonly ILogger<S7ServerService> _logger;
         protected virtual IMediator _mediator { get; set; }
-        protected virtual FutureTech.Snap7.S7Server S7Server { get; set; } = new FutureTech.Snap7.S7Server();
+        protected virtual FutureTech.Snap7.S7Server S7Server { get; set; }
 
         public S7ServerService(IMediator mediator, RunningSnap7ServerVM runningVM, ILogger<S7ServerService> logger)
         {
@@ -31,6 +31,8 @@ namespace S7Svr.Simulator.ViewModels
         {
             try
             {
+                this.S7Server = new FutureTech.Snap7.S7Server();
+
                 if (_runningVM.DBConfigs == null)
                 {
                     var msg = new MessageNotification() { Message = "当前 DBConfigs 为 NULL !" };
@@ -68,7 +70,8 @@ namespace S7Svr.Simulator.ViewModels
         {
             try
             {
-                this.S7Server.Stop();
+                this.S7Server?.Stop();
+                this.S7Server = null;
             }
             catch (Exception ex)
             {
@@ -224,8 +227,13 @@ namespace S7Svr.Simulator.ViewModels
             var real = S7.GetRealAt(buffer, pos);
             return real;
         }
+
         #endregion
 
+        public void Dispose()
+        {
+            _ = this.StopServerAsync();
+        }
     }
 
 }
