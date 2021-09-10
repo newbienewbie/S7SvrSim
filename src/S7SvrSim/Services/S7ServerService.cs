@@ -176,7 +176,7 @@ namespace S7Svr.Simulator.ViewModels
         #endregion
 
         #region String
-        public void WriteString(int dbNumber, int offset, string str)
+        public void WriteString(int dbNumber, int offset, int maxlen , string str)
         {
             var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
@@ -185,7 +185,7 @@ namespace S7Svr.Simulator.ViewModels
                 return;
             }
             var buffer = config.Bytes;
-            S7.SetStringAt(buffer, offset, 256, str);
+            S7.SetStringAt(buffer, offset, maxlen, str);
         }
 
         public string ReadString(int dbNumber, int offset)

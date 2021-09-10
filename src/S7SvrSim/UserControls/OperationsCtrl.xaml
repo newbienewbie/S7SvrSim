@@ -206,12 +206,17 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBox Text="{Binding StrToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
-                            <Button Content="写入" Command="{Binding CmdWriteString}" HorizontalAlignment="Center" Grid.Column="1"></Button>
+                            <Label Grid.Row="0" Grid.Column="0">待写入的字符串</Label>
+                            <TextBox Text="{Binding StrToBeWritten}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
+                            <Label Grid.Row="1" Grid.Column="0">最大字符串长度</Label>
+                            <TextBox Text="{Binding StringArrayMaxLength}" Grid.Row="1" Grid.Column="1"></TextBox>
+                            <Button Content="写入" Command="{Binding CmdWriteString}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"></Button>
                         </Grid>
                     </GroupBox>
                 </StackPanel>

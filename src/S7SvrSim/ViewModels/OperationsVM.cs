@@ -105,7 +105,7 @@ namespace S7Server.Simulator.ViewModels
             this.CmdWriteString = new AsyncRelayCommand<object>(
                 o =>
                 {
-                    this._s7ServerService.WriteString(this.TargetDBNumber, this.TargetPos, this.StrToBeWritten);
+                    this._s7ServerService.WriteString(this.TargetDBNumber, this.StringArrayMaxLength, this.TargetPos, this.StrToBeWritten);
                     return Task.CompletedTask;
                 },
                 o => true
@@ -318,6 +318,18 @@ namespace S7Server.Simulator.ViewModels
                 { 
                     this._strRead = value;
                     this.OnPropertyChanged(nameof(StrRead));
+                }
+            }
+        }
+
+        private int _stringArrayMaxLength = 256;
+        public int StringArrayMaxLength {
+            get => _stringArrayMaxLength;
+            set {
+                if (this._stringArrayMaxLength != value)
+                {
+                    this._stringArrayMaxLength = value;
+                    this.OnPropertyChanged(nameof(StringArrayMaxLength));
                 }
             }
         }
