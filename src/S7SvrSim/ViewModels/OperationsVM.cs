@@ -105,7 +105,7 @@ namespace S7Server.Simulator.ViewModels
             this.CmdWriteString = new AsyncRelayCommand<object>(
                 o =>
                 {
-                    this._s7ServerService.WriteString(this.TargetDBNumber, this.StringArrayMaxLength, this.TargetPos, this.StrToBeWritten);
+                    this._s7ServerService.WriteString(this.TargetDBNumber, this.TargetPos, this.StringArrayMaxLength, this.StrToBeWritten);
                     return Task.CompletedTask;
                 },
                 o => true
