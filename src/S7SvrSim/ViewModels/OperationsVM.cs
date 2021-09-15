@@ -86,6 +86,11 @@ namespace S7Server.Simulator.ViewModels
             this.CmdWriteBit = new AsyncRelayCommand<object>(
                 o =>
                 {
+                    if (this.TargetBitPos > 7 || this.TargetBitPos < 0)
+                    {
+                        MessageBox.Show($"位数的取值必须落于范围[0,7]之间，当前={this.TargetBitPos}");
+                        return Task.CompletedTask;
+                    }
                     this._s7ServerService.WriteBit(this.TargetDBNumber, this.TargetPos, this.TargetBitPos, this.BitToBeWritten);
                     return Task.CompletedTask;
                 },
@@ -93,6 +98,11 @@ namespace S7Server.Simulator.ViewModels
             );
             this.CmdReadBit = new AsyncRelayCommand<object>(
                 o => {
+                    if (this.TargetBitPos > 7 || this.TargetBitPos < 0)
+                    {
+                        MessageBox.Show($"位数的取值必须落于范围[0,7]之间，当前={this.TargetBitPos}");
+                        return Task.CompletedTask;
+                    }
                     var val = this._s7ServerService.ReadBit(this.TargetDBNumber, this.TargetPos, this.TargetBitPos);
                     this.BitRead= val;
                     return Task.CompletedTask;
