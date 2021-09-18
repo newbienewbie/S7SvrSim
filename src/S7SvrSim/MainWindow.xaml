@@ -83,6 +83,35 @@
 
             </Grid>
         </TabItem>
+
+        <TabItem Header="PyEngine" DataContext="{Binding ConfigPyEngineVM}">
+            <GroupBox>
+                <GroupBox.Header>Search Paths</GroupBox.Header>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="200"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition Height="24"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <ItemsControl ItemsSource="{Binding PyEngineSearchPaths}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" >
+                                    <TextBox Text="{Binding .}" IsReadOnly="True" ></TextBox>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Command="{Binding CmdSelectModulePath}" Content="选择路径" Grid.Row="1" Grid.Column="0" ></Button>
+                    <TextBox Text="{Binding SelectedModulePath.Value}" VerticalAlignment="Stretch" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
+                    <Button Content="提交" Command="{Binding CmdSubmitSelectPath}" Grid.Row="1" Grid.Column="2"  ></Button>
+                </Grid>
+            </GroupBox>
+        </TabItem>
     </TabControl>
 
 </Window>

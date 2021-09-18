@@ -7,6 +7,7 @@ using S7Server.Simulator.ViewModels;
 using S7Svr.Simulator.MessageHandlers;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Services;
+using S7SvrSim.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -62,6 +63,7 @@ namespace S7Svr.Simulator
             services.AddSingleton<OperationVM>();
             services.AddSingleton<ConfigSnap7ServerVM>();
             services.AddSingleton<PyScriptRunner>();
+            services.AddSingleton<ConfigPyEngineVM>();
             services.AddSingleton<MainWindow>();
             services.AddSingleton<S7ServerService>();
             services.AddSingleton<MainVM>();

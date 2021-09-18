@@ -14,26 +14,29 @@ namespace S7SvrSim.Services
     {
         private readonly S7ServerService _s7ServerSvc;
         private readonly ILogger<PyScriptRunner> _logger;
-        private ScriptEngine pyEngine = null;
+        public ScriptEngine PyEngine { get; }
         private ScriptScope pyScope = null;
 
         public PyScriptRunner(S7ServerService s7ServerSvc, ILogger<PyScriptRunner> logger)
         {
             this._s7ServerSvc = s7ServerSvc;
             this._logger = logger;
+            this.PyEngine = Python.CreateEngine();
         }
+
+
 
         public void RunFile(string scriptpath)
         {
-            if (pyEngine is null)
+            if (pyScope is null)
             {
-                pyEngine = Python.CreateEngine();
-                pyScope = pyEngine.CreateScope();
+                pyScope = PyEngine.CreateScope();
                 pyScope.SetVariable("s7_server_svc", this._s7ServerSvc);
                 pyScope.SetVariable("S7", this._s7ServerSvc);
+                pyScope.SetVariable("__PY_ENGINE__", this.PyEngine);
             }
 
-            var source = pyEngine.CreateScriptSourceFromFile(scriptpath);
+            var source = PyEngine.CreateScriptSourceFromFile(scriptpath);
             var code = source.Compile();
 
             code.Execute(pyScope);

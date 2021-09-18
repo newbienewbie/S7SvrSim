@@ -1,5 +1,6 @@
 ﻿using FutureTech.Mvvm;
 using S7Server.Simulator.ViewModels;
+using S7SvrSim.ViewModels;
 using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
@@ -8,9 +9,10 @@ namespace S7Svr.Simulator.ViewModels
     {
         private readonly S7ServerService _s7ServerService;
 
-        public MainVM(S7ServerService s7ServerService, RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
+        public MainVM(S7ServerService s7ServerService, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
         {
             this._s7ServerService = s7ServerService;
+            ConfigPyEngineVM = configPyEngineVM;
             this.RunningVM = runningVM;
             this.OperationVM = operationVM;
             this.ConfigVM = configVM;
@@ -44,7 +46,7 @@ namespace S7Svr.Simulator.ViewModels
         public ICommand CmdStopServer { get; }
 
         public ConfigSnap7ServerVM ConfigVM { get; }
-
+        public ConfigPyEngineVM ConfigPyEngineVM { get; }
         public RunningSnap7ServerVM RunningVM { get; }
 
         public OperationVM OperationVM { get; }
