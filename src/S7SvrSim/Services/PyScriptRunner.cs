@@ -30,6 +30,7 @@ namespace S7SvrSim.Services
                 pyEngine = Python.CreateEngine();
                 pyScope = pyEngine.CreateScope();
                 pyScope.SetVariable("s7_server_svc", this._s7ServerSvc);
+                pyScope.SetVariable("S7", this._s7ServerSvc);
             }
 
             var source = pyEngine.CreateScriptSourceFromFile(scriptpath);
