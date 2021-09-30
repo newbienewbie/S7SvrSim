@@ -7,6 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
+
   <ItemGroup>
     <PackageReference Include="FutureTech.Mvvm" Version="0.1.1" />
     <PackageReference Include="FutureTech.Snap7" Version="0.3.7" />
@@ -21,8 +22,5 @@
     <PackageReference Include="ReactiveProperty.WPF" Version="7.12.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Views\" />
-  </ItemGroup>
 
 </Project>

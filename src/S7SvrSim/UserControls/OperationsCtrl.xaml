@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls"
+             xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls" xmlns:viewmodels="clr-namespace:S7Server.Simulator.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:OperationVM}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid >
@@ -149,6 +149,79 @@
                 </StackPanel>
             </TabItem>
 
+            <TabItem Header="uint">
+                <StackPanel>
+                    <GroupBox Header="读操作">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <Button Content="读取" Command="{Binding CmdReadUInt}" HorizontalAlignment="Left" Grid.Column="0">
+                            </Button>
+                            <TextBlock Text="{Binding UIntRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                            </TextBlock>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="写操作">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0">待写入的无符号32位整数</Label>
+                            <TextBox Text="{Binding UIntToBeWritten.Value}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
+                            <Button Content="写入" Command="{Binding CmdWriteUInt}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"></Button>
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+            <TabItem Header="ulong">
+                <StackPanel>
+                    <GroupBox Header="读操作">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+
+                            <Button Content="读取" Command="{Binding CmdReadULong}" HorizontalAlignment="Left" Grid.Column="0">
+                            </Button>
+                            <TextBlock Text="{Binding ULongRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                            </TextBlock>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Header="写操作">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                                <ColumnDefinition></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition></RowDefinition>
+                                <RowDefinition></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0">待写入的无符号64位整数</Label>
+                            <TextBox Text="{Binding ULongToBeWritten.Value}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
+                            <Button Content="写入" Command="{Binding CmdWriteULong}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"></Button>
+                        </Grid>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+
             <TabItem Header="Real操作">
                 <StackPanel>
                     <GroupBox Header="读操作">
@@ -218,119 +291,6 @@
                             <TextBox Text="{Binding StringArrayMaxLength}" Grid.Row="1" Grid.Column="1"></TextBox>
                             <Button Content="写入" Command="{Binding CmdWriteString}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"></Button>
                         </Grid>
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-
-            <TabItem Header="SInt操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-
-            <TabItem Header="DInt操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="LInt操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="USInt操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="UInt操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="UDInt操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-            <TabItem Header="ULInt操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-
-            <TabItem Header="Word操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-
-            <TabItem Header="DWord操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-
-            <TabItem Header="LWord操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-
-
-            <TabItem Header="LReal操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-
-            <TabItem Header="DateTime操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                    </GroupBox>
-                </StackPanel>
-            </TabItem>
-
-            <TabItem Header="Date操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                    </GroupBox>
-                    <GroupBox Header="写操作">
                     </GroupBox>
                 </StackPanel>
             </TabItem>

@@ -230,6 +230,67 @@ namespace S7Svr.Simulator.ViewModels
 
         #endregion
 
+        #region ulong
+        public ulong ReadULong(int dbNumber, int pos)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
+                return default;
+            }
+
+            var buffer = config.Bytes;
+
+            var val = S7.GetULIntAt(buffer, pos);
+            return val;
+        }
+
+
+        public void WriteULong(int dbNumber, int pos, ulong value)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
+                return;
+            }
+            var buffer = config.Bytes;
+
+            S7.SetULintAt(buffer, pos, value);
+        }
+        #endregion
+
+        #region uint32
+        public uint ReadUInt32(int dbNumber, int pos)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
+                return default;
+            }
+
+            var buffer = config.Bytes;
+
+            var val = S7.GetUDIntAt(buffer, pos);
+            return val;
+        }
+
+        public void WriteUInt32(int dbNumber, int pos, uint value)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
+                return;
+            }
+            var buffer = config.Bytes;
+
+            S7.SetUDIntAt(buffer, pos, value);
+        }
+        #endregion
+
         public void Dispose()
         {
             _ = this.StopServerAsync();

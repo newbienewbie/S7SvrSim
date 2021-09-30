@@ -1,5 +1,6 @@
 ﻿using FutureTech.Mvvm;
 using Microsoft.Win32;
+using Reactive.Bindings;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Services;
 using System;
@@ -147,6 +148,38 @@ namespace S7Server.Simulator.ViewModels
                 },
                 o => true
             );
+            #endregion
+
+            #region UInt
+            this.UIntRead = new ReactiveProperty<uint>();
+            this.UIntToBeWritten = new ReactiveProperty<uint>();
+
+            this.CmdReadUInt = new ReactiveCommand();
+            this.CmdReadUInt.Subscribe(i => {
+                var s = this._s7ServerService.ReadUInt32(this.TargetDBNumber, this.TargetPos);
+                this.UIntRead.Value = s;
+            });
+
+            this.CmdWriteUInt = new ReactiveCommand();
+            this.CmdWriteUInt.Subscribe(i => {
+                this._s7ServerService.WriteUInt32(this.TargetDBNumber, this.TargetPos, this.UIntToBeWritten.Value);
+            });
+            #endregion
+
+            #region ULong
+            this.ULongRead = new ReactiveProperty<ulong>();
+            this.ULongToBeWritten = new ReactiveProperty<ulong>();
+
+            this.CmdReadULong = new ReactiveCommand();
+            this.CmdReadULong.Subscribe(i => {
+                var s = this._s7ServerService.ReadULong(this.TargetDBNumber, this.TargetPos);
+                this.ULongRead.Value = s;
+            });
+
+            this.CmdWriteULong= new ReactiveCommand();
+            this.CmdWriteULong.Subscribe(i => {
+                this._s7ServerService.WriteULong(this.TargetDBNumber, this.TargetPos, this.ULongToBeWritten.Value);
+            });
             #endregion
         }
 
@@ -383,5 +416,18 @@ namespace S7Server.Simulator.ViewModels
         public ICommand CmdReadReal{ get; }
         #endregion
 
+        #region UInt
+        public ReactiveProperty<uint> UIntToBeWritten { get; }
+        public ReactiveProperty<uint> UIntRead { get; }
+        public ReactiveCommand CmdReadUInt { get; }
+        public ReactiveCommand CmdWriteUInt { get; }
+        #endregion
+
+        #region ULong
+        public ReactiveProperty<ulong> ULongToBeWritten { get; }
+        public ReactiveProperty<ulong> ULongRead { get; }
+        public ReactiveCommand CmdReadULong{ get; }
+        public ReactiveCommand CmdWriteULong{ get; }
+        #endregion
     }
 }
