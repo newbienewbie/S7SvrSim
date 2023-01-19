@@ -1,0 +1,11 @@
+FutureTech.Mvvm
+FutureTech.Snap7
+IronPython
+IronPython.StdLib
+MediatR
+MediatR.Extensions.Microsoft.DependencyInjection
+Microsoft.Extensions.Hosting
+Microsoft.Extensions.Logging
+Microsoft.Extensions.Logging.Debug
+ReactiveProperty
+ReactiveProperty.WPF
