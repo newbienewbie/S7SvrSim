@@ -5,42 +5,60 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:S7Svr.Simulator"
         xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
         Title="Siemens PLC 通讯模拟器" Height="450" Width="800">
 
-    <TabControl>
+    <TabControl TabStripPlacement="Left">
+        <TabControl.Resources>
+            <Style TargetType="TabItem" BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}">
+                <Style.Triggers>
+                </Style.Triggers>
+            </Style>
+            <Style TargetType="Label" BasedOn="{StaticResource MaterialDesignLabel}"></Style>
+            <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}"></Style>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
+            </Style>
+        </TabControl.Resources>
         <TabItem Header="DB配置">
+            <TabItem.Resources>
+                <Style TargetType="Grid" >
+                    <Setter Property="Margin" Value="4,8,4,4"></Setter>
+                </Style>
+            </TabItem.Resources>
+
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition MinHeight="200"></RowDefinition>
+                    <RowDefinition ></RowDefinition>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="97*"></ColumnDefinition>
-                    <ColumnDefinition Width="35*"/>
-                    <ColumnDefinition Width="132*"></ColumnDefinition>
-                    <ColumnDefinition Width="132*"></ColumnDefinition>
-                    <ColumnDefinition Width="132*"></ColumnDefinition>
-                    <ColumnDefinition Width="132*"></ColumnDefinition>
-                    <ColumnDefinition Width="132*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,0,0"  />
-                <TextBox Text="{Binding ConfigVM.IpAddress}" VerticalAlignment="Center" Grid.Column="1" Grid.ColumnSpan="3" Margin="35,0,132,0" />
-                <Button Content="启动" IsEnabled="{Binding RunningVM.IsNotRunning}"  Command="{Binding CmdStartServer}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="5"/>
-                <Button Content="停止" IsEnabled="{Binding RunningVM.RunningStatus}" Command="{Binding CmdStopServer}" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="6"/>
+
+                <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" ></Label>
+                <TextBox Text="{Binding ConfigVM.IpAddress}" 
+                        Width="100" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" />
+                <Button Content="启动" IsEnabled="{Binding RunningVM.IsNotRunning}"  Command="{Binding CmdStartServer}" 
+                        Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="2"/>
+                <Button Content="停止" IsEnabled="{Binding RunningVM.RunningStatus}" Command="{Binding CmdStopServer}" 
+                        Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="3"/>
 
                 <DataGrid ItemsSource="{Binding ConfigVM.DBConfigs}" 
                      IsEnabled="{Binding RunningVM.IsNotRunning}"
                           CanUserDeleteRows="True"  
-                          CanUserAddRows="True" Grid.Column="0" Grid.ColumnSpan="7" Margin="0,25,0,0" Grid.RowSpan="2" >
+                          CanUserAddRows="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7" Margin="0,25,0,0" Grid.RowSpan="2" >
                     <DataGrid.Columns>
                     </DataGrid.Columns>
                 </DataGrid>
 
             </Grid>
         </TabItem>
-        <TabItem Header="DB监控">
+        <TabItem Header="DB命令">
 
             <Grid>
                 <Grid.RowDefinitions>
