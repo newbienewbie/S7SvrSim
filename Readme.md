@@ -52,6 +52,40 @@ s7_server_svc.WriteReal(6, 3040, 68.3)
 s7_server_svc.WriteReal(6, 3040, 4.8)
 ```
 
+### API
+
+Python可以使用的`S7`其实是一个`IS7ServerService`接口对象：
+
+```C#
+public interface IS7ServerService
+{
+	bool ReadBit(int dbNumber, int offset, byte bit);
+	void WriteBit(int dbNumber, int offset, byte bit, bool flag);
+
+	byte ReadByte(int dbNumber, int pos);
+	void WriteByte(int dbNumber, int pos, byte value);
+
+	short ReadShort(int dbNumber, int pos);
+	void WriteShort(int dbNumber, int pos, short value);
+
+	uint ReadUInt32(int dbNumber, int pos);
+	void WriteUInt32(int dbNumber, int pos, uint value);
+
+	ulong ReadULong(int dbNumber, int pos);
+	void WriteULong(int dbNumber, int pos, ulong value);
+
+	float ReadReal(int dbNumber, int pos);
+	void WriteReal(int dbNumber, int pos, float real);
+
+	string ReadString(int dbNumber, int offset);
+	void WriteString(int dbNumber, int offset, int maxlen, string str);
+	Task StartServerAsync();
+	Task StopServerAsync();
+}
+```
+
+
+
 ## 已知问题
 
 - [X] <del>由于[#44602](https://github.com/dotnet/runtime/issues/44602#issuecomment-726472185) 这个问题，目前没法使用`ClickOnce`发布</del>。2021-01-16：#44602 号问题已在 *VS16.8.4* 中修复，参见[VS Developer Community](https://developercommunity2.visualstudio.com/t/A-NET-Core-31-or-NET-50-application-/1248873)

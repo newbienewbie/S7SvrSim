@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2952E6D1-2B99-46A8-8E2B-5A14CB67F6F1}"
 	ProjectSection(SolutionItems) = preProject
 		paket.dependencies = paket.dependencies
+		..\Readme.md = ..\Readme.md
 	EndProjectSection
 EndProject
 Global
