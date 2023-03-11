@@ -23,9 +23,9 @@
         <Button Content="导入Python脚本" Command="{Binding CmdRunScript}"  Grid.Row="0" Grid.Column="1" ></Button>
 
         <Label Content="DBNumber" Grid.Row="1" Grid.Column="0"></Label>
-        <TextBox Text="{Binding TargetDBNumber}" Grid.Row="1" Grid.Column="1" ></TextBox>
+        <TextBox Text="{Binding TargetDBNumber.Value}" Grid.Row="1" Grid.Column="1" ></TextBox>
         <Label Content="Position" Grid.Row="2" Grid.Column="0"></Label>
-        <TextBox Text="{Binding TargetPos}"  Grid.Row="2" Grid.Column="1" ></TextBox>
+        <TextBox Text="{Binding TargetPos.Value}"  Grid.Row="2" Grid.Column="1" ></TextBox>
 
         <TabControl Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
             <TabItem Header="Bit操作">
@@ -38,7 +38,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
-                        <TextBox Text="{Binding TargetBitPos}" Grid.Row="0" Grid.Column="1"></TextBox>
+                        <TextBox Text="{Binding TargetBitPos.Value}" Grid.Row="0" Grid.Column="1"></TextBox>
                         <TextBlock Text="第Nth位"></TextBlock>
                     </Grid>
                     <StackPanel>
@@ -56,7 +56,7 @@
                                 <Button Content="读取" Command="{Binding CmdReadBit}" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0">
                                 </Button>
 
-                                <CheckBox IsChecked="{Binding BitRead}" IsEnabled="False" Grid.Row="1" Grid.Column="1"></CheckBox>
+                                <CheckBox IsChecked="{Binding BitRead.Value}" IsEnabled="False" Grid.Row="1" Grid.Column="1"></CheckBox>
                             </Grid>
                         </GroupBox>
                         <GroupBox Header="写操作">
@@ -72,7 +72,7 @@
 
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="真"></TextBlock>
-                                    <CheckBox IsChecked="{Binding BitToBeWritten}"  Grid.Row="0" Grid.Column="0"></CheckBox>
+                                    <CheckBox IsChecked="{Binding BitToBeWritten.Value}"  Grid.Row="0" Grid.Column="0"></CheckBox>
                                 </StackPanel>
                                 <Button Content="写入" Command="{Binding CmdWriteBit}" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"></Button>
                             </Grid>
@@ -95,7 +95,7 @@
 
                             <Button Content="读取" Command="{Binding CmdReadByte}" HorizontalAlignment="Left" Grid.Column="0">
                             </Button>
-                            <TextBlock Text="{Binding ByteRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                            <TextBlock Text="{Binding ByteRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
                             </TextBlock>
                         </Grid>
                     </GroupBox>
@@ -108,7 +108,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBox Text="{Binding ByteToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
+                            <TextBox Text="{Binding ByteToBeWritten.Value}" Grid.Row="0" Grid.Column="0"></TextBox>
                             <Button Content="写入" Command="{Binding CmdWriteByte}" HorizontalAlignment="Center" Grid.Column="1"></Button>
                         </Grid>
                     </GroupBox>
@@ -129,7 +129,7 @@
 
                             <Button Content="读取" Command="{Binding CmdReadShort}" HorizontalAlignment="Left" Grid.Column="0">
                             </Button>
-                            <TextBlock Text="{Binding ShortRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                            <TextBlock Text="{Binding ShortRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
                             </TextBlock>
                         </Grid>
                     </GroupBox>
@@ -142,7 +142,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBox Text="{Binding ShortToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
+                            <TextBox Text="{Binding ShortToBeWritten.Value}" Grid.Row="0" Grid.Column="0"></TextBox>
                             <Button Content="写入" Command="{Binding CmdWriteShort}" HorizontalAlignment="Center" Grid.Column="1"></Button>
                         </Grid>
                     </GroupBox>
@@ -236,7 +236,7 @@
 
                             <Button Content="读取" Command="{Binding CmdReadReal}" HorizontalAlignment="Left" Grid.Column="0">
                             </Button>
-                            <TextBlock Text="{Binding RealRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                            <TextBlock Text="{Binding RealRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
                             </TextBlock>
                         </Grid>
                     </GroupBox>
@@ -249,7 +249,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
-                            <TextBox Text="{Binding RealToBeWritten}" Grid.Row="0" Grid.Column="0"></TextBox>
+                            <TextBox Text="{Binding RealToBeWritten.Value}" Grid.Row="0" Grid.Column="0"></TextBox>
                             <Button Content="写入" Command="{Binding CmdWriteReal}" HorizontalAlignment="Center" Grid.Column="1"></Button>
                         </Grid>
                     </GroupBox>
@@ -270,7 +270,7 @@
 
                             <Button Content="读取" Command="{Binding CmdReadString}" HorizontalAlignment="Left" Grid.Column="0">
                             </Button>
-                            <TextBlock Text="{Binding StrRead}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                            <TextBlock Text="{Binding StrRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
                             </TextBlock>
                         </Grid>
                     </GroupBox>
@@ -286,9 +286,9 @@
                                 <RowDefinition></RowDefinition>
                             </Grid.RowDefinitions>
                             <Label Grid.Row="0" Grid.Column="0">待写入的字符串</Label>
-                            <TextBox Text="{Binding StrToBeWritten}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
+                            <TextBox Text="{Binding StrToBeWritten.Value}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
                             <Label Grid.Row="1" Grid.Column="0">最大字符串长度</Label>
-                            <TextBox Text="{Binding StringArrayMaxLength}" Grid.Row="1" Grid.Column="1"></TextBox>
+                            <TextBox Text="{Binding StringArrayMaxLength.Value}" Grid.Row="1" Grid.Column="1"></TextBox>
                             <Button Content="写入" Command="{Binding CmdWriteString}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"></Button>
                         </Grid>
                     </GroupBox>

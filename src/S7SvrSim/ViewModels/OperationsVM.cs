@@ -1,5 +1,4 @@
-﻿using FutureTech.Mvvm;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Reactive.Bindings;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Services;
@@ -13,17 +12,17 @@ using System.Windows.Input;
 
 namespace S7Server.Simulator.ViewModels
 {
-    public class OperationVM : ViewModelBase
+    public class OperationVM 
     {
-        private S7ServerService _s7ServerService;
+        private IS7ServerService _s7ServerService;
         private readonly PyScriptRunner _scriptRunner;
 
-        public OperationVM(S7ServerService s7ServerService, PyScriptRunner scriptRunner)
+        public OperationVM(IS7ServerService s7ServerService, PyScriptRunner scriptRunner)
         {
             this._s7ServerService = s7ServerService;
             this._scriptRunner = scriptRunner;
 
-            this.CmdRunScript = new AsyncRelayCommand<object>(
+            this.CmdRunScript = new ReactiveCommand().WithSubscribe(
                 o => {
                     try
                     {
@@ -39,114 +38,92 @@ namespace S7Server.Simulator.ViewModels
                     catch(Exception ex) {
                         MessageBox.Show($"执行脚本出错！{ex.Message}");
                     }
-                    return Task.CompletedTask;
-                },
-                o => true
+                }
             );
 
 
             #region Byte
-            this.CmdWriteByte = new AsyncRelayCommand<object>(
+            this.CmdWriteByte = new ReactiveCommand().WithSubscribe(
                 o =>
                 {
-                    this._s7ServerService.WriteByte(this.TargetDBNumber, this.TargetPos, this.ByteToBeWritten);
-                    return Task.CompletedTask;
-                },
-                o => true
+                    this._s7ServerService.WriteByte(this.TargetDBNumber.Value, this.TargetPos.Value, this.ByteToBeWritten.Value);
+                }
             );
-            this.CmdReadByte = new AsyncRelayCommand<object>(
+            this.CmdReadByte = new ReactiveCommand().WithSubscribe(
                 o => {
-                    var val = this._s7ServerService.ReadByte(this.TargetDBNumber, this.TargetPos);
-                    this.ByteRead= val;
-                    return Task.CompletedTask;
-                },
-                o => true
+                    var val = this._s7ServerService.ReadByte(this.TargetDBNumber.Value, this.TargetPos.Value);
+                    this.ByteRead.Value = val;
+                }
             );
             #endregion
 
             #region Short
-            this.CmdWriteShort = new AsyncRelayCommand<object>(
+            this.CmdWriteShort = new ReactiveCommand().WithSubscribe(
                 o =>
                 {
-                    this._s7ServerService.WriteShort(this.TargetDBNumber, this.TargetPos, this.ShortToBeWritten);
-                    return Task.CompletedTask;
-                },
-                o => true
+                    this._s7ServerService.WriteShort(this.TargetDBNumber.Value, this.TargetPos.Value, this.ShortToBeWritten.Value);
+                }
             );
-            this.CmdReadShort = new AsyncRelayCommand<object>(
+            this.CmdReadShort = new ReactiveCommand().WithSubscribe(
                 o => {
-                    var val = this._s7ServerService.ReadShort(this.TargetDBNumber, this.TargetPos);
-                    this.ShortRead = val;
-                    return Task.CompletedTask;
-                },
-                o => true
+                    var val = this._s7ServerService.ReadShort(this.TargetDBNumber.Value, this.TargetPos.Value);
+                    this.ShortRead.Value = val;
+                }
             );
             #endregion
 
             #region Bit
-            this.CmdWriteBit = new AsyncRelayCommand<object>(
+            this.CmdWriteBit = new ReactiveCommand().WithSubscribe(
                 o =>
                 {
-                    if (this.TargetBitPos > 7 || this.TargetBitPos < 0)
+                    if (this.TargetBitPos.Value > 7 || this.TargetBitPos.Value < 0)
                     {
                         MessageBox.Show($"位数的取值必须落于范围[0,7]之间，当前={this.TargetBitPos}");
-                        return Task.CompletedTask;
+                        return;
                     }
-                    this._s7ServerService.WriteBit(this.TargetDBNumber, this.TargetPos, this.TargetBitPos, this.BitToBeWritten);
-                    return Task.CompletedTask;
-                },
-                o => true
+                    this._s7ServerService.WriteBit(this.TargetDBNumber.Value, this.TargetPos.Value, this.TargetBitPos.Value, this.BitToBeWritten.Value);
+                }
             );
-            this.CmdReadBit = new AsyncRelayCommand<object>(
+            this.CmdReadBit = new ReactiveCommand().WithSubscribe(
                 o => {
-                    if (this.TargetBitPos > 7 || this.TargetBitPos < 0)
+                    if (this.TargetBitPos.Value > 7 || this.TargetBitPos.Value < 0)
                     {
                         MessageBox.Show($"位数的取值必须落于范围[0,7]之间，当前={this.TargetBitPos}");
-                        return Task.CompletedTask;
+                        return;
                     }
-                    var val = this._s7ServerService.ReadBit(this.TargetDBNumber, this.TargetPos, this.TargetBitPos);
-                    this.BitRead= val;
-                    return Task.CompletedTask;
-                },
-                o => true
+                    var val = this._s7ServerService.ReadBit(this.TargetDBNumber.Value,this.TargetPos.Value, this.TargetBitPos.Value);
+                    this.BitRead.Value = val;
+                }
             );
             #endregion
 
             #region String
-            this.CmdWriteString = new AsyncRelayCommand<object>(
+            this.CmdWriteString = new ReactiveCommand().WithSubscribe(
                 o =>
                 {
-                    this._s7ServerService.WriteString(this.TargetDBNumber, this.TargetPos, this.StringArrayMaxLength, this.StrToBeWritten);
-                    return Task.CompletedTask;
-                },
-                o => true
+                    this._s7ServerService.WriteString(this.TargetDBNumber.Value, this.TargetPos.Value, this.StringArrayMaxLength.Value, this.StrToBeWritten.Value);
+                }
             );
-            this.CmdReadString = new AsyncRelayCommand<object>(
+            this.CmdReadString = new ReactiveCommand().WithSubscribe(
                 o => {
-                    var str = this._s7ServerService.ReadString(this.TargetDBNumber, this.TargetPos);
-                    this.StrRead = str;
-                    return Task.CompletedTask;
-                },
-                o => true
+                    var str = this._s7ServerService.ReadString(this.TargetDBNumber.Value, this.TargetPos.Value);
+                    this.StrRead.Value = str;
+                }
             );
             #endregion
 
             #region Real
-            this.CmdWriteReal = new AsyncRelayCommand<object>(
+            this.CmdWriteReal = new ReactiveCommand().WithSubscribe(
                 o =>
                 {
-                    this._s7ServerService.WriteReal(this.TargetDBNumber, this.TargetPos, this.RealToBeWritten);
-                    return Task.CompletedTask;
-                },
-                o => true
+                    this._s7ServerService.WriteReal(this.TargetDBNumber.Value, this.TargetPos.Value, this.RealToBeWritten.Value);
+                }
             );
-            this.CmdReadReal = new AsyncRelayCommand<object>(
+            this.CmdReadReal = new ReactiveCommand().WithSubscribe(
                 o => {
-                    var real = this._s7ServerService.ReadReal(this.TargetDBNumber, this.TargetPos);
-                    this.RealRead= real;
-                    return Task.CompletedTask;
-                },
-                o => true
+                    var real = this._s7ServerService.ReadReal(this.TargetDBNumber.Value, this.TargetPos.Value);
+                    this.RealRead.Value = real;
+                }
             );
             #endregion
 
@@ -156,13 +133,13 @@ namespace S7Server.Simulator.ViewModels
 
             this.CmdReadUInt = new ReactiveCommand();
             this.CmdReadUInt.Subscribe(i => {
-                var s = this._s7ServerService.ReadUInt32(this.TargetDBNumber, this.TargetPos);
+                var s = this._s7ServerService.ReadUInt32(this.TargetDBNumber.Value, this.TargetPos.Value);
                 this.UIntRead.Value = s;
             });
 
             this.CmdWriteUInt = new ReactiveCommand();
             this.CmdWriteUInt.Subscribe(i => {
-                this._s7ServerService.WriteUInt32(this.TargetDBNumber, this.TargetPos, this.UIntToBeWritten.Value);
+                this._s7ServerService.WriteUInt32(this.TargetDBNumber.Value, this.TargetPos.Value, this.UIntToBeWritten.Value);
             });
             #endregion
 
@@ -172,75 +149,25 @@ namespace S7Server.Simulator.ViewModels
 
             this.CmdReadULong = new ReactiveCommand();
             this.CmdReadULong.Subscribe(i => {
-                var s = this._s7ServerService.ReadULong(this.TargetDBNumber, this.TargetPos);
+                var s = this._s7ServerService.ReadULong(this.TargetDBNumber.Value, this.TargetPos.Value);
                 this.ULongRead.Value = s;
             });
 
             this.CmdWriteULong= new ReactiveCommand();
             this.CmdWriteULong.Subscribe(i => {
-                this._s7ServerService.WriteULong(this.TargetDBNumber, this.TargetPos, this.ULongToBeWritten.Value);
+                this._s7ServerService.WriteULong(this.TargetDBNumber.Value, this.TargetPos.Value, this.ULongToBeWritten.Value);
             });
             #endregion
         }
 
-        private int _targetDBNumber;
-        private int _targetPos;
-
-        public int TargetDBNumber { 
-            get => _targetDBNumber;
-            set
-            {
-                if (_targetDBNumber != value)
-                { 
-                    _targetDBNumber = value;
-                    this.OnPropertyChanged(nameof(TargetDBNumber));
-                }
-            }
-        }
-
-        public int TargetPos { 
-            get => _targetPos;
-            set
-            {
-                if (this._targetPos != value)
-                { 
-                    _targetPos = value;
-                    this.OnPropertyChanged(nameof(TargetPos));
-                }
-            }
-        }
-
+        public ReactiveProperty<int> TargetDBNumber { get; } = new();
+        public ReactiveProperty<int> TargetPos { get; } = new();
         public ICommand CmdRunScript { get; }
 
         #region Short Read And Write
-        private short _shortToBeWritten;
-        public short ShortToBeWritten
-        {
-            get => _shortToBeWritten;
-            set
-            {
-                if (this._shortToBeWritten != value)
-                {
-                    _shortToBeWritten = value;
-                    this.OnPropertyChanged(nameof(ShortToBeWritten));
-                }
-            }
-        }
+        public ReactiveProperty<short> ShortToBeWritten { get; } = new();
 
-
-        private short _shortRead;
-        public short ShortRead
-        {
-            get => _shortRead;
-            set
-            {
-                if (this._shortRead != value)
-                {
-                    this._shortRead = value;
-                    this.OnPropertyChanged(nameof(ShortRead));
-                }
-            }
-        }
+        public ReactiveProperty<short> ShortRead { get; } = new();
 
         public ICommand CmdWriteShort{ get; }
         public ICommand CmdReadShort{ get; }
@@ -249,34 +176,9 @@ namespace S7Server.Simulator.ViewModels
 
 
         #region Byte Read And Write
-        private byte _byteToBeWritten;
-        public byte ByteToBeWritten
-        {
-            get => _byteToBeWritten;
-            set
-            {
-                if (this._byteToBeWritten != value)
-                {
-                    _byteToBeWritten = value;
-                    this.OnPropertyChanged(nameof(ByteToBeWritten));
-                }
-            }
-        }
+        public ReactiveProperty<byte> ByteToBeWritten { get; } = new();
 
-
-        private byte _byteRead;
-        public byte ByteRead
-        {
-            get => _byteRead;
-            set
-            {
-                if (this._byteRead != value)
-                {
-                    this._byteRead = value;
-                    this.OnPropertyChanged(nameof(ByteRead));
-                }
-            }
-        }
+        public ReactiveProperty<byte> ByteRead { get; } = new();
 
         public ICommand CmdWriteByte{ get; }
         public ICommand CmdReadByte{ get; }
@@ -286,146 +188,50 @@ namespace S7Server.Simulator.ViewModels
         #region Bit Read And Write
 
 
-        private byte _targetBitPos;
 
         /// <summary>
         /// 标识字节的第N位：取值 0 -7
         /// </summary>
-        public byte TargetBitPos
-        {
-            get => _targetBitPos;
-            set
-            {
-                if (this._targetBitPos != value)
-                {
-                    _targetBitPos = value;
-                    this.OnPropertyChanged(nameof(TargetBitPos));
-                }
-            }
-        }
+        public ReactiveProperty<byte> TargetBitPos { get; } = new();
 
-        private bool _bitToBeWritten;
-        public bool BitToBeWritten
-        {
-            get => _bitToBeWritten;
-            set
-            {
-                if (this._bitToBeWritten != value)
-                {
-                    _bitToBeWritten = value;
-                    this.OnPropertyChanged(nameof(BitToBeWritten));
-                }
-            }
-        }
+        public ReactiveProperty<bool> BitToBeWritten { get; } = new();
 
-        private bool _bitRead;
-        public bool BitRead
-        {
-            get => _bitRead;
-            set
-            {
-                if (this._bitRead != value)
-                {
-                    this._bitRead = value;
-                    this.OnPropertyChanged(nameof(BitRead));
-                }
-            }
-        }
-
+        public ReactiveProperty<bool> BitRead { get; } = new();
         public ICommand CmdWriteBit{ get; }
         public ICommand CmdReadBit{ get; }
         #endregion
 
 
         #region String Read And Write
-        private string _strToBeWritten;
-        public string StrToBeWritten
-        {
-            get => _strToBeWritten;
-            set
-            {
-                if (this._strToBeWritten != value)
-                {
-                    _strToBeWritten = value;
-                    this.OnPropertyChanged(nameof(StrToBeWritten));
-                }
-            }
-        }
+        public ReactiveProperty<string> StrToBeWritten { get; } = new ();
 
+        public ReactiveProperty<string> StrRead { get; } = new();
 
-        private string _strRead;
-        public string StrRead { 
-            get => _strRead;
-            set {
-                if (this._strRead != value)
-                { 
-                    this._strRead = value;
-                    this.OnPropertyChanged(nameof(StrRead));
-                }
-            }
-        }
-
-        private int _stringArrayMaxLength = 256;
-        public int StringArrayMaxLength {
-            get => _stringArrayMaxLength;
-            set {
-                if (this._stringArrayMaxLength != value)
-                {
-                    this._stringArrayMaxLength = value;
-                    this.OnPropertyChanged(nameof(StringArrayMaxLength));
-                }
-            }
-        }
-
+        public ReactiveProperty<int> StringArrayMaxLength { get; } = new(256);
         public ICommand CmdWriteString { get; }
         public ICommand CmdReadString { get; }
         #endregion
 
 
         #region Real Read And Write
-        private float _realToBeWritten;
-        public float RealToBeWritten
-        {
-            get => _realToBeWritten;
-            set
-            {
-                if (this._realToBeWritten != value)
-                {
-                    _realToBeWritten = value;
-                    this.OnPropertyChanged(nameof(RealToBeWritten));
-                }
-            }
-        }
+        public ReactiveProperty<float> RealToBeWritten { get; } = new();
 
-
-        private float _realRead;
-        public float RealRead
-        {
-            get => _realRead;
-            set
-            {
-                if (this._realRead != value)
-                {
-                    this._realRead = value;
-                    this.OnPropertyChanged(nameof(RealRead));
-                }
-            }
-        }
+        public ReactiveProperty<float> RealRead { get; } = new();
 
         public ICommand CmdWriteReal{ get; }
         public ICommand CmdReadReal{ get; }
         #endregion
 
         #region UInt
-        public ReactiveProperty<uint> UIntToBeWritten { get; }
-        public ReactiveProperty<uint> UIntRead { get; }
+        public ReactiveProperty<uint> UIntToBeWritten { get; } = new();
+        public ReactiveProperty<uint> UIntRead { get; } = new();
         public ReactiveCommand CmdReadUInt { get; }
         public ReactiveCommand CmdWriteUInt { get; }
         #endregion
 
         #region ULong
-        public ReactiveProperty<ulong> ULongToBeWritten { get; }
-        public ReactiveProperty<ulong> ULongRead { get; }
+        public ReactiveProperty<ulong> ULongToBeWritten { get; } = new ();
+        public ReactiveProperty<ulong> ULongRead { get; }= new ();
         public ReactiveCommand CmdReadULong{ get; }
         public ReactiveCommand CmdWriteULong{ get; }
         #endregion

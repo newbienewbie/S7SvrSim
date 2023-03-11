@@ -1,6 +1,6 @@
-﻿using FutureTech.Mvvm;
-using System;
+﻿using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace S7Svr.Simulator.ViewModels
 {
@@ -11,13 +11,23 @@ namespace S7Svr.Simulator.ViewModels
     }
 
 
-    public class DBConfigVM : ViewModelBase, IEditableObject
+    public class DBConfigVM :IEditableObject, INotifyPropertyChanged
     {
         private DBConfig _currentConfig = new DBConfig();
         private DBConfig _bakeup = default;
 
         public DBConfigVM()
         {
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged(string propName)
+        {
+            if (this.PropertyChanged != null)
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(nameof(propName)));
+            }
         }
 
         public int DBNumber { 
@@ -38,10 +48,11 @@ namespace S7Svr.Simulator.ViewModels
                 if (this._currentConfig.DBSize!= value)
                 { 
                     this._currentConfig.DBSize = value;
-                    this.OnPropertyChanged(nameof(DBSize));
+                    this.OnPropertyChanged(nameof(DBNumber));
                 }
             }
         }
+
 
         public void BeginEdit()
         {

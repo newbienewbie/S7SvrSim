@@ -1,15 +1,16 @@
-﻿using FutureTech.Mvvm;
+﻿using Reactive.Bindings;
 using S7Server.Simulator.ViewModels;
 using S7SvrSim.ViewModels;
+using System.Reactive.Linq;
 using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
 {
-    public class MainVM : ViewModelBase
+    public class MainVM 
     {
-        private readonly S7ServerService _s7ServerService;
+        private readonly IS7ServerService _s7ServerService;
 
-        public MainVM(S7ServerService s7ServerService, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
+        public MainVM(IS7ServerService s7ServerService, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
         {
             this._s7ServerService = s7ServerService;
             ConfigPyEngineVM = configPyEngineVM;
@@ -17,35 +18,33 @@ namespace S7Svr.Simulator.ViewModels
             this.OperationVM = operationVM;
             this.ConfigVM = configVM;
 
-            this.CmdStartServer = new AsyncRelayCommand<object>(
-                async o => {
-                    this.RunningVM.IpAddress = this.ConfigVM.IpAddress;
+            this.CmdStartServer = this.RunningVM.RunningStatus.Select(i => !i)
+                .ToReactiveCommand()
+                .WithSubscribe(async i => {
+                    this.RunningVM.IpAddress.Value = this.ConfigVM.IpAddress.Value;
                     this.RunningVM.DBConfigs.Clear();
                     foreach (var config in this.ConfigVM.DBConfigs)
-                    { 
+                    {
                         this.RunningVM.DBConfigs.Add(config);
                     }
                     await this._s7ServerService.StartServerAsync();
-                    this.RunningVM.RunningStatus = true;
-                },
-                o => true
-            );
+                    this.RunningVM.RunningStatus.Value = true;
+                });
 
-            this.CmdStopServer = new AsyncRelayCommand<object>(
-                async o => {
-                    this.RunningVM.IpAddress = string.Empty;
+            this.CmdStopServer = this.RunningVM.RunningStatus
+                .ToReactiveCommand()
+                .WithSubscribe(async i => {
+                    this.RunningVM.IpAddress.Value = string.Empty;
                     this.RunningVM.DBConfigs.Clear();
                     await this._s7ServerService.StopServerAsync();
-                    this.RunningVM.RunningStatus = false;
-                },
-                o => true
-            );
+                    this.RunningVM.RunningStatus.Value = false;
+                });
         }
-
-        public ICommand CmdStartServer { get; }
-        public ICommand CmdStopServer { get; }
+        public ReactiveCommand<object> CmdStartServer { get; }
+        public ReactiveCommand<object> CmdStopServer { get; }
 
         public ConfigSnap7ServerVM ConfigVM { get; }
+
         public ConfigPyEngineVM ConfigPyEngineVM { get; }
         public RunningSnap7ServerVM RunningVM { get; }
 

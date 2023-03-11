@@ -5,9 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:S7Svr.Simulator"
         xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls"
-        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" 
+        xmlns:viewmodels="clr-namespace:S7Svr.Simulator.ViewModels"
         mc:Ignorable="d"
-        Title="Siemens PLC 通讯模拟器" Height="450" Width="800">
+        d:DataContext="{d:DesignInstance Type=viewmodels:MainVM}"
+        Title="Siemens PLC 通讯模拟器" 
+        Height="450" Width="800">
 
     <TabControl TabStripPlacement="Left">
         <TabControl.Resources>
@@ -41,17 +44,29 @@
 
 
                 <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" ></Label>
-                <TextBox Text="{Binding ConfigVM.IpAddress}" 
+                <TextBox Text="{Binding ConfigVM.IpAddress.Value}" 
                         Width="100" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" />
-                <Button Content="启动" IsEnabled="{Binding RunningVM.IsNotRunning}"  Command="{Binding CmdStartServer}" 
+                <Button Content="启动" Command="{Binding CmdStartServer}" 
                         Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="2"/>
-                <Button Content="停止" IsEnabled="{Binding RunningVM.RunningStatus}" Command="{Binding CmdStopServer}" 
+                <Button Content="停止" Command="{Binding CmdStopServer}" 
                         Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="3"/>
 
+
                 <DataGrid ItemsSource="{Binding ConfigVM.DBConfigs}" 
-                     IsEnabled="{Binding RunningVM.IsNotRunning}"
                           CanUserDeleteRows="True"  
                           CanUserAddRows="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7" Margin="0,25,0,0" Grid.RowSpan="2" >
+                    <DataGrid.Style>
+                        <Style TargetType="DataGrid" BasedOn="{StaticResource MaterialDesignDataGrid}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding RunningVM.RunningStatus.Value}" Value="True">
+                                    <Setter Property="IsEnabled" Value="False"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding RunningVM.RunningStatus.Value}" Value="False">
+                                    <Setter Property="IsEnabled" Value="True"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.Style>
                     <DataGrid.Columns>
                     </DataGrid.Columns>
                 </DataGrid>
@@ -73,7 +88,7 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Content="IpAddress" Grid.Row="0" Grid.Column="0" ></Label>
-                <TextBlock Text="{Binding ConfigVM.IpAddress}" Grid.Row="0" Grid.Column="1"></TextBlock>
+                <TextBlock Text="{Binding ConfigVM.IpAddress.Value}" Grid.Row="0" Grid.Column="1"></TextBlock>
 
                 <uc:OperationsCtrl DataContext="{Binding OperationVM}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ></uc:OperationsCtrl>
 
@@ -88,11 +103,6 @@
                                             <TextBlock Text="{Binding DBSize,StringFormat={}\, DBSize\={0}}"></TextBlock>
                                         </StackPanel>
                                     </Expander.Header>
-                                    <!--<uc:HexoCtrl 
-                                        DBNumber="{Binding DBNumber}" 
-                                        DBSize="{Binding DBSize}" 
-                                        Bytes="{Binding Bytes}">
-                                    </uc:HexoCtrl>-->
                                 </Expander>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -118,9 +128,7 @@
                     <ItemsControl ItemsSource="{Binding PyEngineSearchPaths}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" >
-                                    <TextBox Text="{Binding .}" IsReadOnly="True" ></TextBox>
-                                </StackPanel>
+                                <TextBox Text="{Binding .}" IsReadOnly="True" ></TextBox>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

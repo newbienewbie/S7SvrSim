@@ -194,6 +194,5 @@ NUGET
     System.Threading.Tasks.Extensions (4.5.4) - restriction: || (&& (== net6.0) (>= net462)) (&& (== net6.0) (>= net472)) (&& (== net6.0) (< netcoreapp3.1)) (&& (== net6.0) (< netstandard2.1)) (&& (== net6.0) (>= uap10.1)) (== netstandard2.0) (== netstandard2.1)
       System.Runtime.CompilerServices.Unsafe (>= 4.5.3) - restriction: || (&& (== net6.0) (>= net461)) (&& (== net6.0) (< netcoreapp2.1)) (&& (== net6.0) (< netstandard1.0)) (&& (== net6.0) (< netstandard2.0)) (&& (== net6.0) (>= wp8)) (== netstandard2.0) (== netstandard2.1)
   remote: https://baget.stdunit.com/v3/index.json
-    FutureTech.Mvvm (0.1.1)
     FutureTech.Snap7 (0.4.3)
       FSharp.Core (>= 4.7.2)

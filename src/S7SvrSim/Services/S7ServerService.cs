@@ -1,5 +1,4 @@
-﻿using FutureTech.Mvvm;
-using FutureTech.Snap7;
+﻿using FutureTech.Snap7;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using S7Svr.Simulator.Messages;
@@ -12,7 +11,7 @@ using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
 {
-    public class S7ServerService : IDisposable
+    public class S7ServerService : IDisposable, IS7ServerService
     {
         private readonly RunningSnap7ServerVM _runningVM;
         private readonly ILogger<S7ServerService> _logger;
@@ -45,15 +44,15 @@ namespace S7Svr.Simulator.ViewModels
                 foreach (var db in _runningVM.DBConfigs)
                 {
                     var buffer = new byte[db.DBSize];
-                    _runningVM.RunningsItems.Add(new RunningSnap7ServerVM.RunningServerItem
+                    _runningVM.RunningsItems.Add(new RunningServerItem
                     {
                         DBNumber = db.DBNumber,
                         DBSize = db.DBSize,
-                        Bytes  = buffer,
+                        Bytes = buffer,
                     });
                     this.S7Server.RegisterArea(FutureTech.Snap7.S7Server.srvAreaDB, db.DBNumber, ref buffer, db.DBSize);
                 }
-                this.S7Server.StartTo(_runningVM.IpAddress);
+                this.S7Server.StartTo(_runningVM.IpAddress.Value);
             }
             catch (Exception ex)
             {
@@ -66,7 +65,7 @@ namespace S7Svr.Simulator.ViewModels
             }
         }
 
-        public async Task StopServerAsync() 
+        public async Task StopServerAsync()
         {
             try
             {
@@ -125,7 +124,7 @@ namespace S7Svr.Simulator.ViewModels
             var buffer = config.Bytes;
 
             var val = S7.GetIntAt(buffer, pos);
-            return (short) val;
+            return (short)val;
         }
 
 
@@ -150,7 +149,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！"});
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
                 return default;
             }
 
@@ -166,7 +165,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！"});
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
                 return;
             }
             var buffer = config.Bytes;
@@ -176,12 +175,12 @@ namespace S7Svr.Simulator.ViewModels
         #endregion
 
         #region String
-        public void WriteString(int dbNumber, int offset, int maxlen , string str)
+        public void WriteString(int dbNumber, int offset, int maxlen, string str)
         {
             var config = _runningVM.RunningsItems.Where(i => i.DBNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！"});
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
                 return;
             }
             var buffer = config.Bytes;

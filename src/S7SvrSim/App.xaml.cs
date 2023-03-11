@@ -65,7 +65,7 @@ namespace S7Svr.Simulator
             services.AddSingleton<PyScriptRunner>();
             services.AddSingleton<ConfigPyEngineVM>();
             services.AddSingleton<MainWindow>();
-            services.AddSingleton<S7ServerService>();
+            services.AddSingleton<IS7ServerService, S7ServerService>();
             services.AddSingleton<MainVM>();
         }
 
