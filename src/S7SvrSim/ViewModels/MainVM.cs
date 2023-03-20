@@ -2,6 +2,7 @@
 using S7Server.Simulator.ViewModels;
 using S7SvrSim.ViewModels;
 using System.Reactive.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
@@ -21,6 +22,11 @@ namespace S7Svr.Simulator.ViewModels
             this.CmdStartServer = this.RunningVM.RunningStatus.Select(i => !i)
                 .ToReactiveCommand()
                 .WithSubscribe(async i => {
+                    if (this.ConfigVM.DBConfigs.Count == 0)
+                    {
+                        MessageBox.Show("当前未指定DB配置！");
+                        return;
+                    }
                     this.RunningVM.IpAddress.Value = this.ConfigVM.IpAddress.Value;
                     this.RunningVM.DBConfigs.Clear();
                     foreach (var config in this.ConfigVM.DBConfigs)
