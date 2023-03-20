@@ -11,45 +11,102 @@
 - 没钱购买博图，又不屑于使用盗版
 - 有钱购买博图，但是这个软件超大，还会自动安装了一堆WinCC/SQL Server之类服务。偏偏自己对电脑还有洁癖。
 - 有钱买了博图，然后废了老大劲安装好了，却不一定有权限拿到电气部门的`PLC`程序。
+- 拿到了电气部门的程序，发现他们的程序还没写好，跑不起来
+- ...
 
-回过头来想，上位机开发人员真的需要物理PLC或者博图吗？我们只需要一个`PLC`**通讯模拟器**而已！我们甚至不需要模拟完整的`PLC`程序，我们仅仅只需要根据和电气部门的通讯规约操作点表！对，只需要**模拟通讯**。
+回过头来想，上位机开发人员真的需要物理PLC或者博图吗？我们只需要一个`西门子 PLC`**S7通讯模拟器**而已！我们甚至不需要模拟完整的`PLC`程序，我们仅仅只需要根据和电气部门的通讯规约操作点表！对，只需要**模拟通讯**。
 
-(当然，如果上面所列的场景不适合你，那么你没必要用这个程序 :))
+当然，**如果上面所列的场景不适合你，那么你没必要用这个程序** :) 
 
 ## 这个程序不能干什么
 
-我不打算、也没能力做一个完整的软`PLC`。像画各种梯形图、执行ST程序这种事，压根不是这个项目的目标。要是真有这种需求，还是去购买倍福之类的商用产品吧。
+我不打算、也没能力做一个完整的软`PLC`。像画各种梯形图、执行ST程序这种事，压根不是这个项目的目标。
 
-## 如何使用
+## 安装和启动
 
 由于前端是使用 `WPF`开发的，故目前只能在Windows上使用（后期可能会考虑做成跨平台的，但是暂时没有这个动力）。使用该工具最简单的方法是使用`ClickOnce`技术来安装，只需打开如下`URL`即可（需要Windows操作系统）：
 
 https://assets.chiyiqian.net/S7SvrSim/S7SvrSim.application
 
 
-## 操作方式
+不过有个别同事使用最新的`Win11`打开`ClickOnce`有问题。所以还提供直接zip包打开。
 
-*S7SvcSim* 支持单步操作和基于`Python`脚本的批量操作。其中，单步操作主要是为了方便手动调试；而基于`Python`脚本，我们可以为上位机程序编写自动化测试。
+启动程序后，在 **DB配置** 界面中:
+- 设置好要监听的IP地址，
+- 配置一个或者多个`DB`的号码、大小
+- 点击 **"启动"** 按钮
 
-### Python 脚本工作方式
 
-用户可以自定义一个`Python`脚本，然后在程序运行后导入。一旦导入，该脚本就会被立刻执行。为了操作模拟器，我向`Python`脚本暴露了一个预定义的`s7_server_svc`对象(类型为`S7ServerService`)，用于对当前正在运行的`S7` PLC模拟器进行操作。:
-- 启动服务器
-- 关闭服务器
-- 读/写单个String
-- 读/写单个Bit
-- 读/写单个Byte
-- 读/写单个Short
-- 读/写单个浮点数
-- 其它
+### 操作方式
+
+*S7SvcSim* 支持单步操作和基于`Python`脚本的批量操作。其中，单步操作主要是为了方便手动调试。
+
+更多的时候，为了减少重复工作，我们会编写一些`Python`脚本来实现自动化测试。
+
+```python
+# -*- coding: UTF-8 -*-
+import time
+import shell  
+
+DB_INDEX= 200
+OFFSET_FLAGS_BASE = 1082  
+SIZEOF_DEV_BELT_MSG = 56
+
+FUNC = shell.accept_input_int("请选择皮带线： 1-belt1; 2-belt2; 3-belt3; 4-belt4")
+if FUNC < 1 and FUNC > 4 :
+    shell.show_message_box("请选择正确的皮带线！")
+else:
+	# 计算地址偏移
+    OFFSET_FLAGS = OFFSET_FLAGS_BASE + (FUNC - 1) * SIZEOF_DEV_BELT_MSG
+    OFFSET_VEC_NUMBER = OFFSET_FLAGS + 1
+
+	# 让用户输入来料信息
+    vector_num = shell.accept_input_int("incoming vector number")
+
+    S7.WriteByte(DB_INDEX, OFFSET_VEC_NUMBER , vector_num)
+    S7.WriteBit(DB_INDEX, OFFSET_FLAGS, 0, True)
+
+	# 3s后清除信号
+    time.sleep(3)
+    S7.WriteByte(DB_INDEX, OFFSET_VEC_NUMBER , 0)
+    S7.WriteBit(DB_INDEX, OFFSET_FLAGS, 0, False) 
+```
+
+> 注：这里的`shell`是用户自定义的模块。
+
+有了这些测试脚本，我们只需要在合适的时间点导入这些脚本即可自动完成动作模拟。
+
+
+### Python的版本支持
+
+底层用的是`IronPython`，由于到目前为之，`IronPython 3.x`尚未成熟，故这里`IronPython`的版本是`2.7.11`。
+
+这意味着：
+- 只能使用 **Python2.x** 的语法和特性
+- 如果要写中文，应该指定文件编码 `# -*- coding: UTF-8 -*-`
+
+### 自定义模块的检索路径
+
+如果需要导入自定义的检索路径，可以在`PyEngine/SearchPaths`界面中，点击 **"选择路径"**，来指定自己的模块路径。
+
+![search_path](./docs/configure_search_paths.PNG)
+
+### 清空数据
+
+点击 **"DB配置"** 里的 **停止**、**"启动"** 会清空当前模拟器中的数据。
+
+### Python 脚本
+
+用户可以自定义一个`Python`脚本，然后在程序运行后导入。一旦导入，该脚本就会被立刻执行。
+为了操作模拟器，我向`Python`暴露了一个预定义的`S7`对象(类型为`IS7ServerService`)，用于对当前正在运行的 **S7 PLC模拟器** 进行操作。
 
 通过这些API方法，我们可以通过编写`Python`脚本来动态执行一系列操作，比如：
 
 ```python
-s7_server_svc.WriteString(6, 2780, "1908WC16V299F6+YSTC1100139+L2/L3:1757;L1/N:1762;")
-s7_server_svc.WriteReal(6, 3036, 3545.2)
-s7_server_svc.WriteReal(6, 3040, 68.3)
-s7_server_svc.WriteReal(6, 3040, 4.8)
+S7.WriteString(6, 2780, "1908WC16V299F6+YSTC1100139+L2/L3:1757;L1/N:1762;")
+S7.WriteReal(6, 3036, 3545.2)
+S7.WriteReal(6, 3040, 68.3)
+S7.WriteReal(6, 3040, 4.8)
 ```
 
 ### API
@@ -59,10 +116,10 @@ Python可以使用的`S7`其实是一个`IS7ServerService`接口对象：
 ```C#
 public interface IS7ServerService
 {
-	bool ReadBit(int dbNumber, int offset, byte bit);
-	void WriteBit(int dbNumber, int offset, byte bit, bool flag);
+    bool ReadBit(int dbNumber, int offset, byte bit);
+    void WriteBit(int dbNumber, int offset, byte bit, bool flag);
 
-	byte ReadByte(int dbNumber, int pos);
+    byte ReadByte(int dbNumber, int pos);
 	void WriteByte(int dbNumber, int pos, byte value);
 
 	short ReadShort(int dbNumber, int pos);

@@ -123,7 +123,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition></RowDefinition>
-                        <RowDefinition Height="24"></RowDefinition>
+                        <RowDefinition Height="32"></RowDefinition>
                     </Grid.RowDefinitions>
                     <ItemsControl ItemsSource="{Binding PyEngineSearchPaths}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
                         <ItemsControl.ItemTemplate>
@@ -133,7 +133,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                     <Button Command="{Binding CmdSelectModulePath}" Content="选择路径" Grid.Row="1" Grid.Column="0" ></Button>
-                    <TextBox Text="{Binding SelectedModulePath.Value}" VerticalAlignment="Stretch" TextAlignment="Justify" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
+                    <TextBox Text="{Binding SelectedModulePath.Value}" VerticalAlignment="Stretch" TextAlignment="Justify" Grid.Row="1" Grid.Column="1"></TextBox>
                     <Button Content="提交" Command="{Binding CmdSubmitSelectPath}" Grid.Row="1" Grid.Column="2"  ></Button>
                 </Grid>
             </GroupBox>
