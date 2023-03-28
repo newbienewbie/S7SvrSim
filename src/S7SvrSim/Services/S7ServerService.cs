@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.Logging;
 using S7Svr.Simulator.Messages;
+using S7SvrSim.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +15,16 @@ namespace S7Svr.Simulator.ViewModels
     public class S7ServerService : IDisposable, IS7ServerService
     {
         private readonly RunningSnap7ServerVM _runningVM;
+        private readonly MsgLoggerVM _loggerVM;
         private readonly ILogger<S7ServerService> _logger;
         protected virtual IMediator _mediator { get; set; }
         protected virtual FutureTech.Snap7.S7Server S7Server { get; set; }
 
-        public S7ServerService(IMediator mediator, RunningSnap7ServerVM runningVM, ILogger<S7ServerService> logger)
+        public S7ServerService(IMediator mediator, RunningSnap7ServerVM runningVM, MsgLoggerVM loggerVM, ILogger<S7ServerService> logger)
         {
             this._mediator = mediator;
             this._runningVM = runningVM;
+            this._loggerVM = loggerVM;
             this._logger = logger;
         }
 
@@ -53,6 +56,8 @@ namespace S7Svr.Simulator.ViewModels
                     this.S7Server.RegisterArea(FutureTech.Snap7.S7Server.srvAreaDB, db.DBNumber, ref buffer, db.DBSize);
                 }
                 this.S7Server.StartTo(_runningVM.IpAddress.Value);
+
+                this._loggerVM.AddLogMsg(new LogMessage(DateTime.Now, LogLevel.Information, "[+]服务启动..."));
             }
             catch (Exception ex)
             {
@@ -71,6 +76,7 @@ namespace S7Svr.Simulator.ViewModels
             {
                 this.S7Server?.Stop();
                 this.S7Server = null;
+                this._loggerVM.AddLogMsg(new LogMessage(DateTime.Now, LogLevel.Information, "[!]服务停止..."));
             }
             catch (Exception ex)
             {

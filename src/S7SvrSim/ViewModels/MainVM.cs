@@ -1,7 +1,10 @@
 ﻿using Reactive.Bindings;
 using S7Server.Simulator.ViewModels;
 using S7SvrSim.ViewModels;
+using System;
+using System.Collections.ObjectModel;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -11,9 +14,10 @@ namespace S7Svr.Simulator.ViewModels
     {
         private readonly IS7ServerService _s7ServerService;
 
-        public MainVM(IS7ServerService s7ServerService, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
+        public MainVM(IS7ServerService s7ServerService, MsgLoggerVM loggerVM, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
         {
             this._s7ServerService = s7ServerService;
+            LoggerVM = loggerVM;
             ConfigPyEngineVM = configPyEngineVM;
             this.RunningVM = runningVM;
             this.OperationVM = operationVM;
@@ -45,15 +49,22 @@ namespace S7Svr.Simulator.ViewModels
                     await this._s7ServerService.StopServerAsync();
                     this.RunningVM.RunningStatus.Value = false;
                 });
+
+
+
+
         }
         public ReactiveCommand<object> CmdStartServer { get; }
         public ReactiveCommand<object> CmdStopServer { get; }
 
         public ConfigSnap7ServerVM ConfigVM { get; }
-
+        public MsgLoggerVM LoggerVM { get; }
         public ConfigPyEngineVM ConfigPyEngineVM { get; }
         public RunningSnap7ServerVM RunningVM { get; }
 
         public OperationVM OperationVM { get; }
+
+
+
     }
 }

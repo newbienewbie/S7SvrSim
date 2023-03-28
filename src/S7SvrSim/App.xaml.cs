@@ -24,9 +24,6 @@ namespace S7Svr.Simulator
     /// </summary>
     public partial class App : Application
     {
-
-
-
         public IHost _host { get; private set; }
         public IServiceProvider ServiceProvider { get; internal set; }
 
@@ -64,6 +61,7 @@ namespace S7Svr.Simulator
             services.AddSingleton<ConfigSnap7ServerVM>();
             services.AddSingleton<PyScriptRunner>();
             services.AddSingleton<ConfigPyEngineVM>();
+            services.AddSingleton<MsgLoggerVM>();
             services.AddSingleton<MainWindow>();
             services.AddSingleton<IS7ServerService, S7ServerService>();
             services.AddSingleton<MainVM>();

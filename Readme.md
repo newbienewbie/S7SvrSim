@@ -111,6 +111,8 @@ S7.WriteReal(6, 3040, 4.8)
 
 ### API
 
+#### `S7`
+
 Python可以使用的`S7`其实是一个`IS7ServerService`接口对象：
 
 ```C#
@@ -139,6 +141,14 @@ public interface IS7ServerService
 	Task StartServerAsync();
 	Task StopServerAsync();
 }
+```
+
+#### `Logger`
+
+还暴露一个`Logger`对象，用于追加日志：
+```
+void LogInfo(string content);
+void LogError(string content);
 ```
 
 

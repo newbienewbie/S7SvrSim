@@ -6,138 +6,149 @@
         xmlns:local="clr-namespace:S7Svr.Simulator"
         xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" 
-        xmlns:viewmodels="clr-namespace:S7Svr.Simulator.ViewModels"
+        xmlns:viewmodels="clr-namespace:S7Svr.Simulator.ViewModels" 
+        xmlns:usercontrols="clr-namespace:S7SvrSim.UserControls"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainVM}"
         Title="Siemens PLC 通讯模拟器" 
-        Height="450" Width="800">
+        Height="850" Width="800">
 
-    <TabControl TabStripPlacement="Left">
-        <TabControl.Resources>
-            <Style TargetType="TabItem" BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}">
-                <Style.Triggers>
-                </Style.Triggers>
-            </Style>
-            <Style TargetType="Label" BasedOn="{StaticResource MaterialDesignLabel}"></Style>
-            <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}"></Style>
-            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
-            </Style>
-        </TabControl.Resources>
-        <TabItem Header="DB配置">
-            <TabItem.Resources>
-                <Style TargetType="Grid" >
-                    <Setter Property="Margin" Value="4,8,4,4"></Setter>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition Height="200"></RowDefinition>
+        </Grid.RowDefinitions>
+        <TabControl TabStripPlacement="Left">
+            <TabControl.Resources>
+                <Style TargetType="TabItem" BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}">
+                    <Style.Triggers>
+                    </Style.Triggers>
                 </Style>
-            </TabItem.Resources>
+                <Style TargetType="Label" BasedOn="{StaticResource MaterialDesignLabel}"></Style>
+                <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}"></Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
+                </Style>
+            </TabControl.Resources>
+            <TabItem Header="DB配置">
+                <TabItem.Resources>
+                    <Style TargetType="Grid" >
+                        <Setter Property="Margin" Value="4,8,4,4"></Setter>
+                    </Style>
+                </TabItem.Resources>
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition ></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition ></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
 
-                <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" ></Label>
-                <TextBox Text="{Binding ConfigVM.IpAddress.Value}" 
+                    <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" ></Label>
+                    <TextBox Text="{Binding ConfigVM.IpAddress.Value}" 
                         Width="100" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" />
-                <Button Content="启动" Command="{Binding CmdStartServer}" 
+                    <Button Content="启动" Command="{Binding CmdStartServer}" 
                         Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="2"/>
-                <Button Content="停止" Command="{Binding CmdStopServer}" 
+                    <Button Content="停止" Command="{Binding CmdStopServer}" 
                         Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="3"/>
 
 
-                <DataGrid ItemsSource="{Binding ConfigVM.DBConfigs}" 
+                    <DataGrid ItemsSource="{Binding ConfigVM.DBConfigs}" 
                           CanUserDeleteRows="True"  
                           CanUserAddRows="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7" Margin="0,25,0,0" Grid.RowSpan="2" >
-                    <DataGrid.Style>
-                        <Style TargetType="DataGrid" BasedOn="{StaticResource MaterialDesignDataGrid}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding RunningVM.RunningStatus.Value}" Value="True">
-                                    <Setter Property="IsEnabled" Value="False"></Setter>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding RunningVM.RunningStatus.Value}" Value="False">
-                                    <Setter Property="IsEnabled" Value="True"></Setter>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGrid.Style>
-                    <DataGrid.Columns>
-                    </DataGrid.Columns>
-                </DataGrid>
+                        <DataGrid.Style>
+                            <Style TargetType="DataGrid" BasedOn="{StaticResource MaterialDesignDataGrid}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RunningVM.RunningStatus.Value}" Value="True">
+                                        <Setter Property="IsEnabled" Value="False"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding RunningVM.RunningStatus.Value}" Value="False">
+                                        <Setter Property="IsEnabled" Value="True"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.Style>
+                        <DataGrid.Columns>
+                        </DataGrid.Columns>
+                    </DataGrid>
 
-            </Grid>
-        </TabItem>
-        <TabItem Header="DB命令">
-
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition Height="Auto"></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                    <RowDefinition></RowDefinition>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition></ColumnDefinition>
-                    <ColumnDefinition></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-
-                <Label Content="IpAddress" Grid.Row="0" Grid.Column="0" ></Label>
-                <TextBlock Text="{Binding ConfigVM.IpAddress.Value}" Grid.Row="0" Grid.Column="1"></TextBlock>
-
-                <uc:OperationsCtrl DataContext="{Binding OperationVM}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ></uc:OperationsCtrl>
-
-                <ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-                    <ItemsControl ItemsSource="{Binding RunningVM.RunningsItems}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Expander >
-                                    <Expander.Header>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding DBNumber,StringFormat={}DBNumber\={0}}"></TextBlock>
-                                            <TextBlock Text="{Binding DBSize,StringFormat={}\, DBSize\={0}}"></TextBlock>
-                                        </StackPanel>
-                                    </Expander.Header>
-                                </Expander>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
-
-            </Grid>
-        </TabItem>
-
-        <TabItem Header="PyEngine" DataContext="{Binding ConfigPyEngineVM}">
-            <GroupBox>
-                <GroupBox.Header>Search Paths</GroupBox.Header>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"></ColumnDefinition>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="200"></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition Height="32"></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <ItemsControl ItemsSource="{Binding PyEngineSearchPaths}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBox Text="{Binding .}" IsReadOnly="True" ></TextBox>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                    <Button Command="{Binding CmdSelectModulePath}" Content="选择路径" Grid.Row="1" Grid.Column="0" ></Button>
-                    <TextBox Text="{Binding SelectedModulePath.Value}" VerticalAlignment="Stretch" TextAlignment="Justify" Grid.Row="1" Grid.Column="1"></TextBox>
-                    <Button Content="提交" Command="{Binding CmdSubmitSelectPath}" Grid.Row="1" Grid.Column="2"  ></Button>
                 </Grid>
-            </GroupBox>
-        </TabItem>
-    </TabControl>
+            </TabItem>
+            <TabItem Header="DB命令">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Content="IpAddress" Grid.Row="0" Grid.Column="0" ></Label>
+                    <TextBlock Text="{Binding ConfigVM.IpAddress.Value}" Grid.Row="0" Grid.Column="1"></TextBlock>
+
+                    <uc:OperationsCtrl DataContext="{Binding OperationVM}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ></uc:OperationsCtrl>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+                        <ItemsControl ItemsSource="{Binding RunningVM.RunningsItems}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Expander >
+                                        <Expander.Header>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding DBNumber,StringFormat={}DBNumber\={0}}"></TextBlock>
+                                                <TextBlock Text="{Binding DBSize,StringFormat={}\, DBSize\={0}}"></TextBlock>
+                                            </StackPanel>
+                                        </Expander.Header>
+                                    </Expander>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="PyEngine" DataContext="{Binding ConfigPyEngineVM}">
+                <GroupBox>
+                    <GroupBox.Header>Search Paths</GroupBox.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="200"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="200"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition></RowDefinition>
+                            <RowDefinition Height="32"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <ItemsControl ItemsSource="{Binding PyEngineSearchPaths}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding .}" IsReadOnly="True" ></TextBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button Command="{Binding CmdSelectModulePath}" Content="选择路径" Grid.Row="1" Grid.Column="0" ></Button>
+                        <TextBox Text="{Binding SelectedModulePath.Value}" VerticalAlignment="Stretch" TextAlignment="Justify" Grid.Row="1" Grid.Column="1"></TextBox>
+                        <Button Content="提交" Command="{Binding CmdSubmitSelectPath}" Grid.Row="1" Grid.Column="2"  ></Button>
+                    </Grid>
+                </GroupBox>
+            </TabItem>
+        </TabControl>
+
+        <usercontrols:MsgLoggerCtrl DataContext="{Binding LoggerVM }"  Grid.Row="3" Grid.Column="1" >
+        </usercontrols:MsgLoggerCtrl>
+    </Grid>
 
 </Window>
