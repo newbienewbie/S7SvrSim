@@ -94,7 +94,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _ = this.StopServerAsync();
         }
     }
 
