@@ -63,13 +63,13 @@ else:
 	# 让用户输入来料信息
     vector_num = shell.accept_input_int("incoming vector number")
 
-    S7.WriteByte(DB_INDEX, OFFSET_VEC_NUMBER , vector_num)
-    S7.WriteBit(DB_INDEX, OFFSET_FLAGS, 0, True)
+    DB.WriteByte(DB_INDEX, OFFSET_VEC_NUMBER , vector_num)
+    DB.WriteBit(DB_INDEX, OFFSET_FLAGS, 0, True)
 
 	# 3s后清除信号
     time.sleep(3)
-    S7.WriteByte(DB_INDEX, OFFSET_VEC_NUMBER , 0)
-    S7.WriteBit(DB_INDEX, OFFSET_FLAGS, 0, False) 
+    DB.WriteByte(DB_INDEX, OFFSET_VEC_NUMBER , 0)
+    DB.WriteBit(DB_INDEX, OFFSET_FLAGS, 0, False) 
 ```
 
 > 注：这里的`shell`是用户自定义的模块。
@@ -103,25 +103,25 @@ else:
 通过这些API方法，我们可以通过编写`Python`脚本来动态执行一系列操作，比如：
 
 ```python
-S7.WriteString(6, 2780, "1908WC16V299F6+YSTC1100139+L2/L3:1757;L1/N:1762;")
-S7.WriteReal(6, 3036, 3545.2)
-S7.WriteReal(6, 3040, 68.3)
-S7.WriteReal(6, 3040, 4.8)
+DB.WriteString(6, 2780, "1908WC16V299F6+YSTC1100139+L2/L3:1757;L1/N:1762;")
+DB.WriteReal(6, 3036, 3545.2)
+DB.WriteReal(6, 3040, 68.3)
+DB.WriteReal(6, 3040, 4.8)
 ```
 
 ### API
 
 #### `S7`
 
-Python可以使用的`S7`其实是一个`IS7ServerService`接口对象：
+Python可以使用的`DB`其实是一个`IS7DataBlockService`接口对象：
 
 ```C#
-public interface IS7ServerService
+public interface IS7DataBlockService
 {
-    bool ReadBit(int dbNumber, int offset, byte bit);
-    void WriteBit(int dbNumber, int offset, byte bit, bool flag);
+	bool ReadBit(int dbNumber, int offset, byte bit);
+	void WriteBit(int dbNumber, int offset, byte bit, bool flag);
 
-    byte ReadByte(int dbNumber, int pos);
+	byte ReadByte(int dbNumber, int pos);
 	void WriteByte(int dbNumber, int pos, byte value);
 
 	short ReadShort(int dbNumber, int pos);
@@ -138,8 +138,33 @@ public interface IS7ServerService
 
 	string ReadString(int dbNumber, int offset);
 	void WriteString(int dbNumber, int offset, int maxlen, string str);
-	Task StartServerAsync();
-	Task StopServerAsync();
+}
+```
+
+而`MB`则是一个`IS7MBService`:
+```C#
+public interface IS7MBService
+{
+	bool ReadBit(int offset, byte bit);
+	void WriteBit(int offset, byte bit, bool flag);
+
+	byte ReadByte(int pos);
+	void WriteByte(int pos, byte value);
+
+	short ReadShort(int pos);
+	void WriteShort(int pos, short value);
+
+	uint ReadUInt32(int pos);
+	void WriteUInt32(int pos, uint value);
+
+	ulong ReadULong(int pos);
+	void WriteULong(int pos, ulong value);
+
+	float ReadReal(int pos);
+	void WriteReal(int pos, float real);
+
+	string ReadString(int offset);
+	void WriteString(int offset, int maxlen, string str);
 }
 ```
 
