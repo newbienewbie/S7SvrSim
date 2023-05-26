@@ -26,16 +26,16 @@ namespace S7Svr.Simulator.ViewModels
             this.CmdStartServer = this.RunningVM.RunningStatus.Select(i => !i)
                 .ToReactiveCommand()
                 .WithSubscribe(async i => {
-                    if (this.ConfigVM.DBConfigs.Count == 0)
+                    if (this.ConfigVM.AreaConfigs.Count == 0)
                     {
                         MessageBox.Show("当前未指定DB配置！");
                         return;
                     }
                     this.RunningVM.IpAddress.Value = this.ConfigVM.IpAddress.Value;
-                    this.RunningVM.DBConfigs.Clear();
-                    foreach (var config in this.ConfigVM.DBConfigs)
+                    this.RunningVM.AreaConfigs.Clear();
+                    foreach (var config in this.ConfigVM.AreaConfigs)
                     {
-                        this.RunningVM.DBConfigs.Add(config);
+                        this.RunningVM.AreaConfigs.Add(config);
                     }
                     await this._s7ServerService.StartServerAsync();
                     this.RunningVM.RunningStatus.Value = true;
@@ -45,7 +45,7 @@ namespace S7Svr.Simulator.ViewModels
                 .ToReactiveCommand()
                 .WithSubscribe(async i => {
                     this.RunningVM.IpAddress.Value = string.Empty;
-                    this.RunningVM.DBConfigs.Clear();
+                    this.RunningVM.AreaConfigs.Clear();
                     await this._s7ServerService.StopServerAsync();
                     this.RunningVM.RunningStatus.Value = false;
                 });

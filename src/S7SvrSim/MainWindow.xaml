@@ -59,7 +59,7 @@
                         Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="3"/>
 
 
-                    <DataGrid ItemsSource="{Binding ConfigVM.DBConfigs}" 
+                    <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}" 
                           CanUserDeleteRows="True"  
                           CanUserAddRows="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7" Margin="0,25,0,0" Grid.RowSpan="2" >
                         <DataGrid.Style>
@@ -106,8 +106,9 @@
                                     <Expander >
                                         <Expander.Header>
                                             <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding DBNumber,StringFormat={}DBNumber\={0}}"></TextBlock>
-                                                <TextBlock Text="{Binding DBSize,StringFormat={}\, DBSize\={0}}"></TextBlock>
+                                                <TextBlock Text="{Binding AreaKind,StringFormat={} {0}}"></TextBlock>
+                                                <TextBlock Text="{Binding BlockNumber,StringFormat={}\, Number\={0}}"></TextBlock>
+                                                <TextBlock Text="{Binding BlockSize,StringFormat={}\, Size\={0}}"></TextBlock>
                                             </StackPanel>
                                         </Expander.Header>
                                     </Expander>

@@ -18,7 +18,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public ConfigSnap7ServerVM()
         {
-            this.DBConfigs = new ObservableCollection<DBConfigVM>();
+            this.AreaConfigs = new ObservableCollection<AreaConfigVM>();
 
             this.IpAddress = new ReactiveProperty<string>(_ipAddress);
         }
@@ -31,15 +31,17 @@ namespace S7Svr.Simulator.ViewModels
         /// <summary>
         /// DB Configs
         /// </summary>
-        public virtual ObservableCollection<DBConfigVM> DBConfigs { get; } 
+        public virtual ObservableCollection<AreaConfigVM> AreaConfigs { get; } 
     }
 
 
     public class RunningServerItem
     {
-        public int DBNumber { get; set; }
+        public AreaKind AreaKind { get; set; }
 
-        public int DBSize { get; set; }
+        public int BlockNumber { get; set; }
+
+        public int BlockSize { get; set; }
 
         public byte[] Bytes { get; set; }
     }

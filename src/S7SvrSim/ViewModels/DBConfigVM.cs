@@ -4,19 +4,27 @@ using System.Runtime.CompilerServices;
 
 namespace S7Svr.Simulator.ViewModels
 {
-    public struct DBConfig
+    public enum AreaKind 
     { 
-        public int DBNumber { get; set; }
-        public int DBSize { get; set; }
+        DB = 0,
+        MB = 1,
     }
 
 
-    public class DBConfigVM :IEditableObject, INotifyPropertyChanged
-    {
-        private DBConfig _currentConfig = new DBConfig();
-        private DBConfig _bakeup = default;
+    public struct AreaConfig
+    { 
+        public AreaKind AreaKind { get; set; }
+        public int BlockNumber { get; set; }
+        public int BlockSize { get; set; }
+    }
 
-        public DBConfigVM()
+
+    public class AreaConfigVM :IEditableObject, INotifyPropertyChanged
+    {
+        private AreaConfig _currentConfig = new AreaConfig();
+        private AreaConfig _bakeup = default;
+
+        public AreaConfigVM()
         {
         }
 
@@ -30,24 +38,37 @@ namespace S7Svr.Simulator.ViewModels
             }
         }
 
-        public int DBNumber { 
-            get => this._currentConfig.DBNumber;
+        public AreaKind AreaKind
+        {
+            get => this._currentConfig.AreaKind;
             set
             {
-                if (this._currentConfig.DBNumber != value)
+                if (this._currentConfig.AreaKind != value)
+                {
+                    this._currentConfig.AreaKind = value;
+                    this.OnPropertyChanged(nameof(AreaKind));
+                }
+            }
+        }
+
+        public int DBNumber { 
+            get => this._currentConfig.BlockNumber;
+            set
+            {
+                if (this._currentConfig.BlockNumber != value)
                 { 
-                    this._currentConfig.DBNumber = value;
+                    this._currentConfig.BlockNumber = value;
                     this.OnPropertyChanged(nameof(DBNumber));
                 }
             }
         }
         public int DBSize { 
-            get => this._currentConfig.DBSize;
+            get => this._currentConfig.BlockSize;
             set
             {
-                if (this._currentConfig.DBSize!= value)
+                if (this._currentConfig.BlockSize!= value)
                 { 
-                    this._currentConfig.DBSize = value;
+                    this._currentConfig.BlockSize = value;
                     this.OnPropertyChanged(nameof(DBNumber));
                 }
             }
