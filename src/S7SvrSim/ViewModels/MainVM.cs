@@ -12,11 +12,9 @@ namespace S7Svr.Simulator.ViewModels
 {
     public class MainVM 
     {
-        private readonly IS7DataBlockService _s7ServerService;
 
-        public MainVM(IS7DataBlockService s7ServerService, MsgLoggerVM loggerVM, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
+        public MainVM(IS7ServerService server, MsgLoggerVM loggerVM, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
         {
-            this._s7ServerService = s7ServerService;
             LoggerVM = loggerVM;
             ConfigPyEngineVM = configPyEngineVM;
             this.RunningVM = runningVM;
@@ -37,7 +35,7 @@ namespace S7Svr.Simulator.ViewModels
                     {
                         this.RunningVM.AreaConfigs.Add(config);
                     }
-                    await this._s7ServerService.StartServerAsync();
+                    await server.StartServerAsync();
                     this.RunningVM.RunningStatus.Value = true;
                 });
 
@@ -46,7 +44,7 @@ namespace S7Svr.Simulator.ViewModels
                 .WithSubscribe(async i => {
                     this.RunningVM.IpAddress.Value = string.Empty;
                     this.RunningVM.AreaConfigs.Clear();
-                    await this._s7ServerService.StopServerAsync();
+                    await server.StopServerAsync();
                     this.RunningVM.RunningStatus.Value = false;
                 });
 

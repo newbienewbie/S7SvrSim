@@ -24,7 +24,5 @@ namespace S7Svr.Simulator.ViewModels
 
         string ReadString(int dbNumber, int offset);
         void WriteString(int dbNumber, int offset, int maxlen, string str);
-        Task StartServerAsync();
-        Task StopServerAsync();
     }
 }
