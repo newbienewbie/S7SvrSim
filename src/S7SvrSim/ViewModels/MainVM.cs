@@ -12,9 +12,9 @@ namespace S7Svr.Simulator.ViewModels
 {
     public class MainVM 
     {
-        private readonly IS7ServerService _s7ServerService;
+        private readonly IS7DataBlockService _s7ServerService;
 
-        public MainVM(IS7ServerService s7ServerService, MsgLoggerVM loggerVM, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
+        public MainVM(IS7DataBlockService s7ServerService, MsgLoggerVM loggerVM, ConfigPyEngineVM configPyEngineVM , RunningSnap7ServerVM runningVM, OperationVM operationVM, ConfigSnap7ServerVM configVM)
         {
             this._s7ServerService = s7ServerService;
             LoggerVM = loggerVM;

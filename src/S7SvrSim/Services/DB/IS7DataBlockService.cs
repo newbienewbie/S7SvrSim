@@ -2,7 +2,7 @@
 
 namespace S7Svr.Simulator.ViewModels
 {
-    public interface IS7ServerService
+    public interface IS7DataBlockService
     {
         bool ReadBit(int dbNumber, int offset, byte bit);
         void WriteBit(int dbNumber, int offset, byte bit, bool flag);

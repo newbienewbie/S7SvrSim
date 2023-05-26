@@ -14,10 +14,10 @@ namespace S7Server.Simulator.ViewModels
 {
     public class OperationVM 
     {
-        private IS7ServerService _s7ServerService;
+        private IS7DataBlockService _s7ServerService;
         private readonly PyScriptRunner _scriptRunner;
 
-        public OperationVM(IS7ServerService s7ServerService, PyScriptRunner scriptRunner)
+        public OperationVM(IS7DataBlockService s7ServerService, PyScriptRunner scriptRunner)
         {
             this._s7ServerService = s7ServerService;
             this._scriptRunner = scriptRunner;

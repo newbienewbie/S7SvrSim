@@ -12,15 +12,15 @@ using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
 {
-    public class S7ServerService : IDisposable, IS7ServerService
+    public class S7DataBlockService : IDisposable, IS7DataBlockService
     {
         private readonly RunningSnap7ServerVM _runningVM;
         private readonly MsgLoggerVM _loggerVM;
-        private readonly ILogger<S7ServerService> _logger;
+        private readonly ILogger<S7DataBlockService> _logger;
         protected virtual IMediator _mediator { get; set; }
         protected virtual FutureTech.Snap7.S7Server S7Server { get; set; }
 
-        public S7ServerService(IMediator mediator, RunningSnap7ServerVM runningVM, MsgLoggerVM loggerVM, ILogger<S7ServerService> logger)
+        public S7DataBlockService(IMediator mediator, RunningSnap7ServerVM runningVM, MsgLoggerVM loggerVM, ILogger<S7DataBlockService> logger)
         {
             this._mediator = mediator;
             this._runningVM = runningVM;
@@ -100,7 +100,7 @@ namespace S7Svr.Simulator.ViewModels
         #region Byte
         public byte ReadByte(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -116,7 +116,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteByte(int dbNumber, int pos, byte value)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -131,7 +131,7 @@ namespace S7Svr.Simulator.ViewModels
         #region Short
         public short ReadShort(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -147,7 +147,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteShort(int dbNumber, int pos, short value)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -163,7 +163,7 @@ namespace S7Svr.Simulator.ViewModels
         #region Bit
         public bool ReadBit(int dbNumber, int offset, byte bit)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -179,7 +179,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteBit(int dbNumber, int offset, byte bit, bool flag)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -194,7 +194,7 @@ namespace S7Svr.Simulator.ViewModels
         #region String
         public void WriteString(int dbNumber, int offset, int maxlen, string str)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -206,7 +206,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public string ReadString(int dbNumber, int offset)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -221,7 +221,7 @@ namespace S7Svr.Simulator.ViewModels
         #region Real
         public void WriteReal(int dbNumber, int pos, float real)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -233,7 +233,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public float ReadReal(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -249,7 +249,7 @@ namespace S7Svr.Simulator.ViewModels
         #region ulong
         public ulong ReadULong(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -265,7 +265,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteULong(int dbNumber, int pos, ulong value)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -280,7 +280,7 @@ namespace S7Svr.Simulator.ViewModels
         #region uint32
         public uint ReadUInt32(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
@@ -295,7 +295,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteUInt32(int dbNumber, int pos, uint value)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.BlockNumber == dbNumber).FirstOrDefault();
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
                 this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });

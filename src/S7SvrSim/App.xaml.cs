@@ -63,7 +63,7 @@ namespace S7Svr.Simulator
             services.AddSingleton<ConfigPyEngineVM>();
             services.AddSingleton<MsgLoggerVM>();
             services.AddSingleton<MainWindow>();
-            services.AddSingleton<IS7ServerService, S7ServerService>();
+            services.AddSingleton<IS7DataBlockService, S7DataBlockService>();
             services.AddSingleton<MainVM>();
         }
 

@@ -13,13 +13,13 @@ namespace S7SvrSim.Services
 {
     public class PyScriptRunner
     {
-        private readonly IS7ServerService _s7ServerSvc;
+        private readonly IS7DataBlockService _s7ServerSvc;
         private readonly MsgLoggerVM _loggerVM;
         private readonly ILogger<PyScriptRunner> _logger;
         public ScriptEngine PyEngine { get; }
         private ScriptScope pyScope = null;
 
-        public PyScriptRunner(IS7ServerService s7ServerSvc, MsgLoggerVM loggerVM ,ILogger<PyScriptRunner> logger)
+        public PyScriptRunner(IS7DataBlockService s7ServerSvc, MsgLoggerVM loggerVM ,ILogger<PyScriptRunner> logger)
         {
             this._s7ServerSvc = s7ServerSvc;
             this._loggerVM = loggerVM;
