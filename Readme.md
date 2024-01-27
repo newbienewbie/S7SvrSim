@@ -24,18 +24,25 @@
 
 ## 安装和启动
 
-由于前端是使用 `WPF`开发的，故目前只能在Windows上使用（后期可能会考虑做成跨平台的，但是暂时没有这个动力）。使用该工具最简单的方法是使用`ClickOnce`技术来安装，只需打开如下`URL`即可（需要Windows操作系统）：
+由于前端是使用 `WPF`开发的，故目前只能在Windows上使用（后期可能会考虑做成跨平台的，但是暂时没有这个动力）。
 
-https://assets.chiyiqian.net/S7SvrSim/S7SvrSim.application
+<del>使用该工具最简单的方法是使用`ClickOnce`技术来安装，只需打开如下`URL`即可（需要Windows操作系统）：</del>
 
+<del>https://assets.chiyiqian.net/S7SvrSim/S7SvrSim.application</del>
 
-不过有个别同事使用最新的`Win11`打开`ClickOnce`有问题。所以还提供直接zip包打开。
+(有个别同事使用最新的`Win11`打开`ClickOnce`有问题，所以不再提供ClickOnce方式安装)
+
+请到本项目的Release下，直接下载对应的zip包即可。
 
 启动程序后，在 **DB配置** 界面中:
 - 设置好要监听的IP地址，
 - 配置一个或者多个`DB`的号码、大小
 - 点击 **"启动"** 按钮
 
+### 功能
+
+1. 本质上，这是S7 Server通信模拟器，可以简单把它当成采用S7通信时上位机所连的PLC。
+2. 提供DB、MB操作接口。
 
 ### 操作方式
 
@@ -74,7 +81,7 @@ else:
 
 > 注：这里的`shell`是用户自定义的模块。
 
-有了这些测试脚本，我们只需要在合适的时间点导入这些脚本即可自动完成动作模拟。
+有了这些测试脚本，我们只需要在合适的时间点导入这些脚本即可自动完成动作模拟。(更多示例参考 `docs/sample scripts`文件夹)
 
 
 ### Python的版本支持
@@ -87,7 +94,10 @@ else:
 
 ### 自定义模块的检索路径
 
-如果需要导入自定义的检索路径，可以在`PyEngine/SearchPaths`界面中，点击 **"选择路径"**，来指定自己的模块路径。
+我们可以定义一些公共模块到一些单独的文件下:
+![python_scripts_path.PNG](./docs/python_scripts_path.PNG)
+
+然后通过在`PyEngine/SearchPaths`界面中，点击 **"选择路径"**，来导入自定义的检索路径：
 
 ![search_path](./docs/configure_search_paths.PNG)
 
@@ -118,26 +128,26 @@ Python可以使用的`DB`其实是一个`IS7DataBlockService`接口对象：
 ```C#
 public interface IS7DataBlockService
 {
-	bool ReadBit(int dbNumber, int offset, byte bit);
-	void WriteBit(int dbNumber, int offset, byte bit, bool flag);
+    bool ReadBit(int dbNumber, int offset, byte bit);
+    void WriteBit(int dbNumber, int offset, byte bit, bool flag);
 
-	byte ReadByte(int dbNumber, int pos);
-	void WriteByte(int dbNumber, int pos, byte value);
+    byte ReadByte(int dbNumber, int pos);
+    void WriteByte(int dbNumber, int pos, byte value);
 
-	short ReadShort(int dbNumber, int pos);
-	void WriteShort(int dbNumber, int pos, short value);
+    short ReadShort(int dbNumber, int pos);
+    void WriteShort(int dbNumber, int pos, short value);
 
-	uint ReadUInt32(int dbNumber, int pos);
-	void WriteUInt32(int dbNumber, int pos, uint value);
+    uint ReadUInt32(int dbNumber, int pos);
+    void WriteUInt32(int dbNumber, int pos, uint value);
 
-	ulong ReadULong(int dbNumber, int pos);
-	void WriteULong(int dbNumber, int pos, ulong value);
-
+    ulong ReadULong(int dbNumber, int pos);
+    void WriteULong(int dbNumber, int pos, ulong value);
+    
 	float ReadReal(int dbNumber, int pos);
-	void WriteReal(int dbNumber, int pos, float real);
+    void WriteReal(int dbNumber, int pos, float real);
 
-	string ReadString(int dbNumber, int offset);
-	void WriteString(int dbNumber, int offset, int maxlen, string str);
+    string ReadString(int dbNumber, int offset);
+    void WriteString(int dbNumber, int offset, int maxlen, string str);
 }
 ```
 
@@ -145,33 +155,33 @@ public interface IS7DataBlockService
 ```C#
 public interface IS7MBService
 {
-	bool ReadBit(int offset, byte bit);
-	void WriteBit(int offset, byte bit, bool flag);
+    bool ReadBit(int offset, byte bit);
+    void WriteBit(int offset, byte bit, bool flag);
 
-	byte ReadByte(int pos);
-	void WriteByte(int pos, byte value);
+    byte ReadByte(int pos);
+    void WriteByte(int pos, byte value);
 
-	short ReadShort(int pos);
-	void WriteShort(int pos, short value);
+    short ReadShort(int pos);
+    void WriteShort(int pos, short value);
 
-	uint ReadUInt32(int pos);
-	void WriteUInt32(int pos, uint value);
+    uint ReadUInt32(int pos);
+    void WriteUInt32(int pos, uint value);
 
-	ulong ReadULong(int pos);
-	void WriteULong(int pos, ulong value);
+    ulong ReadULong(int pos);
+    void WriteULong(int pos, ulong value);
 
-	float ReadReal(int pos);
-	void WriteReal(int pos, float real);
+    float ReadReal(int pos);
+    void WriteReal(int pos, float real);
 
-	string ReadString(int offset);
-	void WriteString(int offset, int maxlen, string str);
+    string ReadString(int offset);
+    void WriteString(int offset, int maxlen, string str);
 }
 ```
 
 #### `Logger`
 
 还暴露一个`Logger`对象，用于追加日志：
-```
+```c#
 void LogInfo(string content);
 void LogError(string content);
 ```
