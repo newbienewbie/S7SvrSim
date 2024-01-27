@@ -113,10 +113,9 @@ else:
 通过这些API方法，我们可以通过编写`Python`脚本来动态执行一系列操作，比如：
 
 ```python
-DB.WriteString(6, 2780, "1908WC16V299F6+YSTC1100139+L2/L3:1757;L1/N:1762;")
-DB.WriteReal(6, 3036, 3545.2)
-DB.WriteReal(6, 3040, 68.3)
-DB.WriteReal(6, 3040, 4.8)
+DB.WriteString(200, 2000, 40, "abcdefghijklmn")
+DB.WriteBit(200, 2060, 0, True)
+DB.WriteShort(200, 2062, 1)
 ```
 
 ### API
@@ -143,7 +142,7 @@ public interface IS7DataBlockService
     ulong ReadULong(int dbNumber, int pos);
     void WriteULong(int dbNumber, int pos, ulong value);
     
-	float ReadReal(int dbNumber, int pos);
+    float ReadReal(int dbNumber, int pos);
     void WriteReal(int dbNumber, int pos, float real);
 
     string ReadString(int dbNumber, int offset);
@@ -191,4 +190,4 @@ void LogError(string content);
 ## 已知问题
 
 - [X] <del>由于[#44602](https://github.com/dotnet/runtime/issues/44602#issuecomment-726472185) 这个问题，目前没法使用`ClickOnce`发布</del>。2021-01-16：#44602 号问题已在 *VS16.8.4* 中修复，参见[VS Developer Community](https://developercommunity2.visualstudio.com/t/A-NET-Core-31-or-NET-50-application-/1248873)
-- [ ] 目前由于[`IronPython`](https://ironpython.net/)的限制，发布时无法生成单个文件。参见[IronPython #762](https://github.com/IronLanguages/ironpython2/issues/762)。故发布项目时请不要使用`-p:PublishSingleFile=true`。
+- [X] <del>目前由于[`IronPython`](https://ironpython.net/)的限制，发布时无法生成单个文件。参见[IronPython #762](https://github.com/IronLanguages/ironpython2/issues/762)。故发布项目时请不要使用`-p:PublishSingleFile=true`。</del>
