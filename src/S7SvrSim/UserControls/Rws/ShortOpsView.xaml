@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="S7SvrSim.UserControls.Rws.ShortOpsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:S7SvrSim.UserControls.Rws"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <GroupBox Header="读操作">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+
+                <Button Name="btnRead" Content="读取" HorizontalAlignment="Left" Grid.Column="0">
+                </Button>
+                <TextBlock Name="txtValueRead" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
+                </TextBlock>
+            </Grid>
+        </GroupBox>
+        <GroupBox Header="写操作">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition></ColumnDefinition>
+                    <ColumnDefinition></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition></RowDefinition>
+                </Grid.RowDefinitions>
+                <TextBox Name="txtValueWritten" Grid.Row="0" Grid.Column="0"></TextBox>
+                <Button Name="btnWrite" Content="写入" HorizontalAlignment="Center" Grid.Column="1"></Button>
+            </Grid>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

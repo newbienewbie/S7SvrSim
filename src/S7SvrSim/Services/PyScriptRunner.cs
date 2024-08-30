@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Scripting.Hosting;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.ViewModels;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,12 @@ namespace S7SvrSim.Services
         public ScriptEngine PyEngine { get; }
         private ScriptScope pyScope = null;
 
-        public PyScriptRunner(IS7DataBlockService db, IS7MBService mb, IS7ServerService server, MsgLoggerVM loggerVM ,ILogger<PyScriptRunner> logger)
+        public PyScriptRunner(IS7DataBlockService db, IS7MBService mb, IS7ServerService server, ILogger<PyScriptRunner> logger)
         {
             this._db = db;
             this._mb = mb;
             this._server = server;
-            this._loggerVM = loggerVM;
+            this._loggerVM =  Locator.Current.GetRequiredService<MsgLoggerVM>(); ;
             this._logger = logger;
             this.PyEngine = Python.CreateEngine();
         }

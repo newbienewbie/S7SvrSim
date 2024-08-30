@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using S7Server.Simulator.ViewModels;
 using S7Svr.Simulator.MessageHandlers;
 using S7Svr.Simulator.ViewModels;
+using S7SvrSim;
 using S7SvrSim.Services;
 using S7SvrSim.ViewModels;
 using System;
@@ -47,27 +48,13 @@ namespace S7Svr.Simulator
                     }
                 })
                 .ConfigureServices((ctx, services) => {
-                    this.ConfigureServices(ctx, services);
+                    services.AddS7CoreServices();
                 })
                 .Build();
             this.ServiceProvider = this._host.Services;
+            this.ServiceProvider.RegisterViews();
         }
 
-        private void ConfigureServices(HostBuilderContext ctx, IServiceCollection services)
-        {
-            services.AddMediatR(typeof(MessageNotificationHandler).Assembly);
-            services.AddSingleton<RunningSnap7ServerVM>();
-            services.AddSingleton<OperationVM>();
-            services.AddSingleton<ConfigSnap7ServerVM>();
-            services.AddSingleton<PyScriptRunner>();
-            services.AddSingleton<ConfigPyEngineVM>();
-            services.AddSingleton<MsgLoggerVM>();
-            services.AddSingleton<MainWindow>();
-            services.AddSingleton<IS7ServerService, S7ServerService>();
-            services.AddSingleton<IS7DataBlockService, S7DataBlockService>();
-            services.AddSingleton<IS7MBService, S7MBService>();
-            services.AddSingleton<MainVM>();
-        }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
@@ -80,7 +67,7 @@ namespace S7Svr.Simulator
                     var config = sp.GetRequiredService<IConfiguration>();
                     var logger = sp.GetRequiredService<ILogger<App>>();
                 }
-                var mainWin = this.ServiceProvider.GetRequiredService<MainWindow>();
+                var mainWin = new MainWindow();
                 mainWin.Show();
                 _ = Task.Run(async () =>
                 {

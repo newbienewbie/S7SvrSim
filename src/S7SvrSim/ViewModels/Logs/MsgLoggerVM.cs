@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Reactive.Bindings;
 using S7Svr.Simulator.ViewModels;
 using System;
 using System.Collections.Generic;

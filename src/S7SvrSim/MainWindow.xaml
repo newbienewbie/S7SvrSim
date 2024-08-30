@@ -7,7 +7,7 @@
         xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" 
         xmlns:viewmodels="clr-namespace:S7Svr.Simulator.ViewModels" 
-        xmlns:usercontrols="clr-namespace:S7SvrSim.UserControls"
+        xmlns:usercontrols="clr-namespace:S7SvrSim.UserControls" xmlns:scripting="clr-namespace:S7SvrSim.UserControls.Scripting"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainVM}"
         Title="Siemens PLC 通讯模拟器" 
@@ -51,7 +51,7 @@
 
 
                     <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" ></Label>
-                    <TextBox Text="{Binding ConfigVM.IpAddress.Value}" 
+                    <TextBox Text="{Binding ConfigVM.IpAddress}" 
                         Width="100" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" />
                     <Button Content="启动" Command="{Binding CmdStartServer}" 
                         Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="2"/>
@@ -65,10 +65,10 @@
                         <DataGrid.Style>
                             <Style TargetType="DataGrid" BasedOn="{StaticResource MaterialDesignDataGrid}">
                                 <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RunningVM.RunningStatus.Value}" Value="True">
+                                    <DataTrigger Binding="{Binding RunningVM.RunningStatus}" Value="True">
                                         <Setter Property="IsEnabled" Value="False"></Setter>
                                     </DataTrigger>
-                                    <DataTrigger Binding="{Binding RunningVM.RunningStatus.Value}" Value="False">
+                                    <DataTrigger Binding="{Binding RunningVM.RunningStatus}" Value="False">
                                         <Setter Property="IsEnabled" Value="True"></Setter>
                                     </DataTrigger>
                                 </Style.Triggers>
@@ -95,7 +95,7 @@
                     </Grid.ColumnDefinitions>
 
                     <Label Content="IpAddress" Grid.Row="0" Grid.Column="0" ></Label>
-                    <TextBlock Text="{Binding ConfigVM.IpAddress.Value}" Grid.Row="0" Grid.Column="1"></TextBlock>
+                    <TextBlock Text="{Binding ConfigVM.IpAddress}" Grid.Row="0" Grid.Column="1"></TextBlock>
 
                     <uc:OperationsCtrl DataContext="{Binding OperationVM}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ></uc:OperationsCtrl>
 
@@ -120,31 +120,8 @@
                 </Grid>
             </TabItem>
 
-            <TabItem Header="PyEngine" DataContext="{Binding ConfigPyEngineVM}">
-                <GroupBox>
-                    <GroupBox.Header>Search Paths</GroupBox.Header>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="200"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="200"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                            <RowDefinition Height="32"></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <ItemsControl ItemsSource="{Binding PyEngineSearchPaths}" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBox Text="{Binding .}" IsReadOnly="True" ></TextBox>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                        <Button Command="{Binding CmdSelectModulePath}" Content="选择路径" Grid.Row="1" Grid.Column="0" ></Button>
-                        <TextBox Text="{Binding SelectedModulePath.Value}" VerticalAlignment="Stretch" TextAlignment="Justify" Grid.Row="1" Grid.Column="1"></TextBox>
-                        <Button Content="提交" Command="{Binding CmdSubmitSelectPath}" Grid.Row="1" Grid.Column="2"  ></Button>
-                    </Grid>
-                </GroupBox>
+            <TabItem Header="PyEngine">
+                <scripting:ConfigPyEngineView></scripting:ConfigPyEngineView>
             </TabItem>
         </TabControl>
 

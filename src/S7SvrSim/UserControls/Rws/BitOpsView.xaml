@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="S7SvrSim.UserControls.Rws.BitOpsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:S7SvrSim.UserControls.Rws"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition></ColumnDefinition>
+                <ColumnDefinition></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBox Name="txtTargetBitPos" Text="0" Grid.Row="0" Grid.Column="1"></TextBox>
+            <TextBlock Text="第Nth位"></TextBlock>
+        </Grid>
+        <StackPanel>
+            <GroupBox Header="读操作">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <Button Content="读取" Name="btnRead" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0">
+                    </Button>
+
+                    <CheckBox Name="cboxValueRead" IsEnabled="False" Grid.Row="1" Grid.Column="1"></CheckBox>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="写操作">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition></RowDefinition>
+                        <RowDefinition></RowDefinition>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="真"></TextBlock>
+                        <CheckBox Name="cboxToBeWritten" Grid.Row="0" Grid.Column="0"></CheckBox>
+                    </StackPanel>
+                    <Button Name="btnWrite" Content="写入"  HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"></Button>
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
