@@ -88,7 +88,7 @@ namespace S7Svr.Simulator
                 var lieftime = _host.Services.GetRequiredService<IHostApplicationLifetime>();
                 lieftime.StopApplication();
             }
-            base.OnExit(e);
+            Environment.Exit(0);
         }
 
 
