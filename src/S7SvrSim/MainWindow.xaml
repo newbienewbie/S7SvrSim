@@ -30,7 +30,7 @@
                 <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
                 </Style>
             </TabControl.Resources>
-            <TabItem Header="DB配置">
+            <TabItem Header="配置">
                 <TabItem.Resources>
                     <Style TargetType="Grid" >
                         <Setter Property="Margin" Value="4,8,4,4"></Setter>
@@ -80,11 +80,11 @@
 
                 </Grid>
             </TabItem>
-            <TabItem Header="DB命令">
+            <TabItem Header="命令">
 
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
+                        <RowDefinition Height="Auto" ></RowDefinition>
                         <RowDefinition Height="Auto"></RowDefinition>
                         <RowDefinition></RowDefinition>
                         <RowDefinition></RowDefinition>
@@ -94,13 +94,13 @@
                         <ColumnDefinition></ColumnDefinition>
                     </Grid.ColumnDefinitions>
 
-                    <Label Content="IpAddress" Grid.Row="0" Grid.Column="0" ></Label>
-                    <TextBlock Text="{Binding ConfigVM.IpAddress}" Grid.Row="0" Grid.Column="1"></TextBlock>
+                    <Label Content="IpAddress" Margin="0,4,0,4" Grid.Row="0" Grid.Column="0" ></Label>
+                    <TextBlock Text="{Binding ConfigVM.IpAddress}" Margin="0,4,0,4" Grid.Row="0" Grid.Column="1"></TextBlock>
 
                     <uc:OperationsCtrl DataContext="{Binding OperationVM}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ></uc:OperationsCtrl>
 
-                    <ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-                        <ItemsControl ItemsSource="{Binding RunningVM.RunningsItems}">
+                    <!--<ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+                        <HeaderedItemsControl Header="运行" ItemsSource="{Binding RunningVM.RunningsItems}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Expander >
@@ -114,13 +114,13 @@
                                     </Expander>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
+                        </HeaderedItemsControl>
+                    </ScrollViewer>-->
 
                 </Grid>
             </TabItem>
 
-            <TabItem Header="PyEngine">
+            <TabItem Header="脚本">
                 <scripting:ConfigPyEngineView></scripting:ConfigPyEngineView>
             </TabItem>
         </TabControl>

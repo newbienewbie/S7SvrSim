@@ -6,54 +6,41 @@
              xmlns:local="clr-namespace:S7SvrSim.UserControls.Rws"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <StackPanel>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition></ColumnDefinition>
-                <ColumnDefinition></ColumnDefinition>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition></RowDefinition>
-            </Grid.RowDefinitions>
-            <TextBox Name="txtTargetBitPos" Text="0" Grid.Row="0" Grid.Column="1"></TextBox>
-            <TextBlock Text="第Nth位"></TextBlock>
-        </Grid>
-        <StackPanel>
-            <GroupBox Header="读操作">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
+    <Grid Margin="16 2 16 2">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
 
-                    <Button Content="读取" Name="btnRead" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0">
-                    </Button>
+        <Grid.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            </Style>
+            <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
+                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            </Style>
+            <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}">
+                <Setter Property="VerticalAlignment" Value="Center"></Setter>
+            </Style>
+        </Grid.Resources>
 
-                    <CheckBox Name="cboxValueRead" IsEnabled="False" Grid.Row="1" Grid.Column="1"></CheckBox>
-                </Grid>
-            </GroupBox>
-            <GroupBox Header="写操作">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
+        <TextBlock Text="第Nth位" Grid.Row="0" Grid.Column="0"></TextBlock>
+        <TextBox Name="txtTargetBitPos" Text="0" Grid.Row="0" Grid.Column="1"></TextBox>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="真"></TextBlock>
-                        <CheckBox Name="cboxToBeWritten" Grid.Row="0" Grid.Column="0"></CheckBox>
-                    </StackPanel>
-                    <Button Name="btnWrite" Content="写入"  HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"></Button>
-                </Grid>
-            </GroupBox>
+
+        <Button Content="读取" Name="btnRead" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0"></Button>
+        <CheckBox Name="cboxValueRead" IsEnabled="False"  Grid.Row="1" Grid.Column="1"></CheckBox>
+
+
+        <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="0">
+            <TextBlock Text="真"></TextBlock>
+            <CheckBox Name="cboxToBeWritten" Grid.Row="0" Grid.Column="0"></CheckBox>
         </StackPanel>
-    </StackPanel>
+        <Button Name="btnWrite" Content="写入" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="1"></Button>
+    </Grid>
 </UserControl>

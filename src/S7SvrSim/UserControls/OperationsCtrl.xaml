@@ -21,53 +21,64 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <Label Content="批量执行" Grid.Row="0" Grid.Column="0"></Label>
-        <Button Name="btnRunScript" Content="导入Python脚本"  Grid.Row="0" Grid.Column="1" ></Button>
 
-        <Label Content="DBNumber" Grid.Row="1" Grid.Column="0"></Label>
-        <TextBox Name="txtTargetDbNumber" Grid.Row="1" Grid.Column="1" ></TextBox>
-        <Label Content="Position" Grid.Row="2" Grid.Column="0"></Label>
-        <TextBox Name="txtTargetPos"  Grid.Row="2" Grid.Column="1" ></TextBox>
+        <Label Content="DBNumber" Margin="0,8,0,8" Grid.Row="0" Grid.Column="0"></Label>
+        <TextBox Name="txtTargetDbNumber" Margin="0,8,0,8" Grid.Row="0" Grid.Column="1" ></TextBox>
+        <Label Content="Position" Margin="0,8,0,8" Grid.Row="1" Grid.Column="0"></Label>
+        <TextBox Name="txtTargetPos" Margin="0,8,0,8" Grid.Row="1" Grid.Column="1" ></TextBox>
+
+
+        <Label Content="批量执行" Margin="0,8,0,8" Grid.Row="2" Grid.Column="0"></Label>
+        <Button Name="btnRunScript" Margin="0,8,0,8" Content="导入Python脚本"  Grid.Row="2" Grid.Column="1" >
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                    <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                    <Setter Property="HorizontalAlignment" Value="Left"></Setter>
+                </Style>
+            </Button.Style>
+        </Button>
+
+
 
         <TabControl Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
             
-            <TabItem Header="Bit操作">
+            <TabItem Header="Bit">
                 <rxui:ViewModelViewHost Name="bitOps" 
                                         MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="Byte操作">
+            <TabItem Header="Byte">
                 <rxui:ViewModelViewHost Name="byteOps" 
                                         MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="Short操作">
+            <TabItem Header="Short">
                 <rxui:ViewModelViewHost Name="shortOps"
                                         MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="uint">
+            <TabItem Header="UInt">
                 <rxui:ViewModelViewHost Name="uintOps"
                                         MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
             
-            <TabItem Header="ulong">
+            <TabItem Header="ULong">
                 <rxui:ViewModelViewHost Name="ulongOps"
                                         MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="Real操作">
+            <TabItem Header="Real">
                 <rxui:ViewModelViewHost Name="realOps"
                                         MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="String操作">
+            <TabItem Header="String">
                 <rxui:ViewModelViewHost Name="stringOps"
                                         MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
@@ -75,6 +86,7 @@
 
 
         </TabControl>
+
 
 
     </Grid>

@@ -18,15 +18,23 @@
                 <RowDefinition></RowDefinition>
                 <RowDefinition Height="32"></RowDefinition>
             </Grid.RowDefinitions>
+
+            <Grid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                    <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                </Style>
+            </Grid.Resources>
+            
+            
             <ItemsControl Name="itemsPyEngineSearchPaths" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBox Text="{Binding .}" IsReadOnly="True" ></TextBox>
+                        <TextBox Text="{Binding .}"  Margin="2,8,2,8" IsReadOnly="True" ></TextBox>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
             <Button Name="btnSelectModulePath" Content="选择路径" Grid.Row="1" Grid.Column="0" ></Button>
-            <TextBox Name="txtSelectedModulePath" VerticalAlignment="Stretch" TextAlignment="Justify" Grid.Row="1" Grid.Column="1"></TextBox>
+            <TextBox Name="txtSelectedModulePath" Margin="8,2,8,2" VerticalAlignment="Stretch" TextAlignment="Justify" Grid.Row="1" Grid.Column="1"></TextBox>
             <Button Name="btnSubmitSelectPath" Content="提交"  Grid.Row="1" Grid.Column="2"  ></Button>
         </Grid>
     </GroupBox>
