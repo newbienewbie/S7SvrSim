@@ -11,7 +11,7 @@
     <PyStdLibFolderName>Lib</PyStdLibFolderName>
   </PropertyGroup>
   <ItemGroup>
-    <ContentWithTargetPath Include="E:\nuget\packages\ironpython.stdlib\2.7.11\contentFiles\any\any\Lib\**\*.*">
+    <ContentWithTargetPath Include="E:\nuget\packages\ironpython.stdlib\3.4.1\contentFiles\any\any\Lib\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>$(PyStdLibFolderName)\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
     </ContentWithTargetPath>
