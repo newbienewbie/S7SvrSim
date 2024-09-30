@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace S7SvrSim.ViewModels
 {
@@ -35,10 +37,9 @@ namespace S7SvrSim.ViewModels
         #endregion
 
 
-        public void AddLogMsg(LogMessage s)
+        public IDisposable AddLogMsg(LogMessage s)
         {
-            try
-            {
+            var obs = Observable.Create<Unit>((observer) => {
                 var logcount = this.Logs.Count;
                 if (logcount >= LOGS_MAX)
                 {
@@ -46,23 +47,32 @@ namespace S7SvrSim.ViewModels
                 }
                 this.Logs.Add(s);
                 this.IsLogsChanged = true;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+                observer.OnCompleted();
+                return Disposable.Empty;
+            });
+
+            return obs.SubscribeOn(RxApp.MainThreadScheduler)
+                .ObserveOn(RxApp.TaskpoolScheduler)
+                .Subscribe(
+                        e => {
+                            MessageBox.Show("脚本执行完成！");
+                        },
+                        err => {
+                            MessageBox.Show(err.Message);
+                        }
+                );
         }
 
-        public void LogInfo(string content)
+        public IDisposable LogInfo(string content)
         {
             var msg = new LogMessage(DateTime.Now, LogLevel.Information, content);
-            this.AddLogMsg(msg);
+            return this.AddLogMsg(msg);
         }
 
-        public void LogError(string content)
+        public IDisposable LogError(string content)
         {
             var msg = new LogMessage(DateTime.Now, LogLevel.Error, content);
-            this.AddLogMsg(msg);
+            return this.AddLogMsg(msg);
         }
 
         public MsgLoggerVM()
