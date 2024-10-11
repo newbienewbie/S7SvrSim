@@ -86,11 +86,14 @@ else:
 
 ### Python的版本支持
 
-底层用的是`IronPython`，由于到目前为之，`IronPython 3.x`尚未成熟，故这里`IronPython`的版本是`2.7.11`。
+底层用的是`IronPython`，<del>由于到目前为之，`IronPython 3.x`尚未成熟，故这里`IronPython`的版本是`2.7.11`。</del>
 
-这意味着：
-- 只能使用 **Python2.x** 的语法和特性
-- 如果要写中文，应该指定文件编码 `# -*- coding: UTF-8 -*-`
+<del>这意味着：</del>
+- <del>只能使用 **Python2.x** 的语法和特性</del>
+- <del>如果要写中文，应该指定文件编码 `# -*- coding: UTF-8 -*-`</del>
+
+
+从0.4.0开始，使用`IronPython 3.4.1`
 
 ### 自定义模块的检索路径
 
