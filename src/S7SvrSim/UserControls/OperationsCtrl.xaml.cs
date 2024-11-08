@@ -34,7 +34,8 @@ namespace S7Svr.Simulator.UserControls
             this.WhenActivated(d => {
                 this.ViewModel = Locator.Current.GetRequiredService<OperationVM>();
                 this.BindCommand(this.ViewModel, vm => vm.RwTargetVM.CmdRunScript, v => v.btnRunScript).DisposeWith(d);
-
+                this.BindCommand(this.ViewModel, vm => vm.RwTargetVM.CmdTaskList, v => v.btnTaskList).DisposeWith(d);
+                
                 this.Bind(this.ViewModel, vm => vm.RwTargetVM.TargetDBNumber, v => v.txtTargetDbNumber.Text).DisposeWith(d);
                 this.Bind(this.ViewModel, vm => vm.RwTargetVM.TargetPos, v => v.txtTargetPos.Text).DisposeWith(d);
 
@@ -45,6 +46,7 @@ namespace S7Svr.Simulator.UserControls
                 this.OneWayBind(this.ViewModel, vm => vm.RwUInt64VM, v => v.ulongOps.ViewModel).DisposeWith(d);
                 this.OneWayBind(this.ViewModel, vm => vm.RwRealVM, v => v.realOps.ViewModel).DisposeWith(d);
                 this.OneWayBind(this.ViewModel, vm => vm.RwStringVM, v => v.stringOps.ViewModel).DisposeWith(d);
+                //this.OneWayBind(this.ViewModel, vm => vm.TaskViewModle, v => v.Task.ViewModel).DisposeWith(d);
 
                 this.ViewModel.RwTargetVM.CmdRunScript.ThrownExceptions
                     .Subscribe(e => MessageBox.Show(e.Message));

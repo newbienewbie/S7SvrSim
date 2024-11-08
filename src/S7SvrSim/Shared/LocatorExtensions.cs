@@ -30,6 +30,7 @@ namespace S7SvrSim.Shared.Utils
 
         public static void RegisterLazySingletonEx<TService>(this IMutableDependencyResolver resolver, IServiceProvider sp, params object[] args)
         {
+            
             resolver.RegisterLazySingleton(() => ActivatorUtilities.CreateInstance<TService>(sp, args));
         }
 

@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Splat;
 using S7SvrSim.ViewModels.Rw;
 using S7SvrSim.UserControls.Rws;
+using S7SvrSim.UserControls;
 
 namespace S7SvrSim
 {
@@ -50,6 +51,9 @@ namespace S7SvrSim
             Locator.CurrentMutable.RegisterLazySingletonEx<RwUInt64VM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwRealVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwStringVM>(sp);
+           
+            Locator.CurrentMutable.RegisterLazySingletonEx<ScriptTaskWindowVM>(sp);
+       
 
             Locator.CurrentMutable.Register<IViewFor<RwBitVM>, BitOpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwByteVM>, ByteOpsView>();
@@ -58,6 +62,9 @@ namespace S7SvrSim
             Locator.CurrentMutable.Register<IViewFor<RwUInt64VM>, UInt64OpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwRealVM>, RealOpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwStringVM>, StringOpsView>();
+            //Locator.CurrentMutable.Register<IViewFor<ScriptTaskWindowVM>, ScriptTaskWindow>();
+
+            
 
         }
     }

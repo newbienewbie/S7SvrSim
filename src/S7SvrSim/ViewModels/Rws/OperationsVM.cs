@@ -2,6 +2,7 @@
 using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Services;
+using S7SvrSim.UserControls;
 using S7SvrSim.ViewModels.Rw;
 using Splat;
 using System;
@@ -44,6 +45,7 @@ namespace S7Server.Simulator.ViewModels
         public ReactiveObject RwUInt64VM = Locator.Current.GetRequiredService<RwUInt64VM>();
         public ReactiveObject RwRealVM = Locator.Current.GetRequiredService<RwRealVM>();
         public ReactiveObject RwStringVM = Locator.Current.GetRequiredService<RwStringVM>();
+        
 
 
 

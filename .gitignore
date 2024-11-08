@@ -55,7 +55,7 @@ BenchmarkDotNet.Artifacts/
 project.lock.json
 project.fragment.lock.json
 artifacts/
-
+src/.paket
 # StyleCop
 StyleCopReport.xml
 
@@ -338,3 +338,4 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/src/.paket/.store/paket/8.0.3/paket/8.0.3/tools/netcoreapp2.1/any/de/FSharp.Core.resources.dll

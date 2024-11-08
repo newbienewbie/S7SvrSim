@@ -1,0 +1,27 @@
+﻿<Window x:Class="S7SvrSim.UserControls.ScriptTaskWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:S7SvrSim.UserControls"
+        mc:Ignorable="d"
+        Title="任务管理器" Height="450" Width="800" Name="Taskwin">
+    <DataGrid Name="datagrid" CanUserAddRows="False" IsReadOnly="True" >
+        <DataGrid.Columns>
+            <DataGridTextColumn Header="文件路径"
+                                Binding="{Binding FilePath}" />
+            <DataGridTemplateColumn>
+                <DataGridTemplateColumn.Header>
+                    <TextBlock Text="操作" />
+                </DataGridTemplateColumn.Header>
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <Button Content="停止"
+                                Command="{Binding ViewModel.StopTask, ElementName='Taskwin' }"
+                                CommandParameter="{Binding SelectedItem,ElementName='datagrid'}" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+        </DataGrid.Columns>
+    </DataGrid>
+</Window>

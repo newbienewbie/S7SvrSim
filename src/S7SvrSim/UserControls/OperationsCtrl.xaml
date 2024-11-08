@@ -26,18 +26,61 @@
         <TextBox Name="txtTargetDbNumber" Margin="0,8,0,8" Grid.Row="0" Grid.Column="1" ></TextBox>
         <Label Content="Position" Margin="0,8,0,8" Grid.Row="1" Grid.Column="0"></Label>
         <TextBox Name="txtTargetPos" Margin="0,8,0,8" Grid.Row="1" Grid.Column="1" ></TextBox>
+        <Grid Grid.Row="2"
+              Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition />
+                <ColumnDefinition />
+               
+            </Grid.ColumnDefinitions>
+            <Label Content="批量执行"
+                   Margin="0,8,0,8"
+                   Grid.Row="2"
+                   Grid.Column="0"></Label>
+            <Button Name="btnRunScript"
+                    Margin="0,8,0,8"
+                    Content="导入Python脚本"
+                    Grid.Row="2"
+                    Grid.Column="1">
+                <Button.Style>
+                    <Style TargetType="Button"
+                           BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                        <Setter Property="VerticalAlignment"
+                                Value="Center"></Setter>
+                        <Setter Property="HorizontalAlignment"
+                                Value="Left"></Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <!--<rxui:ViewModelViewHost Name="Task"
+                                    MinHeight="150"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    Grid.Row="2"
+                                    Grid.Column="2" />-->
 
+            <Button Name="btnTaskList"
+                    Margin="0,8,0,8"
+                    Content="正在运行的任务"
+                    Grid.Row="2"
+                    Grid.Column="2">
+                <Button.Style>
+                    <Style TargetType="Button"
+                           BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                        <Setter Property="VerticalAlignment"
+                                Value="Center"></Setter>
+                        <Setter Property="HorizontalAlignment"
+                                Value="Left"></Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
 
-        <Label Content="批量执行" Margin="0,8,0,8" Grid.Row="2" Grid.Column="0"></Label>
-        <Button Name="btnRunScript" Margin="0,8,0,8" Content="导入Python脚本"  Grid.Row="2" Grid.Column="1" >
-            <Button.Style>
-                <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignOutlinedButton}">
-                    <Setter Property="VerticalAlignment" Value="Center"></Setter>
-                    <Setter Property="HorizontalAlignment" Value="Left"></Setter>
-                </Style>
-            </Button.Style>
-        </Button>
-
+        
+       
 
 
         <TabControl Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
