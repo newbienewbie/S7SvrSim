@@ -74,9 +74,13 @@ namespace S7SvrSim.ViewModels
             var msg = new LogMessage(DateTime.Now, LogLevel.Error, content);
             return this.AddLogMsg(msg);
         }
-
+        public ReactiveCommand<Unit, Unit> CleanLogCommand { get; protected set; }
         public MsgLoggerVM()
         {
+            CleanLogCommand = ReactiveCommand.Create(() =>
+            {
+                this.Logs.Clear();
+            });
         }
     }
 }

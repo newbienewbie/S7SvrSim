@@ -5,11 +5,22 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:S7SvrSim.UserControls"
         mc:Ignorable="d"
-        Title="任务管理器" Height="450" Width="800" Name="Taskwin">
-    <DataGrid Name="datagrid" CanUserAddRows="False" IsReadOnly="True" >
+        Title="任务管理器" Height="450" Width="600" Name="Taskwin" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow"
+        >
+    <Window.Resources>
+        <Style TargetType="Button"
+               BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+            <Setter Property="VerticalAlignment"
+                    Value="Center"></Setter>
+        </Style>
+    </Window.Resources>
+    <DataGrid Name="datagrid" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False">
         <DataGrid.Columns>
+            <DataGridTextColumn Header="序号"
+                                Binding="{Binding Order}"
+                                Width="80" />
             <DataGridTextColumn Header="文件路径"
-                                Binding="{Binding FilePath}" />
+                                Binding="{Binding FilePath}" Width="350"/>
             <DataGridTemplateColumn>
                 <DataGridTemplateColumn.Header>
                     <TextBlock Text="操作" />

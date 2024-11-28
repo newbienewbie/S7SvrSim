@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace S7SvrSim.Services
@@ -27,17 +28,17 @@ namespace S7SvrSim.Services
             this._db = db;
             this._mb = mb;
             this._server = server;
-            this._loggerVM =  Locator.Current.GetRequiredService<MsgLoggerVM>(); ;
+            this._loggerVM =  Locator.Current.GetRequiredService<MsgLoggerVM>(); 
             this._logger = logger;
             this.PyEngine = Python.CreateEngine();
         }
 
 
 
-        public void RunFile(string scriptpath)
+        public void RunFile(string scriptpath, CancellationToken token)
         {
-            if (pyScope is null)
-            {
+            //if (pyScope is null)
+            //{
                 pyScope = PyEngine.CreateScope();
                 pyScope.SetVariable("s7_server_svc", this._db);
                 pyScope.SetVariable("S7", this._db);
@@ -48,12 +49,15 @@ namespace S7SvrSim.Services
 
                 pyScope.SetVariable("Logger", this._loggerVM);
                 pyScope.SetVariable("__PY_ENGINE__", this.PyEngine);
-            }
+
+            //}
+            pyScope.SetVariable("Token", token);
 
             var source = PyEngine.CreateScriptSourceFromFile(scriptpath);
             var code = source.Compile();
 
             code.Execute(pyScope);
+            
 
         }
     }

@@ -9,21 +9,35 @@
              d:DataContext="{d:DesignInstance Type=vm:MsgLoggerVM}"
              
              d:DesignHeight="450" d:DesignWidth="800">
-        <ScrollViewer 
-            HorizontalScrollBarVisibility="Auto" 
-            VerticalScrollBarVisibility="Auto" 
-            Background="Azure" 
-            local:Helper.AutoScroll="{Binding IsLogsChanged}"
-            >
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="Button"
+                   BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                <Setter Property="VerticalAlignment"
+                        Value="Center"></Setter>
+            </Style>
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40"/>
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Button Content="清除日志"
+                HorizontalAlignment="Right"
+                Command="{Binding CleanLogCommand}" />
+
+        <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto"
+                      Background="Azure"
+                      local:Helper.AutoScroll="{Binding IsLogsChanged}" Grid.Row="1">
             <ItemsControl ItemsSource="{Binding Logs}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding Timestamp,StringFormat={}{0:HH:mm:ss.ff}:}"></TextBlock>
-                            <TextBlock >
-                                <Run Text="["></Run>
-                                <Run Text="{Binding Level}"></Run>
-                                <Run Text="]: "></Run>
+                            <TextBlock>
+                            <Run Text="["></Run>
+                            <Run Text="{Binding Level}"></Run>
+                            <Run Text="]: "></Run>
                             </TextBlock>
                             <TextBlock Text="{Binding Content}"></TextBlock>
                         </StackPanel>
@@ -31,4 +45,6 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+    </Grid>
+    
 </UserControl>

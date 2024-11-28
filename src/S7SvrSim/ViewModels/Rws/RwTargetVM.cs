@@ -6,8 +6,10 @@ using S7SvrSim.Services;
 using S7SvrSim.UserControls;
 using Splat;
 using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using Unit = System.Reactive.Unit;
 
@@ -51,7 +53,7 @@ namespace S7SvrSim.ViewModels.Rw
         /// 任务管理
         /// </summary>
         public ReactiveCommand<Unit, Unit> CmdTaskList { get; }
-        public void CmdRunScript_Impl()
+        public async void CmdRunScript_Impl()
         {
             try
             {
@@ -64,14 +66,14 @@ namespace S7SvrSim.ViewModels.Rw
                 var filename = fileDialog.FileName;
                 var tokensorce = new CancellationTokenSource();
                 var tasktoken = tokensorce.Token;
-                Observable.Create<Unit>(observer =>
+               
+                var a= Observable.Create<Unit>(observer =>
                     {
-                        this._scriptRunner.RunFile(filename);
+                        this._scriptRunner.RunFile(filename, tasktoken);
                         observer.OnCompleted();
                         return Disposable.Empty;
-                    }).RunAsync(tasktoken)
-                    .SubscribeOn(RxApp.TaskpoolScheduler)
-                    .ObserveOn(RxApp.TaskpoolScheduler)
+                    }).SubscribeOn(RxApp.TaskpoolScheduler)
+                    .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(
                         e =>
                         {
@@ -82,8 +84,7 @@ namespace S7SvrSim.ViewModels.Rw
                             MessageBox.Show(err.Message);
                         }
                  );
-                //tokensorce.Cancel();
-                _mediator.Publish(new MessageScriptTaskNotification() { FilePath = filename, TaskDisposable = tokensorce });
+                await _mediator.Publish(new MessageScriptTaskNotification() { FilePath = filename, TaskDisposable = tokensorce });
 
             }
             catch (Exception ex)

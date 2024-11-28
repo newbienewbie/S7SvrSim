@@ -22,7 +22,7 @@ namespace S7Svr.Simulator.MessageHandlers
         public Task Handle(MessageScriptTaskNotification notification, CancellationToken cancellationToken)
         {
            var taskViewModle = Locator.Current.GetRequiredService<ScriptTaskWindowVM>();
-            taskViewModle.SubjectTaskData.OnNext(new ScriptTaskData() { FilePath = notification.FilePath,TaskDisposable=notification.TaskDisposable});
+            taskViewModle.SubjectTaskData.OnNext(new ScriptTask() { FilePath = notification.FilePath,TokenSource=notification.TaskDisposable});
             return Task.CompletedTask;
         }
     }

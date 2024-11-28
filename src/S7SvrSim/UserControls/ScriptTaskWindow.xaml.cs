@@ -29,7 +29,7 @@ namespace S7SvrSim.UserControls
             InitializeComponent();
             this.WhenActivated(d =>
             {
-                this.OneWayBind(this.ViewModel, vm => vm.ScriptTaskDataGrids, v => v.datagrid.ItemsSource).DisposeWith(d);
+                this.OneWayBind(this.ViewModel, vm => vm.ScriptTaskDatas, v => v.datagrid.ItemsSource).DisposeWith(d);
             });
         }
 
@@ -57,26 +57,28 @@ namespace S7SvrSim.UserControls
             {
                 if (s!=null)
                 {
-                    ScriptTaskDataGrids.Add(s);
+                    s.Order = ScriptTaskDatas.Count+1;
+                    ScriptTaskDatas.Add(s);
 
                 }
             });
 
-            this.StopTask = ReactiveCommand.Create<ScriptTaskData>((data) =>
+            this.StopTask = ReactiveCommand.Create<ScriptTask>((data) =>
             {
-                var needremovetask = ScriptTaskDataGrids.First(o => o.FilePath == data.FilePath);
-                data.TaskDisposable.Cancel();
-                ScriptTaskDataGrids.Remove(needremovetask);
+                
+                data.TokenSource.Cancel();
+                ScriptTaskDatas.Remove(data);
             });
         }
         public ICommand StopTask {  get;  }
-        public Subject<ScriptTaskData> SubjectTaskData { get; } = new Subject<ScriptTaskData>();
-        public ObservableCollection<ScriptTaskData > ScriptTaskDataGrids { get; set; }  =new ObservableCollection<ScriptTaskData>();
+        public Subject<ScriptTask> SubjectTaskData { get; } = new Subject<ScriptTask>();
+        public ObservableCollection<ScriptTask > ScriptTaskDatas { get; set; }  =new ObservableCollection<ScriptTask>();
     }
 
-    public class ScriptTaskData
+    public class ScriptTask
     {
+        public int Order { get; set; }
         public string FilePath { get; set; }
-        public CancellationTokenSource TaskDisposable { get; set; }
+        public CancellationTokenSource TokenSource { get; set; }
     }
 }
