@@ -1,9 +1,11 @@
-﻿using S7Server.Simulator.ViewModels;
+﻿using Microsoft.Scripting.Hosting;
+using S7Server.Simulator.ViewModels;
 using S7Svr.Simulator.UserControls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
@@ -53,32 +55,42 @@ namespace S7SvrSim.UserControls
     {
         public ScriptTaskWindowVM()
         {
-            SubjectTaskData.Subscribe(s =>
-            {
-                if (s!=null)
+            SubjectTaskData
+                .SubscribeOn(RxApp.MainThreadScheduler)
+                .Subscribe(s =>
                 {
-                    s.Order = ScriptTaskDatas.Count+1;
-                    ScriptTaskDatas.Add(s);
+                    if (s!=null)
+                    {
+                        s.Order = ScriptTaskDatas.Count+1;
+                        ScriptTaskDatas.Add(s);
+                    }
+                });
 
-                }
-            });
-
-            this.StopTask = ReactiveCommand.Create<ScriptTask>((data) =>
+            this.CmdStopTask = ReactiveCommand.Create<ScriptTask>((data) =>
             {
-                
                 data.TokenSource.Cancel();
                 ScriptTaskDatas.Remove(data);
             });
         }
-        public ICommand StopTask {  get;  }
+        public ICommand CmdStopTask {  get;  }
         public Subject<ScriptTask> SubjectTaskData { get; } = new Subject<ScriptTask>();
-        public ObservableCollection<ScriptTask > ScriptTaskDatas { get; set; }  =new ObservableCollection<ScriptTask>();
+        public ObservableCollection<ScriptTask > ScriptTaskDatas { get; private set; }  =new ObservableCollection<ScriptTask>();
     }
 
     public class ScriptTask
     {
-        public int Order { get; set; }
+        public ScriptTask(Guid taskId, string filePath, CancellationTokenSource tokenSource, ScriptScope pyScope)
+        {
+            TaskId = taskId;
+            FilePath = filePath;
+            TokenSource = tokenSource;
+            PyScope = pyScope;
+        }
+
+        public Guid TaskId { get; set; }
         public string FilePath { get; set; }
         public CancellationTokenSource TokenSource { get; set; }
-    }
+        public ScriptScope PyScope { get; set; }
+        public int Order { get;set; }
+    };
 }

@@ -7,6 +7,7 @@ using S7SvrSim.UserControls;
 using Splat;
 using System;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -63,28 +64,36 @@ namespace S7SvrSim.ViewModels.Rw
                 {
                     return;
                 }
+                var taskid = Guid.NewGuid();
                 var filename = fileDialog.FileName;
                 var tokensorce = new CancellationTokenSource();
                 var tasktoken = tokensorce.Token;
-               
-                var a= Observable.Create<Unit>(observer =>
-                    {
-                        this._scriptRunner.RunFile(filename, tasktoken);
+                var scope = this._scriptRunner.PyEngine.CreateScope();
+                Observable.Create<Unit>(observer => {
+                        this._scriptRunner.RunFile(scope, filename, tasktoken);
                         observer.OnCompleted();
                         return Disposable.Empty;
-                    }).SubscribeOn(RxApp.TaskpoolScheduler)
+                    })
+                    .SubscribeOn(RxApp.TaskpoolScheduler)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(
-                        e =>
+                        e =>{ },
+                        async err =>
                         {
-                            MessageBox.Show("脚本执行完成！");
-                        },
-                        err =>
-                        {
+                            await this._mediator.Publish(new ScriptTaskCompletedNotification(taskid));
                             MessageBox.Show(err.Message);
+                        },
+                        async () => {
+                            await this._mediator.Publish(new ScriptTaskCompletedNotification(taskid));
+                            MessageBox.Show("脚本执行完成！");
                         }
                  );
-                await _mediator.Publish(new MessageScriptTaskNotification() { FilePath = filename, TaskDisposable = tokensorce });
+                 await _mediator.Publish(new ScriptTaskCreatedNotification(
+                     TaskId: taskid,
+                     FilePath : filename, 
+                     TokenSource : tokensorce, 
+                     PyScope : scope 
+                 ));
 
             }
             catch (Exception ex)

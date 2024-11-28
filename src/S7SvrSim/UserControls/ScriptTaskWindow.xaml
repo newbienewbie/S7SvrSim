@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:S7SvrSim.UserControls"
         mc:Ignorable="d"
-        Title="任务管理器" Height="450" Width="600" Name="Taskwin" WindowStartupLocation="CenterOwner" WindowStyle="ToolWindow"
+        Title="任务管理器" Height="450" Width="600" Name="Taskwin" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow"
         >
     <Window.Resources>
         <Style TargetType="Button"
@@ -28,7 +28,7 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Button Content="停止"
-                                Command="{Binding ViewModel.StopTask, ElementName='Taskwin' }"
+                                Command="{Binding ViewModel.CmdStopTask, ElementName='Taskwin' }"
                                 CommandParameter="{Binding SelectedItem,ElementName='datagrid'}" />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>

@@ -21,7 +21,6 @@ namespace S7SvrSim.Services
         private readonly MsgLoggerVM _loggerVM;
         private readonly ILogger<PyScriptRunner> _logger;
         public ScriptEngine PyEngine { get; }
-        private ScriptScope pyScope = null;
 
         public PyScriptRunner(IS7DataBlockService db, IS7MBService mb, IS7ServerService server, ILogger<PyScriptRunner> logger)
         {
@@ -35,23 +34,20 @@ namespace S7SvrSim.Services
 
 
 
-        public void RunFile(string scriptpath, CancellationToken token)
+        public void RunFile(ScriptScope pyScope, string scriptpath, CancellationToken token)
         {
-            //if (pyScope is null)
-            //{
-                pyScope = PyEngine.CreateScope();
-                pyScope.SetVariable("s7_server_svc", this._db);
-                pyScope.SetVariable("S7", this._db);
+            pyScope.SetVariable("s7_server_svc", this._db);
+            pyScope.SetVariable("S7", this._db);
 
-                pyScope.SetVariable("Server", this._server);
-                pyScope.SetVariable("DB", this._db);
-                pyScope.SetVariable("MB", this._mb);
+            pyScope.SetVariable("Server", this._server);
+            pyScope.SetVariable("DB", this._db);
+            pyScope.SetVariable("MB", this._mb);
 
-                pyScope.SetVariable("Logger", this._loggerVM);
-                pyScope.SetVariable("__PY_ENGINE__", this.PyEngine);
+            pyScope.SetVariable("Logger", this._loggerVM);
+            pyScope.SetVariable("__PY_ENGINE__", this.PyEngine);
 
-            //}
-            pyScope.SetVariable("Token", token);
+            pyScope.SetVariable("ct", token);
+
 
             var source = PyEngine.CreateScriptSourceFromFile(scriptpath);
             var code = source.Compile();

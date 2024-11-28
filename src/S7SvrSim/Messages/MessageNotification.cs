@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Scripting.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,17 @@ namespace S7Svr.Simulator.Messages
         public string Message { get; set; }
 
     }
-    public class MessageScriptTaskNotification : INotification
-    {
-        public string FilePath { get; set; }
-        public CancellationTokenSource TaskDisposable { get; set; }
-    }
+
+
+    public record ScriptTaskCreatedNotification(
+        Guid TaskId, 
+        ScriptScope PyScope, 
+        string FilePath, 
+        CancellationTokenSource TokenSource
+        ) : INotification;
+
+    public record ScriptTaskCompletedNotification(
+        Guid TaskId
+        ) : INotification;
+
 }
