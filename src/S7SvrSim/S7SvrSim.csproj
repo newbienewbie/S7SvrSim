@@ -2,16 +2,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows10.0.17763</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>favicon.ico</ApplicationIcon>
+	  <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <PyStdLibFolderName>Lib</PyStdLibFolderName>
   </PropertyGroup>
   <ItemGroup>
-    <ContentWithTargetPath Include="E:\nuget\packages\ironpython.stdlib\2.7.11\contentFiles\any\any\Lib\**\*.*">
+    <ContentWithTargetPath Include="E:\nuget\packages\ironpython.stdlib\3.4.1\contentFiles\any\any\Lib\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>$(PyStdLibFolderName)\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
     </ContentWithTargetPath>

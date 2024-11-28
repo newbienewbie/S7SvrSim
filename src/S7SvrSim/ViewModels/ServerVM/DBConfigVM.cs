@@ -1,20 +1,31 @@
-﻿using System;
+﻿using ReactiveUI.Fody.Helpers;
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace S7Svr.Simulator.ViewModels
 {
+    /// <summary>
+    /// 区域种类
+    /// </summary>
     public enum AreaKind 
     { 
         DB = 0,
         MB = 1,
     }
 
-
-    public struct AreaConfig
-    { 
+    /// <summary>
+    /// 区域配置
+    /// </summary>
+    public class AreaConfig : ReactiveObject
+    {
+        [Reactive]
         public AreaKind AreaKind { get; set; }
+
+        [Reactive]
         public int BlockNumber { get; set; }
+
+        [Reactive]
         public int BlockSize { get; set; }
     }
 

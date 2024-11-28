@@ -6,6 +6,13 @@ MediatR.Extensions.Microsoft.DependencyInjection
 Microsoft.Extensions.Hosting
 Microsoft.Extensions.Logging
 Microsoft.Extensions.Logging.Debug
-ReactiveProperty
-ReactiveProperty.WPF
+
+
 MaterialDesignThemes
+
+
+ReactiveUI
+ReactiveUI.Fody
+ReactiveUI.WPF
+ReactiveUI.Validation
+Splat

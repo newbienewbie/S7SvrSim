@@ -2,16 +2,20 @@ source https://api.nuget.org/v3/index.json
 source https://baget.stdunit.com/v3/index.json
 
 storage: none
-framework: net6.0, netstandard2.0, netstandard2.1
+framework: net6.0-windows10.0.17763, netstandard2.0, netstandard2.1
 
 
 nuget FutureTech.Snap7 0.4.3
-nuget IronPython 2.7.11
-nuget IronPython.StdLib 2.7.11
+nuget IronPython 3.4.1
+nuget IronPython.StdLib 3.4.1
 nuget MediatR 9.0.0
 nuget MediatR.Extensions.Microsoft.DependencyInjection 9.0.0
 nuget Microsoft.Extensions.Hosting >= 3.1.0
 nuget Microsoft.Extensions.Logging >= 3.1.0
 nuget MaterialDesignThemes 4.3
-nuget ReactiveProperty
-nuget ReactiveProperty.WPF
+
+nuget ReactiveUI >= 19.5.41
+nuget ReactiveUI.Fody >= 19.5.41 
+nuget ReactiveUI.WPF >= 19.5.41
+nuget ReactiveUI.Validation >= 3.1.7
+nuget Splat >= 14.8.12  

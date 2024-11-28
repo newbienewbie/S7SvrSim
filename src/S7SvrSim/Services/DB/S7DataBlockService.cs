@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using S7Svr.Simulator.Messages;
 using S7SvrSim.ViewModels;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,15 +17,15 @@ namespace S7Svr.Simulator.ViewModels
     {
         private readonly RunningSnap7ServerVM _runningVM;
         private readonly MsgLoggerVM _loggerVM;
-        private readonly ILogger<S7DataBlockService> _logger;
+        private readonly ILogger<IS7DataBlockService> _logger;
         protected virtual IMediator _mediator { get; set; }
         protected virtual FutureTech.Snap7.S7Server S7Server { get; set; }
 
-        public S7DataBlockService(IMediator mediator, RunningSnap7ServerVM runningVM, MsgLoggerVM loggerVM, ILogger<S7DataBlockService> logger)
+        public S7DataBlockService(IMediator mediator, ILogger<IS7DataBlockService> logger)
         {
             this._mediator = mediator;
-            this._runningVM = runningVM;
-            this._loggerVM = loggerVM;
+            this._runningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
+            this._loggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>();
             this._logger = logger;
         }
 

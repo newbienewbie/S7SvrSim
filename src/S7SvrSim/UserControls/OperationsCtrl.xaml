@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls" xmlns:viewmodels="clr-namespace:S7Server.Simulator.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:OperationVM}"
+             xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls" 
+             xmlns:viewmodels="clr-namespace:S7Server.Simulator.ViewModels" 
+             xmlns:rxui="http://reactiveui.net" d:DataContext="{d:DesignInstance Type=viewmodels:OperationVM}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid >
@@ -19,282 +21,116 @@
             <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <Label Content="批量执行" Grid.Row="0" Grid.Column="0"></Label>
-        <Button Content="导入Python脚本" Command="{Binding CmdRunScript}"  Grid.Row="0" Grid.Column="1" ></Button>
 
-        <Label Content="DBNumber" Grid.Row="1" Grid.Column="0"></Label>
-        <TextBox Text="{Binding TargetDBNumber.Value}" Grid.Row="1" Grid.Column="1" ></TextBox>
-        <Label Content="Position" Grid.Row="2" Grid.Column="0"></Label>
-        <TextBox Text="{Binding TargetPos.Value}"  Grid.Row="2" Grid.Column="1" ></TextBox>
+        <Label Content="DBNumber" Margin="0,8,0,8" Grid.Row="0" Grid.Column="0"></Label>
+        <TextBox Name="txtTargetDbNumber" Margin="0,8,0,8" Grid.Row="0" Grid.Column="1" ></TextBox>
+        <Label Content="Position" Margin="0,8,0,8" Grid.Row="1" Grid.Column="0"></Label>
+        <TextBox Name="txtTargetPos" Margin="0,8,0,8" Grid.Row="1" Grid.Column="1" ></TextBox>
+        <Grid Grid.Row="2"
+              Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition />
+                <ColumnDefinition />
+               
+            </Grid.ColumnDefinitions>
+            <Label Content="批量执行"
+                   Margin="0,8,0,8"
+                   Grid.Row="2"
+                   Grid.Column="0"></Label>
+            <Button Name="btnRunScript"
+                    Margin="0,8,0,8"
+                    Content="导入Python脚本"
+                    Grid.Row="2"
+                    Grid.Column="1">
+                <Button.Style>
+                    <Style TargetType="Button"
+                           BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                        <Setter Property="VerticalAlignment"
+                                Value="Center"></Setter>
+                        <Setter Property="HorizontalAlignment"
+                                Value="Left"></Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <!--<rxui:ViewModelViewHost Name="Task"
+                                    MinHeight="150"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch"
+                                    Grid.Row="2"
+                                    Grid.Column="2" />-->
+
+            <Button Name="btnTaskList"
+                    Margin="0,8,0,8"
+                    Content="正在运行的任务"
+                    Grid.Row="2"
+                    Grid.Column="2">
+                <Button.Style>
+                    <Style TargetType="Button"
+                           BasedOn="{StaticResource MaterialDesignOutlinedButton}">
+                        <Setter Property="VerticalAlignment"
+                                Value="Center"></Setter>
+                        <Setter Property="HorizontalAlignment"
+                                Value="Left"></Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+
+        
+       
+
 
         <TabControl Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2">
-            <TabItem Header="Bit操作">
-                <StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition></RowDefinition>
-                        </Grid.RowDefinitions>
-                        <TextBox Text="{Binding TargetBitPos.Value}" Grid.Row="0" Grid.Column="1"></TextBox>
-                        <TextBlock Text="第Nth位"></TextBlock>
-                    </Grid>
-                    <StackPanel>
-                        <GroupBox Header="读操作">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition></ColumnDefinition>
-                                    <ColumnDefinition></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                </Grid.RowDefinitions>
-
-                                <Button Content="读取" Command="{Binding CmdReadBit}" HorizontalAlignment="Left" Grid.Row="1" Grid.Column="0">
-                                </Button>
-
-                                <CheckBox IsChecked="{Binding BitRead.Value}" IsEnabled="False" Grid.Row="1" Grid.Column="1"></CheckBox>
-                            </Grid>
-                        </GroupBox>
-                        <GroupBox Header="写操作">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition></ColumnDefinition>
-                                    <ColumnDefinition></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition></RowDefinition>
-                                    <RowDefinition></RowDefinition>
-                                </Grid.RowDefinitions>
-
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="真"></TextBlock>
-                                    <CheckBox IsChecked="{Binding BitToBeWritten.Value}"  Grid.Row="0" Grid.Column="0"></CheckBox>
-                                </StackPanel>
-                                <Button Content="写入" Command="{Binding CmdWriteBit}" HorizontalAlignment="Center" Grid.Row="0" Grid.Column="1"></Button>
-                            </Grid>
-                        </GroupBox>
-                    </StackPanel>
-                </StackPanel>
+            
+            <TabItem Header="Bit">
+                <rxui:ViewModelViewHost Name="bitOps" 
+                                        MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="Byte操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <Button Content="读取" Command="{Binding CmdReadByte}" HorizontalAlignment="Left" Grid.Column="0">
-                            </Button>
-                            <TextBlock Text="{Binding ByteRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                            </TextBlock>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <TextBox Text="{Binding ByteToBeWritten.Value}" Grid.Row="0" Grid.Column="0"></TextBox>
-                            <Button Content="写入" Command="{Binding CmdWriteByte}" HorizontalAlignment="Center" Grid.Column="1"></Button>
-                        </Grid>
-                    </GroupBox>
-                </StackPanel>
+            <TabItem Header="Byte">
+                <rxui:ViewModelViewHost Name="byteOps" 
+                                        MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="Short操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <Button Content="读取" Command="{Binding CmdReadShort}" HorizontalAlignment="Left" Grid.Column="0">
-                            </Button>
-                            <TextBlock Text="{Binding ShortRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                            </TextBlock>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <TextBox Text="{Binding ShortToBeWritten.Value}" Grid.Row="0" Grid.Column="0"></TextBox>
-                            <Button Content="写入" Command="{Binding CmdWriteShort}" HorizontalAlignment="Center" Grid.Column="1"></Button>
-                        </Grid>
-                    </GroupBox>
-                </StackPanel>
+            <TabItem Header="Short">
+                <rxui:ViewModelViewHost Name="shortOps"
+                                        MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="uint">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <Button Content="读取" Command="{Binding CmdReadUInt}" HorizontalAlignment="Left" Grid.Column="0">
-                            </Button>
-                            <TextBlock Text="{Binding UIntRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                            </TextBlock>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Grid.Column="0">待写入的无符号32位整数</Label>
-                            <TextBox Text="{Binding UIntToBeWritten.Value}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
-                            <Button Content="写入" Command="{Binding CmdWriteUInt}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"></Button>
-                        </Grid>
-                    </GroupBox>
-                </StackPanel>
+            <TabItem Header="UInt">
+                <rxui:ViewModelViewHost Name="uintOps"
+                                        MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
-            <TabItem Header="ulong">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <Button Content="读取" Command="{Binding CmdReadULong}" HorizontalAlignment="Left" Grid.Column="0">
-                            </Button>
-                            <TextBlock Text="{Binding ULongRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                            </TextBlock>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Grid.Column="0">待写入的无符号64位整数</Label>
-                            <TextBox Text="{Binding ULongToBeWritten.Value}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
-                            <Button Content="写入" Command="{Binding CmdWriteULong}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"></Button>
-                        </Grid>
-                    </GroupBox>
-                </StackPanel>
+            
+            <TabItem Header="ULong">
+                <rxui:ViewModelViewHost Name="ulongOps"
+                                        MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="Real操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <Button Content="读取" Command="{Binding CmdReadReal}" HorizontalAlignment="Left" Grid.Column="0">
-                            </Button>
-                            <TextBlock Text="{Binding RealRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                            </TextBlock>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <TextBox Text="{Binding RealToBeWritten.Value}" Grid.Row="0" Grid.Column="0"></TextBox>
-                            <Button Content="写入" Command="{Binding CmdWriteReal}" HorizontalAlignment="Center" Grid.Column="1"></Button>
-                        </Grid>
-                    </GroupBox>
-                </StackPanel>
+            <TabItem Header="Real">
+                <rxui:ViewModelViewHost Name="realOps"
+                                        MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
-            <TabItem Header="String操作">
-                <StackPanel>
-                    <GroupBox Header="读操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <Button Content="读取" Command="{Binding CmdReadString}" HorizontalAlignment="Left" Grid.Column="0">
-                            </Button>
-                            <TextBlock Text="{Binding StrRead.Value}" HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1">
-                            </TextBlock>
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="写操作">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                                <ColumnDefinition></ColumnDefinition>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Grid.Column="0">待写入的字符串</Label>
-                            <TextBox Text="{Binding StrToBeWritten.Value}" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"></TextBox>
-                            <Label Grid.Row="1" Grid.Column="0">最大字符串长度</Label>
-                            <TextBox Text="{Binding StringArrayMaxLength.Value}" Grid.Row="1" Grid.Column="1"></TextBox>
-                            <Button Content="写入" Command="{Binding CmdWriteString}" HorizontalAlignment="Center" Grid.Row="1" Grid.Column="2"></Button>
-                        </Grid>
-                    </GroupBox>
-                </StackPanel>
+            <TabItem Header="String">
+                <rxui:ViewModelViewHost Name="stringOps"
+                                        MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
+
+
         </TabControl>
+
+
 
     </Grid>
 </UserControl>
