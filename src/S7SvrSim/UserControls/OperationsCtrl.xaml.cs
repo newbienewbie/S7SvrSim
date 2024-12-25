@@ -45,6 +45,7 @@ namespace S7Svr.Simulator.UserControls
                 this.OneWayBind(this.ViewModel, vm => vm.RwUInt32VM, v => v.uintOps.ViewModel).DisposeWith(d);
                 this.OneWayBind(this.ViewModel, vm => vm.RwUInt64VM, v => v.ulongOps.ViewModel).DisposeWith(d);
                 this.OneWayBind(this.ViewModel, vm => vm.RwRealVM, v => v.realOps.ViewModel).DisposeWith(d);
+                this.OneWayBind(this.ViewModel, vm => vm.RwLRealVM, v => v.lRealOps.ViewModel).DisposeWith(d);
                 this.OneWayBind(this.ViewModel, vm => vm.RwStringVM, v => v.stringOps.ViewModel).DisposeWith(d);
                 //this.OneWayBind(this.ViewModel, vm => vm.TaskViewModle, v => v.Task.ViewModel).DisposeWith(d);
 

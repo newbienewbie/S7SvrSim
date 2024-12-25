@@ -22,6 +22,9 @@ namespace S7Svr.Simulator.ViewModels
         float ReadReal(int dbNumber, int pos);
         void WriteReal(int dbNumber, int pos, float real);
 
+        double ReadLReal(int dbNumber, int pos);
+        void WriteLReal(int dbNumber, int pos, double real);
+
         string ReadString(int dbNumber, int offset);
         void WriteString(int dbNumber, int offset, int maxlen, string str);
     }

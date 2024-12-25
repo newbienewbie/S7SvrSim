@@ -178,6 +178,34 @@ namespace S7Svr.Simulator.ViewModels
 
         #endregion
 
+        #region LReal
+        public void WriteLReal(int dbNumber, int pos, double real)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
+                return;
+            }
+            var buffer = config.Bytes;
+            S7.SetLRealAt(buffer, pos, real);
+        }
+
+        public double ReadLReal(int dbNumber, int pos)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
+                return default;
+            }
+            var buffer = config.Bytes;
+            var real = S7.GetLRealAt(buffer, pos);
+            return real;
+        }
+
+        #endregion
+
         #region ulong
         public ulong ReadULong(int dbNumber, int pos)
         {

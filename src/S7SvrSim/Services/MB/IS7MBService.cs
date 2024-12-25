@@ -20,6 +20,9 @@
         float ReadReal(int pos);
         void WriteReal(int pos, float real);
 
+        double ReadLReal(int pos);
+        void WriteLReal(int pos, double real);
+
         string ReadString(int offset);
         void WriteString(int offset, int maxlen, string str);
     }

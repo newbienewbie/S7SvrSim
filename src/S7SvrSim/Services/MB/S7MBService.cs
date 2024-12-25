@@ -121,6 +121,22 @@ namespace S7Svr.Simulator.ViewModels
 
         #endregion
 
+        #region LReal
+        public void WriteLReal(int pos, double real)
+        {
+            var buffer = GetBuffer();
+            S7.SetLRealAt(buffer, pos, real);
+        }
+
+        public double ReadLReal(int pos)
+        {
+            var buffer = GetBuffer();
+            var real = S7.GetLRealAt(buffer, pos);
+            return real;
+        }
+
+        #endregion
+
         #region ulong
         public ulong ReadULong(int pos)
         {
