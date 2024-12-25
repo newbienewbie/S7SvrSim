@@ -128,56 +128,62 @@ DB.WriteShort(200, 2062, 1)
 Python可以使用的`DB`其实是一个`IS7DataBlockService`接口对象：
 
 ```C#
-public interface IS7DataBlockService
-{
-    bool ReadBit(int dbNumber, int offset, byte bit);
-    void WriteBit(int dbNumber, int offset, byte bit, bool flag);
+    public interface IS7DataBlockService
+    {
+        bool ReadBit(int dbNumber, int offset, byte bit);
+        void WriteBit(int dbNumber, int offset, byte bit, bool flag);
 
-    byte ReadByte(int dbNumber, int pos);
-    void WriteByte(int dbNumber, int pos, byte value);
+        byte ReadByte(int dbNumber, int pos);
+        void WriteByte(int dbNumber, int pos, byte value);
 
-    short ReadShort(int dbNumber, int pos);
-    void WriteShort(int dbNumber, int pos, short value);
+        short ReadShort(int dbNumber, int pos);
+        void WriteShort(int dbNumber, int pos, short value);
 
-    uint ReadUInt32(int dbNumber, int pos);
-    void WriteUInt32(int dbNumber, int pos, uint value);
+        uint ReadUInt32(int dbNumber, int pos);
+        void WriteUInt32(int dbNumber, int pos, uint value);
 
-    ulong ReadULong(int dbNumber, int pos);
-    void WriteULong(int dbNumber, int pos, ulong value);
-    
-    float ReadReal(int dbNumber, int pos);
-    void WriteReal(int dbNumber, int pos, float real);
+        ulong ReadULong(int dbNumber, int pos);
+        void WriteULong(int dbNumber, int pos, ulong value);
 
-    string ReadString(int dbNumber, int offset);
-    void WriteString(int dbNumber, int offset, int maxlen, string str);
-}
+        float ReadReal(int dbNumber, int pos);
+        void WriteReal(int dbNumber, int pos, float real);
+
+        double ReadLReal(int dbNumber, int pos);
+        void WriteLReal(int dbNumber, int pos, double real);
+
+        string ReadString(int dbNumber, int offset);
+        void WriteString(int dbNumber, int offset, int maxlen, string str);
+    }
 ```
 
 而`MB`则是一个`IS7MBService`:
 ```C#
-public interface IS7MBService
-{
-    bool ReadBit(int offset, byte bit);
-    void WriteBit(int offset, byte bit, bool flag);
+    public interface IS7MBService
+    {
+        bool ReadBit(int offset, byte bit);
+        void WriteBit(int offset, byte bit, bool flag);
 
-    byte ReadByte(int pos);
-    void WriteByte(int pos, byte value);
+        byte ReadByte(int pos);
+        void WriteByte(int pos, byte value);
 
-    short ReadShort(int pos);
-    void WriteShort(int pos, short value);
+        short ReadShort(int pos);
+        void WriteShort(int pos, short value);
 
-    uint ReadUInt32(int pos);
-    void WriteUInt32(int pos, uint value);
+        uint ReadUInt32(int pos);
+        void WriteUInt32(int pos, uint value);
 
-    ulong ReadULong(int pos);
-    void WriteULong(int pos, ulong value);
+        ulong ReadULong(int pos);
+        void WriteULong(int pos, ulong value);
 
-    float ReadReal(int pos);
-    void WriteReal(int pos, float real);
+        float ReadReal(int pos);
+        void WriteReal(int pos, float real);
 
-    string ReadString(int offset);
-    void WriteString(int offset, int maxlen, string str);
-}
+        double ReadLReal(int pos);
+        void WriteLReal(int pos, double real);
+
+        string ReadString(int offset);
+        void WriteString(int offset, int maxlen, string str);
+    }
 ```
 
 #### `Logger`

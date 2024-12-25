@@ -50,6 +50,7 @@ namespace S7SvrSim
             Locator.CurrentMutable.RegisterLazySingletonEx<RwUInt32VM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwUInt64VM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwRealVM>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<RwLRealVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwStringVM>(sp);
            
             Locator.CurrentMutable.RegisterLazySingletonEx<ScriptTaskWindowVM>(sp);
@@ -61,6 +62,7 @@ namespace S7SvrSim
             Locator.CurrentMutable.Register<IViewFor<RwUInt32VM>, UInt32OpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwUInt64VM>, UInt64OpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwRealVM>, RealOpsView>();
+            Locator.CurrentMutable.Register<IViewFor<RwLRealVM>, LRealOpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwStringVM>, StringOpsView>();
             //Locator.CurrentMutable.Register<IViewFor<ScriptTaskWindowVM>, ScriptTaskWindow>();
 

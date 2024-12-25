@@ -44,6 +44,7 @@ namespace S7Server.Simulator.ViewModels
         public ReactiveObject RwUInt32VM = Locator.Current.GetRequiredService<RwUInt32VM>();
         public ReactiveObject RwUInt64VM = Locator.Current.GetRequiredService<RwUInt64VM>();
         public ReactiveObject RwRealVM = Locator.Current.GetRequiredService<RwRealVM>();
+        public ReactiveObject RwLRealVM = Locator.Current.GetRequiredService<RwLRealVM>();
         public ReactiveObject RwStringVM = Locator.Current.GetRequiredService<RwStringVM>();
         
 

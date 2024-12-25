@@ -121,6 +121,12 @@
                                         HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
             </TabItem>
 
+            <TabItem Header="LReal">
+                <rxui:ViewModelViewHost Name="lRealOps"
+                                        MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+            </TabItem>
+
             <TabItem Header="String">
                 <rxui:ViewModelViewHost Name="stringOps"
                                         MinHeight="150" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
