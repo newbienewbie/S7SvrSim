@@ -95,6 +95,22 @@ else:
 
 从0.4.0开始，使用`IronPython 3.4.1`
 
+
+### 智能提示
+
+安装：
+```
+pip install s7svrsim
+```
+
+编写脚本的时候，导入提示：
+```
+from s7svrsim import hints
+```
+
+[intellisense](./docs/intellisense.PNG)
+
+
 ### 自定义模块的检索路径
 
 我们可以定义一些公共模块到一些单独的文件下:
