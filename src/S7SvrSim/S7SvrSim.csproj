@@ -10,17 +10,25 @@
   </PropertyGroup>
   <PropertyGroup>
     <PyStdLibFolderName>Lib</PyStdLibFolderName>
+	<PyPreDefinedLibFolderName>predefined</PyPreDefinedLibFolderName>
   </PropertyGroup>
   <ItemGroup>
     <ContentWithTargetPath Include="E:\nuget\packages\ironpython.stdlib\3.4.1\contentFiles\any\any\Lib\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>$(PyStdLibFolderName)\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
     </ContentWithTargetPath>
+	<ContentWithTargetPath Include="predefined\**\*.*">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		<TargetPath>$(PyPreDefinedLibFolderName)\%(RecursiveDir)%(Filename)%(Extension)</TargetPath>
+	</ContentWithTargetPath>
   </ItemGroup>
   <ItemGroup>
     <None Update="favicon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="predefined\" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

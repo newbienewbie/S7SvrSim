@@ -6,7 +6,9 @@ using S7SvrSim.ViewModels;
 using Splat;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -30,6 +32,13 @@ namespace S7SvrSim.Services
             this._loggerVM =  Locator.Current.GetRequiredService<MsgLoggerVM>(); 
             this._logger = logger;
             this.PyEngine = Python.CreateEngine();
+            var searchPaths = this.PyEngine.GetSearchPaths();
+            var predefined = Path.Combine(
+                Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "predefined"
+                );
+            searchPaths.Add(predefined);
+            this.PyEngine.SetSearchPaths(searchPaths);
         }
 
 
