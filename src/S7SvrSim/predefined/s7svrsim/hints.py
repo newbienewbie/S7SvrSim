@@ -12,3 +12,6 @@ class S7MB(ABC):
 class Logger(ABC):
 
     pass
+
+class CancellationToken(ABC):
+    pass
