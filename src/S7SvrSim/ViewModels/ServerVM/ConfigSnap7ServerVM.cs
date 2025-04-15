@@ -31,7 +31,7 @@ namespace S7Svr.Simulator.ViewModels
         {
             get
             {
-                var processPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+                var processPath = Path.GetDirectoryName(Environment.ProcessPath);
                 if (processPath != null)
                 {
                     return Path.Combine(processPath, SERVER_ITEMS_SAVED_FILE);
@@ -45,15 +45,23 @@ namespace S7Svr.Simulator.ViewModels
 
         public ReactiveCommand<AreaConfigVM, Unit> CmdRemoveArea { get; }
 
-        public ConfigSnap7ServerVM()
+        public ConfigSnap7ServerVM() : this(true)
+        {
+            
+        }
+
+        public ConfigSnap7ServerVM(bool file)
         {
             this.CmdRemoveArea = ReactiveCommand.Create<AreaConfigVM>(area =>
             {
                 AreaConfigs.Remove(area);
             });
 
-            AreaConfigs.CollectionChanged += AreaConfigs_CollectionChanged;
-            LoadAreaConfig();
+            if (file)
+            {
+                AreaConfigs.CollectionChanged += AreaConfigs_CollectionChanged;
+                LoadAreaConfig();
+            }
         }
 
         private void AreaConfigs_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
