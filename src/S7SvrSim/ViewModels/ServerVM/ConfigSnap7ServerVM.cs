@@ -1,7 +1,4 @@
-﻿using FutureTech.Snap7;
-using MediatR;
-using ReactiveUI.Fody.Helpers;
-using S7Svr.Simulator.Messages;
+﻿using ReactiveUI.Fody.Helpers;
 using S7SvrSim.Shared;
 using System;
 using System.Collections.ObjectModel;
@@ -10,9 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
 {
@@ -49,8 +43,15 @@ namespace S7Svr.Simulator.ViewModels
             }
         }
 
+        public ReactiveCommand<AreaConfigVM, Unit> CmdRemoveArea { get; }
+
         public ConfigSnap7ServerVM()
         {
+            this.CmdRemoveArea = ReactiveCommand.Create<AreaConfigVM>(area =>
+            {
+                AreaConfigs.Remove(area);
+            });
+
             AreaConfigs.CollectionChanged += AreaConfigs_CollectionChanged;
             LoadAreaConfig();
         }

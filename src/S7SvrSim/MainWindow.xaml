@@ -7,13 +7,16 @@
         xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" 
         xmlns:viewmodels="clr-namespace:S7Svr.Simulator.ViewModels" 
-        xmlns:usercontrols="clr-namespace:S7SvrSim.UserControls" xmlns:scripting="clr-namespace:S7SvrSim.UserControls.Scripting"
+        xmlns:usercontrols="clr-namespace:S7SvrSim.UserControls"
+        xmlns:scripting="clr-namespace:S7SvrSim.UserControls.Scripting"
+        xmlns:shared="clr-namespace:S7SvrSim.Shared"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainVM}"
         Title="Siemens PLC 通讯模拟器" 
         Height="850" Width="800">
-
-
+    <Window.Resources>
+        <shared:IsTypeValueConverter x:Key="IsAreaConfigVM" Type="{x:Type viewmodels:AreaConfigVM}"></shared:IsTypeValueConverter>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition></RowDefinition>
@@ -75,6 +78,13 @@
                             </Style>
                         </DataGrid.Style>
                         <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="删除">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button IsTabStop="False" CommandParameter="{Binding .}" Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid,Mode=FindAncestor},Path=DataContext.ConfigVM.CmdRemoveArea}" Visibility="{Binding .,Converter={StaticResource IsAreaConfigVM}}">删除</Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
 

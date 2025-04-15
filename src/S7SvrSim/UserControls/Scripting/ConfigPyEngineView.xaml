@@ -29,7 +29,10 @@
             <ItemsControl Name="itemsPyEngineSearchPaths" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <TextBox Text="{Binding .}"  Margin="2,8,2,8" IsReadOnly="True" ></TextBox>
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Name="btnDeleteModulePath" Command="{Binding DataContext.CmdDeletePath,RelativeSource={RelativeSource AncestorType=UserControl,Mode=FindAncestor},Mode=OneWay}" CommandParameter="{Binding .}">删除</Button>
+                            <TextBox Text="{Binding .}"  Margin="2,8,2,8" IsReadOnly="True" ></TextBox>
+                        </DockPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

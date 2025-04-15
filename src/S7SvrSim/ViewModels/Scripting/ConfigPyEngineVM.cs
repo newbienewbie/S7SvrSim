@@ -62,6 +62,13 @@ namespace S7SvrSim.ViewModels
                 .Select(p => !string.IsNullOrEmpty(p));
 
             this.CmdSubmitSelectPath = ReactiveCommand.Create(CmdSubmitSelectPath_Impl, canSubmitSelectPath);
+            this.CmdDeletePath = ReactiveCommand.Create<string>(path =>
+            {
+                if (PyEngineSearchPaths.Remove(path))
+                {
+                    this._pyRunner.PyEngine.SetSearchPaths(PyEngineSearchPaths);
+                }
+            });
 
             LoadSearchPath();
             PyEngineSearchPaths.CollectionChanged += PyEngineSearchPaths_CollectionChanged;
@@ -130,5 +137,9 @@ namespace S7SvrSim.ViewModels
             this.PyEngineSearchPaths.Add(this.SelectedModulePath);
         }
         #endregion
+        /// <summary>
+        /// 删除路径
+        /// </summary>
+        public ReactiveCommand<string, Unit> CmdDeletePath { get; }
     }
 }

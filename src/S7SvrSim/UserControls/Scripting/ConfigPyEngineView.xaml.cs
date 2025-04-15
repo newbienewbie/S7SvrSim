@@ -27,6 +27,7 @@ namespace S7SvrSim.UserControls.Scripting
             InitializeComponent();
             this.WhenActivated(d => {
                 this.ViewModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
+                this.DataContext = this.ViewModel;
                 this.OneWayBind(this.ViewModel, vm => vm.PyEngineSearchPaths, v => v.itemsPyEngineSearchPaths.ItemsSource).DisposeWith(d);
                 this.BindCommand(this.ViewModel, vm => vm.CmdSelectModulePath, v => v.btnSelectModulePath).DisposeWith(d);
                 this.Bind(this.ViewModel, vm => vm.SelectedModulePath, v => v.txtSelectedModulePath.Text).DisposeWith(d);
