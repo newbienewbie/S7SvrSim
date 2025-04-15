@@ -10,12 +10,31 @@ using S7SvrSim.Services;
 using ReactiveUI.Fody.Helpers;
 using System.Collections.ObjectModel;
 using DynamicData;
+using System.Diagnostics;
+using S7SvrSim.Shared;
+using S7Svr.Simulator.ViewModels;
 
 namespace S7SvrSim.ViewModels
 {
     public class ConfigPyEngineVM : ReactiveObject
     {
+        private const string PYENGINE_SEARCH_PATHS_FILE = "py-search-path.txt";
         private readonly PyScriptRunner _pyRunner;
+        private string SavedFileName
+        {
+            get
+            {
+                var processPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+                if (processPath != null)
+                {
+                    return Path.Combine(processPath, PYENGINE_SEARCH_PATHS_FILE);
+                }
+                else
+                {
+                    return PYENGINE_SEARCH_PATHS_FILE;
+                }
+            }
+        }
 
         public ConfigPyEngineVM(PyScriptRunner pyRunner)
         {
@@ -43,10 +62,47 @@ namespace S7SvrSim.ViewModels
                 .Select(p => !string.IsNullOrEmpty(p));
 
             this.CmdSubmitSelectPath = ReactiveCommand.Create(CmdSubmitSelectPath_Impl, canSubmitSelectPath);
+
+            LoadSearchPath();
+            PyEngineSearchPaths.CollectionChanged += PyEngineSearchPaths_CollectionChanged;
         }
 
-
         public ObservableCollection<string> PyEngineSearchPaths { get; } = new ObservableCollection<string>();
+
+        private void PyEngineSearchPaths_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            SaveSearchPath();
+        }
+
+        private void LoadSearchPath(string path = null)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = SavedFileName;
+            }
+
+            if (File.Exists(path))
+            {
+                var fileContent = File.ReadAllLines(path);
+                PyEngineSearchPaths.Clear();
+                foreach (var line in fileContent)
+                {
+                    PyEngineSearchPaths.Add(line);
+                }
+                this._pyRunner.PyEngine.SetSearchPaths(PyEngineSearchPaths);
+            }
+        }
+
+        private void SaveSearchPath(string path = null)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                path = SavedFileName;
+            }
+
+            using var fileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+            fileStream.WriteString(string.Join(Environment.NewLine, PyEngineSearchPaths));
+        }
 
         #region 选择路径
         [Reactive]
@@ -74,8 +130,5 @@ namespace S7SvrSim.ViewModels
             this.PyEngineSearchPaths.Add(this.SelectedModulePath);
         }
         #endregion
-
-
-
     }
 }
