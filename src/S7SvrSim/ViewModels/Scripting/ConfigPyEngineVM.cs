@@ -24,7 +24,7 @@ namespace S7SvrSim.ViewModels
         {
             get
             {
-                var processPath = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
+                var processPath = Path.GetDirectoryName(Environment.ProcessPath);
                 if (processPath != null)
                 {
                     return Path.Combine(processPath, PYENGINE_SEARCH_PATHS_FILE);
