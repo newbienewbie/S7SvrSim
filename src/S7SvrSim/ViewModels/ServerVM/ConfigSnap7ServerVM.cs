@@ -1,9 +1,10 @@
 ﻿using ReactiveUI.Fody.Helpers;
+using S7SvrSim.Services;
 using S7SvrSim.Shared;
+using S7SvrSim.ViewModels.ServerVM;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -43,18 +44,27 @@ namespace S7Svr.Simulator.ViewModels
             }
         }
 
+        public ReactiveCommand<Unit, Unit> CmdAddArea { get; }
         public ReactiveCommand<AreaConfigVM, Unit> CmdRemoveArea { get; }
 
         public ConfigSnap7ServerVM() : this(true)
         {
-            
+
         }
 
         public ConfigSnap7ServerVM(bool file)
         {
+            this.CmdAddArea= ReactiveCommand.Create<Unit>(_ =>
+            {
+                S7SvrSim.Services.ICommand command = new AreaConfigChangedCommand(this, ChangedType.Add, new AreaConfigVM());
+                command.Execute();
+                UndoRedoManager.Regist(command);
+            });
             this.CmdRemoveArea = ReactiveCommand.Create<AreaConfigVM>(area =>
             {
-                AreaConfigs.Remove(area);
+                S7SvrSim.Services.ICommand command = new AreaConfigChangedCommand(this, ChangedType.Remove, area);
+                command.Execute();
+                UndoRedoManager.Regist(command);
             });
 
             if (file)

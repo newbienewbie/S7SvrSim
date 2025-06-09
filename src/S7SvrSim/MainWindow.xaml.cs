@@ -1,19 +1,11 @@
 ﻿using S7Svr.Simulator.ViewModels;
+using S7SvrSim.Services;
+using S7SvrSim.ViewModels.ServerVM;
 using Splat;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace S7Svr.Simulator
 {
@@ -27,7 +19,8 @@ namespace S7Svr.Simulator
         {
             InitializeComponent();
 
-            this.WhenActivated(d => {
+            this.WhenActivated(d =>
+            {
                 this.ViewModel = Locator.Current.GetRequiredService<MainVM>();
                 this.DataContext = this.ViewModel;
             });
@@ -48,5 +41,71 @@ namespace S7Svr.Simulator
 
 
         #endregion
+
+        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (e.Command == ApplicationCommands.New)
+            {
+                MessageBox.Show("New");
+            }
+            else if (e.Command == ApplicationCommands.Open)
+            {
+                MessageBox.Show("Open");
+            }
+            else if (e.Command == ApplicationCommands.Save)
+            {
+                MessageBox.Show("Save");
+            }
+            else if (e.Command == ApplicationCommands.SaveAs)
+            {
+                MessageBox.Show("SaveAs");
+            }
+            else if (e.Command == ApplicationCommands.Undo)
+            {
+                UndoRedoManager.Undo();
+            }
+            else if (e.Command == ApplicationCommands.Redo)
+            {
+                UndoRedoManager.Redo();
+            }
+        }
+
+        private void NewCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !ViewModel.RunningVM.RunningStatus;
+            e.Handled = true;
+        }
+
+        private void OpenCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !ViewModel.RunningVM.RunningStatus;
+            e.Handled = true;
+        }
+
+        private void CanExecuteTrue(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+            e.Handled = true;
+        }
+
+        private void Undo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = UndoRedoManager.UndoCount > 0 && !ViewModel.RunningVM.RunningStatus;
+            e.Handled = true;
+        }
+
+        private void Redo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = UndoRedoManager.RedoCount > 0 && !ViewModel.RunningVM.RunningStatus;
+            e.Handled = true;
+        }
+
+        private void AreaConfigGrid_InitializingNewItem(object sender, InitializingNewItemEventArgs e)
+        {
+            if (e.NewItem is AreaConfigVM areaConfigVM)
+            {
+                UndoRedoManager.Regist(new AreaConfigChangedCommand(ViewModel.ConfigVM, ChangedType.Add, areaConfigVM));
+            }
+        }
     }
 }

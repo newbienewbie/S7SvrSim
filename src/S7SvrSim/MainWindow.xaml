@@ -5,138 +5,228 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:S7Svr.Simulator"
         xmlns:uc="clr-namespace:S7Svr.Simulator.UserControls"
-        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" 
-        xmlns:viewmodels="clr-namespace:S7Svr.Simulator.ViewModels" 
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewmodels="clr-namespace:S7Svr.Simulator.ViewModels"
         xmlns:usercontrols="clr-namespace:S7SvrSim.UserControls"
         xmlns:scripting="clr-namespace:S7SvrSim.UserControls.Scripting"
         xmlns:shared="clr-namespace:S7SvrSim.Shared"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainVM}"
-        Title="Siemens PLC 通讯模拟器" 
-        Height="850" Width="800">
+        Title="Siemens PLC 通讯模拟器"
+        Height="850"
+        Width="800"
+        >
     <Window.Resources>
-        <shared:IsTypeValueConverter x:Key="IsAreaConfigVM" Type="{x:Type viewmodels:AreaConfigVM}"></shared:IsTypeValueConverter>
+        <shared:IsTypeValueConverter x:Key="IsAreaConfigVM"
+                                     Type="{x:Type viewmodels:AreaConfigVM}"
+                                     />
     </Window.Resources>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-            <RowDefinition Height="200"></RowDefinition>
-        </Grid.RowDefinitions>
-        <TabControl TabStripPlacement="Left">
-            <TabControl.Resources>
-                <Style TargetType="TabItem" BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}">
-                    <Style.Triggers>
-                    </Style.Triggers>
-                </Style>
-                <Style TargetType="Label" BasedOn="{StaticResource MaterialDesignLabel}"></Style>
-                <Style TargetType="TextBox" BasedOn="{StaticResource MaterialDesignTextBox}"></Style>
-                <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignTextBlock}">
-                </Style>
-            </TabControl.Resources>
-            <TabItem Header="配置">
-                <TabItem.Resources>
-                    <Style TargetType="Grid" >
-                        <Setter Property="Margin" Value="4,8,4,4"></Setter>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.New"
+                        Executed="CommandBinding_Executed"
+                        CanExecute="NewCommand_CanExecute"
+                        />
+        <CommandBinding Command="ApplicationCommands.Open"
+                        Executed="CommandBinding_Executed"
+                        CanExecute="OpenCommand_CanExecute"
+                        />
+        <CommandBinding Command="ApplicationCommands.Save"
+                        Executed="CommandBinding_Executed"
+                        CanExecute="CanExecuteTrue"
+                        />
+        <CommandBinding Command="ApplicationCommands.SaveAs"
+                        Executed="CommandBinding_Executed"
+                        CanExecute="CanExecuteTrue"
+                        />
+        <CommandBinding Command="ApplicationCommands.Undo"
+                        Executed="CommandBinding_Executed"
+                        CanExecute="Undo_CanExecute"
+                        />
+        <CommandBinding Command="ApplicationCommands.Redo"
+                        Executed="CommandBinding_Executed"
+                        CanExecute="Redo_CanExecute"
+                        />
+    </Window.CommandBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="文件">
+                <MenuItem Command="ApplicationCommands.New" />
+                <MenuItem Header="打开"
+                          Command="ApplicationCommands.Open"
+                          />
+                <MenuItem Header="保存"
+                          Command="ApplicationCommands.Save"
+                          />
+                <MenuItem Command="ApplicationCommands.SaveAs" />
+            </MenuItem>
+            <MenuItem Header="编辑">
+                <MenuItem Command="ApplicationCommands.Redo" />
+                <MenuItem Command="ApplicationCommands.Undo" />
+            </MenuItem>
+        </Menu>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="200" />
+            </Grid.RowDefinitions>
+            <TabControl TabStripPlacement="Left">
+                <TabControl.Resources>
+                    <Style TargetType="TabItem"
+                           BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}"
+                           >
+                        <Style.Triggers />
                     </Style>
-                </TabItem.Resources>
+                    <Style TargetType="Label"
+                           BasedOn="{StaticResource MaterialDesignLabel}"
+                           />
+                    <Style TargetType="TextBox"
+                           BasedOn="{StaticResource MaterialDesignTextBox}"
+                           />
+                    <Style TargetType="TextBlock"
+                           BasedOn="{StaticResource MaterialDesignTextBlock}"
+                           />
+                </TabControl.Resources>
+                <TabItem Header="配置">
+                    <TabItem.Resources>
+                        <Style TargetType="Grid">
+                            <Setter Property="Margin" Value="4 8 4 4" />
+                        </Style>
+                    </TabItem.Resources>
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top">
+                            <StackPanel Orientation="Horizontal">
+                                <Label Content="IP Address: "
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       DockPanel.Dock="Left"
+                                       />
+                                <TextBox Text="{Binding ConfigVM.IpAddress}"
+                                         Width="100"
+                                         VerticalAlignment="Center"
+                                         />
+                                <Button Content="启动"
+                                        Command="{Binding CmdStartServer}"
+                                        Width="100"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Margin="10 0"
+                                        />
+                                <Button Content="停止"
+                                        Command="{Binding CmdStopServer}"
+                                        Width="100"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        />
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal"
+                                        Margin="0 10"
+                                        >
+                                <Button Command="{Binding ConfigVM.CmdAddArea}">添加</Button>
+                            </StackPanel>
+                        </StackPanel>
 
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition ></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"></ColumnDefinition>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                        <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}"
+                                  CanUserAddRows="True"
+                                  CanUserDeleteRows="False"
+                                  InitializingNewItem="AreaConfigGrid_InitializingNewItem"
+                                  >
+                            <DataGrid.Style>
+                                <Style TargetType="DataGrid"
+                                       BasedOn="{StaticResource MaterialDesignDataGrid}"
+                                       >
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding RunningVM.RunningStatus}"
+                                                     Value="True"
+                                                     >
+                                            <Setter Property="IsEnabled" Value="False" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding RunningVM.RunningStatus}"
+                                                     Value="False"
+                                                     >
+                                            <Setter Property="IsEnabled" Value="True" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.Style>
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="删除">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button IsTabStop="False"
+                                                    CommandParameter="{Binding .}"
+                                                    Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid, Mode=FindAncestor}, Path=DataContext.ConfigVM.CmdRemoveArea}"
+                                                    Visibility="{Binding ., Converter={StaticResource IsAreaConfigVM}}"
+                                                    >
+                                                删除
+                                            </Button>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Header="命令">
 
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
 
-                    <Label Content="IP Address" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Column="0" ></Label>
-                    <TextBox Text="{Binding ConfigVM.IpAddress}" 
-                        Width="100" VerticalAlignment="Center" Grid.Row="0" Grid.Column="1" />
-                    <Button Content="启动" Command="{Binding CmdStartServer}" 
-                        Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0" Grid.Column="2"/>
-                    <Button Content="停止" Command="{Binding CmdStopServer}" 
-                        Width="100"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="3"/>
+                        <Label Content="IpAddress"
+                               Margin="0 4 0 4"
+                               Grid.Row="0"
+                               Grid.Column="0"
+                               />
+                        <TextBlock Text="{Binding ConfigVM.IpAddress}"
+                                   Margin="0 4 0 4"
+                                   Grid.Row="0"
+                                   Grid.Column="1"
+                                   />
 
+                        <uc:OperationsCtrl DataContext="{Binding OperationVM}"
+                                           Grid.Row="1"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="2"
+                                           />
 
-                    <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}" 
-                          CanUserDeleteRows="True"  
-                          CanUserAddRows="True" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="7" Margin="0,25,0,0" Grid.RowSpan="2" >
-                        <DataGrid.Style>
-                            <Style TargetType="DataGrid" BasedOn="{StaticResource MaterialDesignDataGrid}">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding RunningVM.RunningStatus}" Value="True">
-                                        <Setter Property="IsEnabled" Value="False"></Setter>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding RunningVM.RunningStatus}" Value="False">
-                                        <Setter Property="IsEnabled" Value="True"></Setter>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </DataGrid.Style>
-                        <DataGrid.Columns>
-                            <DataGridTemplateColumn Header="删除">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button IsTabStop="False" CommandParameter="{Binding .}" Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid,Mode=FindAncestor},Path=DataContext.ConfigVM.CmdRemoveArea}" Visibility="{Binding .,Converter={StaticResource IsAreaConfigVM}}">删除</Button>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                        <!--<ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+                    <HeaderedItemsControl Header="运行" ItemsSource="{Binding RunningVM.RunningsItems}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Expander >
+                                    <Expander.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding AreaKind,StringFormat={} {0}}"></TextBlock>
+                                            <TextBlock Text="{Binding BlockNumber,StringFormat={}\, Number\={0}}"></TextBlock>
+                                            <TextBlock Text="{Binding BlockSize,StringFormat={}\, Size\={0}}"></TextBlock>
+                                        </StackPanel>
+                                    </Expander.Header>
+                                </Expander>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </HeaderedItemsControl>
+                </ScrollViewer>-->
 
-                </Grid>
-            </TabItem>
-            <TabItem Header="命令">
+                    </Grid>
+                </TabItem>
 
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" ></RowDefinition>
-                        <RowDefinition Height="Auto"></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                    </Grid.ColumnDefinitions>
+                <TabItem Header="脚本">
+                    <scripting:ConfigPyEngineView />
+                </TabItem>
+            </TabControl>
 
-                    <Label Content="IpAddress" Margin="0,4,0,4" Grid.Row="0" Grid.Column="0" ></Label>
-                    <TextBlock Text="{Binding ConfigVM.IpAddress}" Margin="0,4,0,4" Grid.Row="0" Grid.Column="1"></TextBlock>
-
-                    <uc:OperationsCtrl DataContext="{Binding OperationVM}"  Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ></uc:OperationsCtrl>
-
-                    <!--<ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-                        <HeaderedItemsControl Header="运行" ItemsSource="{Binding RunningVM.RunningsItems}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Expander >
-                                        <Expander.Header>
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock Text="{Binding AreaKind,StringFormat={} {0}}"></TextBlock>
-                                                <TextBlock Text="{Binding BlockNumber,StringFormat={}\, Number\={0}}"></TextBlock>
-                                                <TextBlock Text="{Binding BlockSize,StringFormat={}\, Size\={0}}"></TextBlock>
-                                            </StackPanel>
-                                        </Expander.Header>
-                                    </Expander>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </HeaderedItemsControl>
-                    </ScrollViewer>-->
-
-                </Grid>
-            </TabItem>
-
-            <TabItem Header="脚本">
-                <scripting:ConfigPyEngineView></scripting:ConfigPyEngineView>
-            </TabItem>
-        </TabControl>
-
-        <usercontrols:MsgLoggerCtrl DataContext="{Binding LoggerVM }"  Grid.Row="3" Grid.Column="1" >
-        </usercontrols:MsgLoggerCtrl>
-    </Grid>
-
+            <usercontrols:MsgLoggerCtrl DataContext="{Binding LoggerVM}"
+                                        Grid.Row="3"
+                                        Grid.Column="1"
+                                        />
+        </Grid>
+    </DockPanel>
 </Window>
