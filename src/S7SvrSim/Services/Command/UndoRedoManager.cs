@@ -18,7 +18,7 @@ namespace S7SvrSim.Services
         public delegate void UndoRedoChangedEvent();
         public static event UndoRedoChangedEvent UndoRedoChanged;
 
-        private static void AddCommand(List<ICommand> target, ICommand command)
+        private static void AddCommand(List<ICommand> target, ICommand command, bool clearRedo = true)
         {
             if (target.Count >= 100)
             {
@@ -26,6 +26,11 @@ namespace S7SvrSim.Services
             }
 
             target.Add(command);
+
+            if (clearRedo)
+            {
+                RedoCommands.Clear();
+            }
         }
 
         public static void Undo()
@@ -38,7 +43,7 @@ namespace S7SvrSim.Services
             var command = UndoCommands.Last();
             command.Undo();
             UndoCommands.Remove(command);
-            AddCommand(RedoCommands, command);
+            AddCommand(RedoCommands, command, false);
             UndoRedoChanged?.Invoke();
         }
 
@@ -52,7 +57,7 @@ namespace S7SvrSim.Services
             var command = RedoCommands.Last();
             command.Execute();
             RedoCommands.Remove(command);
-            AddCommand(UndoCommands, command);
+            AddCommand(UndoCommands, command, false);
             UndoRedoChanged?.Invoke();
         }
 
@@ -60,6 +65,12 @@ namespace S7SvrSim.Services
         {
             AddCommand(UndoCommands, command);
             UndoRedoChanged?.Invoke();
+        }
+
+        public static void Run(ICommand command)
+        {
+            command.Execute();
+            Regist(command);
         }
     }
 }

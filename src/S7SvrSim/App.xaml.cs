@@ -67,8 +67,11 @@ namespace S7Svr.Simulator
                     var config = sp.GetRequiredService<IConfiguration>();
                     var logger = sp.GetRequiredService<ILogger<App>>();
                 }
+
                 var mainWin = new MainWindow();
                 mainWin.Show();
+                Application.Current.MainWindow = mainWin;
+
                 _ = Task.Run(async () =>
                 {
                     await _host.RunAsync(cts.Token);

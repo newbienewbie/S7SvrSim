@@ -1,6 +1,6 @@
 ﻿using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Services;
-using S7SvrSim.ViewModels.ServerVM;
+using S7SvrSim.Services.Command;
 using Splat;
 using System;
 using System.Windows;
@@ -70,13 +70,7 @@ namespace S7Svr.Simulator
             }
         }
 
-        private void NewCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = !ViewModel.RunningVM.RunningStatus;
-            e.Handled = true;
-        }
-
-        private void OpenCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void NotRunningStatus_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = !ViewModel.RunningVM.RunningStatus;
             e.Handled = true;
@@ -104,7 +98,17 @@ namespace S7Svr.Simulator
         {
             if (e.NewItem is AreaConfigVM areaConfigVM)
             {
-                UndoRedoManager.Regist(new AreaConfigChangedCommand(ViewModel.ConfigVM, ChangedType.Add, areaConfigVM));
+                var command = new CollectionChangedCommand<AreaConfigVM>(ViewModel.ConfigVM.AreaConfigs, ChangedType.Add, areaConfigVM);
+                ViewModel.ConfigVM.CommandEventRegist(command);
+                UndoRedoManager.Regist(command);
+            }
+        }
+
+        public void SwitchTab(int index)
+        {
+            if (index < tabControl.Items.Count)
+            {
+                tabControl.SelectedIndex = index;
             }
         }
     }

@@ -1,13 +1,10 @@
-﻿using ReactiveUI;
-using S7Server.Simulator.ViewModels;
+﻿using S7Server.Simulator.ViewModels;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
-using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
 {
@@ -37,9 +34,7 @@ namespace S7Svr.Simulator.ViewModels
             this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl, watchRunningStatus);
         }
 
-
         #region 启停服务器
-
         /// <summary>
         /// 启动服务器
         /// </summary>
@@ -64,7 +59,7 @@ namespace S7Svr.Simulator.ViewModels
         /// <summary>
         /// 停止服务器
         /// </summary>
-        public ReactiveCommand<Unit,Unit> CmdStopServer { get; }
+        public ReactiveCommand<Unit, Unit> CmdStopServer { get; }
         private async Task CmdStopServer_Impl()
         {
             this.RunningVM.IpAddress = string.Empty;

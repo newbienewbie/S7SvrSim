@@ -18,7 +18,7 @@ namespace S7Svr.Simulator.ViewModels
         /// </summary>
         public IList<RunningServerItem> RunningsItems { get; } = new List<RunningServerItem>();
 
-        public RunningSnap7ServerVM() : base(false)
+        public RunningSnap7ServerVM()
         {
             
         }
