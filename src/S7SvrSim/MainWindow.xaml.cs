@@ -72,8 +72,11 @@ namespace S7Svr.Simulator
 
         private void NotRunningStatus_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = !ViewModel.RunningVM.RunningStatus;
-            e.Handled = true;
+            if (ViewModel?.RunningVM != null)
+            {
+                e.CanExecute = !ViewModel.RunningVM.RunningStatus;
+                e.Handled = true;
+            }
         }
 
         private void CanExecuteTrue(object sender, CanExecuteRoutedEventArgs e)
@@ -84,14 +87,20 @@ namespace S7Svr.Simulator
 
         private void Undo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = UndoRedoManager.UndoCount > 0 && !ViewModel.RunningVM.RunningStatus;
-            e.Handled = true;
+            if (ViewModel?.RunningVM != null)
+            {
+                e.CanExecute = UndoRedoManager.UndoCount > 0 && !ViewModel.RunningVM.RunningStatus;
+                e.Handled = true;
+            }
         }
 
         private void Redo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = UndoRedoManager.RedoCount > 0 && !ViewModel.RunningVM.RunningStatus;
-            e.Handled = true;
+            if (ViewModel?.RunningVM != null)
+            {
+                e.CanExecute = UndoRedoManager.RedoCount > 0 && !ViewModel.RunningVM.RunningStatus;
+                e.Handled = true;
+            }
         }
 
         private void AreaConfigGrid_InitializingNewItem(object sender, InitializingNewItemEventArgs e)

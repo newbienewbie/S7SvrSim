@@ -8,6 +8,7 @@
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewmodels="clr-namespace:S7Svr.Simulator.ViewModels"
         xmlns:usercontrols="clr-namespace:S7SvrSim.UserControls"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:scripting="clr-namespace:S7SvrSim.UserControls.Scripting"
         xmlns:shared="clr-namespace:S7SvrSim.Shared"
         mc:Ignorable="d"
@@ -48,22 +49,53 @@
                         />
     </Window.CommandBindings>
     <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="文件">
-                <MenuItem Command="ApplicationCommands.New" />
-                <MenuItem Header="打开"
-                          Command="ApplicationCommands.Open"
-                          />
-                <MenuItem Header="保存"
-                          Command="ApplicationCommands.Save"
-                          />
-                <MenuItem Command="ApplicationCommands.SaveAs" />
-            </MenuItem>
-            <MenuItem Header="编辑">
-                <MenuItem Command="ApplicationCommands.Undo" />
-                <MenuItem Command="ApplicationCommands.Redo" />
-            </MenuItem>
-        </Menu>
+        <StackPanel DockPanel.Dock="Top">
+            <md:Card Margin="5 0">
+                <Menu>
+                    <MenuItem Header="文件">
+                        <MenuItem Command="ApplicationCommands.New" />
+                        <MenuItem Header="打开"
+                                  Command="ApplicationCommands.Open"
+                                  />
+                        <MenuItem Header="保存"
+                                  Icon="{md:PackIcon Kind=ContentSave}"
+                                  Command="ApplicationCommands.Save"
+                                  />
+                        <MenuItem Command="ApplicationCommands.SaveAs" />
+                    </MenuItem>
+                    <MenuItem Header="编辑">
+                        <MenuItem Command="ApplicationCommands.Undo" />
+                        <MenuItem Command="ApplicationCommands.Redo" />
+                    </MenuItem>
+                </Menu>
+            </md:Card>
+            <ToolBar>
+                <ToolBar.Resources>
+                    <Thickness x:Key="ButtonPadding">10</Thickness>
+                </ToolBar.Resources>
+                <Button Command="ApplicationCommands.New"
+                        Content="{md:PackIcon Kind=FileDocument}"
+                        Padding="{StaticResource ButtonPadding}"
+                        />
+                <Button Command="ApplicationCommands.Open"
+                        Content="{md:PackIcon Kind=FolderOutline}"
+                        Padding="{StaticResource ButtonPadding}"
+                        />
+                <Button Command="ApplicationCommands.Save"
+                        Content="{md:PackIcon Kind=ContentSave}"
+                        Padding="{StaticResource ButtonPadding}"
+                        />
+                <Separator />
+                <Button Command="ApplicationCommands.Undo"
+                        Content="{md:PackIcon Kind=Undo}"
+                        Padding="{StaticResource ButtonPadding}"
+                        />
+                <Button Command="ApplicationCommands.Redo"
+                        Content="{md:PackIcon Kind=Redo}"
+                        Padding="{StaticResource ButtonPadding}"
+                        />
+            </ToolBar>
+        </StackPanel>
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -135,25 +167,8 @@
                                   CanUserAddRows="True"
                                   CanUserDeleteRows="False"
                                   InitializingNewItem="AreaConfigGrid_InitializingNewItem"
+                                  IsEnabled="{Binding RunningVM.RunningStatus, Converter={StaticResource InvertBooleanConverter}}"
                                   >
-                            <DataGrid.Style>
-                                <Style TargetType="DataGrid"
-                                       BasedOn="{StaticResource MaterialDesignDataGrid}"
-                                       >
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding RunningVM.RunningStatus}"
-                                                     Value="True"
-                                                     >
-                                            <Setter Property="IsEnabled" Value="False" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding RunningVM.RunningStatus}"
-                                                     Value="False"
-                                                     >
-                                            <Setter Property="IsEnabled" Value="True" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.Style>
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn Header="删除">
                                     <DataGridTemplateColumn.CellTemplate>
