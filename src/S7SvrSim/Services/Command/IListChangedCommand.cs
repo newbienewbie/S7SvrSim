@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace S7SvrSim.Services.Command
 {
-    internal class CollectionChangedCommand<T> : ICommand
+    internal class IListChangedCommand<T> : ICommand
     {
-        protected readonly ICollection<T> list;
+        protected readonly IList<T> list;
         protected readonly ChangedType changedType;
         protected readonly T obj;
-
-        public CollectionChangedCommand(ICollection<T> list, ChangedType changedType, T obj)
+        protected int? index = null;
+        public IListChangedCommand(IList<T> list, ChangedType changedType, T obj)
         {
             this.list = list;
             this.changedType = changedType;
@@ -23,10 +23,18 @@ namespace S7SvrSim.Services.Command
         {
             if (changedType == ChangedType.Add)
             {
-                list.Add(obj);
+                if (index != null)
+                {
+                    list.Insert(index.Value, obj);
+                }
+                else
+                {
+                    list.Add(obj);
+                }
             }
             else
             {
+                index = list.IndexOf(obj);
                 list.Remove(obj);
             }
 
@@ -41,7 +49,14 @@ namespace S7SvrSim.Services.Command
             }
             else
             {
-                list.Add(obj);
+                if (index != null)
+                {
+                    list.Insert(index.Value, obj);
+                }
+                else
+                {
+                    list.Add(obj);
+                }
             }
             AfterUndo?.Invoke(this, EventArgs.Empty);
         }

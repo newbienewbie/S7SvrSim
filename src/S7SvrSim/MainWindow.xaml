@@ -53,8 +53,11 @@
             <md:Card Margin="5 0">
                 <Menu>
                     <MenuItem Header="文件">
-                        <MenuItem Command="ApplicationCommands.New" />
+                        <MenuItem Command="ApplicationCommands.New"
+                                  Icon="{md:PackIcon Kind=FileDocument}"
+                                  />
                         <MenuItem Header="打开"
+                                  Icon="{md:PackIcon Kind=FolderOutline}"
                                   Command="ApplicationCommands.Open"
                                   />
                         <MenuItem Header="保存"
@@ -64,8 +67,12 @@
                         <MenuItem Command="ApplicationCommands.SaveAs" />
                     </MenuItem>
                     <MenuItem Header="编辑">
-                        <MenuItem Command="ApplicationCommands.Undo" />
-                        <MenuItem Command="ApplicationCommands.Redo" />
+                        <MenuItem Command="ApplicationCommands.Undo"
+                                  Icon="{md:PackIcon Kind=UndoVariant}"
+                                  />
+                        <MenuItem Command="ApplicationCommands.Redo"
+                                  Icon="{md:PackIcon Kind=RedoVariant}"
+                                  />
                     </MenuItem>
                 </Menu>
             </md:Card>
@@ -87,11 +94,11 @@
                         />
                 <Separator />
                 <Button Command="ApplicationCommands.Undo"
-                        Content="{md:PackIcon Kind=Undo}"
+                        Content="{md:PackIcon Kind=UndoVariant}"
                         Padding="{StaticResource ButtonPadding}"
                         />
                 <Button Command="ApplicationCommands.Redo"
-                        Content="{md:PackIcon Kind=Redo}"
+                        Content="{md:PackIcon Kind=RedoVariant}"
                         Padding="{StaticResource ButtonPadding}"
                         />
             </ToolBar>

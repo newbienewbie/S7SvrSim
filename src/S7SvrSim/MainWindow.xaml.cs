@@ -46,19 +46,15 @@ namespace S7Svr.Simulator
         {
             if (e.Command == ApplicationCommands.New)
             {
-                MessageBox.Show("New");
             }
             else if (e.Command == ApplicationCommands.Open)
             {
-                MessageBox.Show("Open");
             }
             else if (e.Command == ApplicationCommands.Save)
             {
-                MessageBox.Show("Save");
             }
             else if (e.Command == ApplicationCommands.SaveAs)
             {
-                MessageBox.Show("SaveAs");
             }
             else if (e.Command == ApplicationCommands.Undo)
             {
@@ -107,7 +103,7 @@ namespace S7Svr.Simulator
         {
             if (e.NewItem is AreaConfigVM areaConfigVM)
             {
-                var command = new CollectionChangedCommand<AreaConfigVM>(ViewModel.ConfigVM.AreaConfigs, ChangedType.Add, areaConfigVM);
+                var command = new IListChangedCommand<AreaConfigVM>(ViewModel.ConfigVM.AreaConfigs, ChangedType.Add, areaConfigVM);
                 ViewModel.ConfigVM.CommandEventRegist(command);
                 UndoRedoManager.Regist(command);
             }

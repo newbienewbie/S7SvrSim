@@ -30,13 +30,13 @@ namespace S7Svr.Simulator.ViewModels
         {
             this.CmdAddArea = ReactiveCommand.Create<Unit>(_ =>
             {
-                var command = new CollectionChangedCommand<AreaConfigVM>(AreaConfigs, ChangedType.Add, new AreaConfigVM());
+                var command = new IListChangedCommand<AreaConfigVM>(AreaConfigs, ChangedType.Add, new AreaConfigVM());
                 CommandEventRegist(command);
                 UndoRedoManager.Run(command);
             });
             this.CmdRemoveArea = ReactiveCommand.Create<AreaConfigVM>(area =>
             {
-                var command = new CollectionChangedCommand<AreaConfigVM>(AreaConfigs, ChangedType.Remove, area);
+                var command = new IListChangedCommand<AreaConfigVM>(AreaConfigs, ChangedType.Remove, area);
                 CommandEventRegist(command);
                 UndoRedoManager.Run(command);
             });
