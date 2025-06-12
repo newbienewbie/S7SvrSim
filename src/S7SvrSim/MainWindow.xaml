@@ -54,10 +54,10 @@
                 <Menu>
                     <MenuItem Header="文件">
                         <MenuItem Command="ApplicationCommands.New"
-                                  Icon="{md:PackIcon Kind=FileDocument}"
+                                  Icon="{md:PackIcon Kind=FileOutline}"
                                   />
                         <MenuItem Header="打开"
-                                  Icon="{md:PackIcon Kind=FolderOutline}"
+                                  Icon="{md:PackIcon Kind=FolderOpenOutline}"
                                   Command="ApplicationCommands.Open"
                                   />
                         <MenuItem Header="保存"
@@ -83,23 +83,28 @@
                 <Button Command="ApplicationCommands.New"
                         Content="{md:PackIcon Kind=FileDocument}"
                         Padding="{StaticResource ButtonPadding}"
+                        shared:RoutedCommandTooltip.Enabled="True"
                         />
                 <Button Command="ApplicationCommands.Open"
                         Content="{md:PackIcon Kind=FolderOutline}"
                         Padding="{StaticResource ButtonPadding}"
+                        shared:RoutedCommandTooltip.Enabled="True"
                         />
                 <Button Command="ApplicationCommands.Save"
                         Content="{md:PackIcon Kind=ContentSave}"
                         Padding="{StaticResource ButtonPadding}"
+                        shared:RoutedCommandTooltip.Enabled="True"
                         />
                 <Separator />
                 <Button Command="ApplicationCommands.Undo"
                         Content="{md:PackIcon Kind=UndoVariant}"
                         Padding="{StaticResource ButtonPadding}"
+                        shared:RoutedCommandTooltip.Enabled="True"
                         />
                 <Button Command="ApplicationCommands.Redo"
                         Content="{md:PackIcon Kind=RedoVariant}"
                         Padding="{StaticResource ButtonPadding}"
+                        shared:RoutedCommandTooltip.Enabled="True"
                         />
             </ToolBar>
         </StackPanel>
