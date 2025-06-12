@@ -37,7 +37,22 @@ namespace S7SvrSim.Services
             configS7Model = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
             this.pyRunner = pyRunner;
-            Load(ProjectPath);
+
+            try
+            {
+                if (File.Exists(ProjectPath))
+                {
+                    Load(ProjectPath);
+                }
+                else
+                {
+                    New();
+                }
+            }
+            catch (Exception)
+            {
+                New();
+            }
         }
 
         private void SetSoftware(ProjectFile project)

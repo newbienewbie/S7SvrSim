@@ -61,7 +61,7 @@
                                   Command="ApplicationCommands.Open"
                                   />
                         <MenuItem Header="保存"
-                                  Icon="{md:PackIcon Kind=ContentSave}"
+                                  Icon="{md:PackIcon Kind=ContentSaveOutline}"
                                   Command="ApplicationCommands.Save"
                                   />
                         <MenuItem Command="ApplicationCommands.SaveAs" />
@@ -81,17 +81,17 @@
                     <Thickness x:Key="ButtonPadding">10</Thickness>
                 </ToolBar.Resources>
                 <Button Command="ApplicationCommands.New"
-                        Content="{md:PackIcon Kind=FileDocument}"
+                        Content="{md:PackIcon Kind=FileOutline}"
                         Padding="{StaticResource ButtonPadding}"
                         shared:RoutedCommandTooltip.Enabled="True"
                         />
                 <Button Command="ApplicationCommands.Open"
-                        Content="{md:PackIcon Kind=FolderOutline}"
+                        Content="{md:PackIcon Kind=FolderOpenOutline}"
                         Padding="{StaticResource ButtonPadding}"
                         shared:RoutedCommandTooltip.Enabled="True"
                         />
                 <Button Command="ApplicationCommands.Save"
-                        Content="{md:PackIcon Kind=ContentSave}"
+                        Content="{md:PackIcon Kind=ContentSaveOutline}"
                         Padding="{StaticResource ButtonPadding}"
                         shared:RoutedCommandTooltip.Enabled="True"
                         />

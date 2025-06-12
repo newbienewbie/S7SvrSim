@@ -55,11 +55,10 @@ namespace S7Svr.Simulator
             else if (e.Command == ApplicationCommands.Open)
             {
                 OpenProject();
-                UndoRedoManager.Reset();
             }
             else if (e.Command == ApplicationCommands.Save)
             {
-                projectManager.Save();
+                SaveProject();
             }
             else if (e.Command == ApplicationCommands.SaveAs)
             {
@@ -71,6 +70,18 @@ namespace S7Svr.Simulator
             else if (e.Command == ApplicationCommands.Redo)
             {
                 UndoRedoManager.Redo();
+            }
+        }
+
+        private void SaveProject()
+        {
+            try
+            {
+                projectManager.Save();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex}", "保存项目文件失败", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -89,7 +100,17 @@ namespace S7Svr.Simulator
                 return;
             }
 
-            projectManager.Load(openFileDialog.FileName);
+            try
+            {
+                projectManager.Load(openFileDialog.FileName);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex}", "打开项目文件失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            UndoRedoManager.Reset();
         }
 
         private void NotRunningStatus_CanExecute(object sender, CanExecuteRoutedEventArgs e)
