@@ -72,5 +72,11 @@ namespace S7SvrSim.Services
             command.Execute();
             Regist(command);
         }
+
+        public static void Reset()
+        {
+            UndoCommands.Clear();
+            RedoCommands.Clear();
+        }
     }
 }
