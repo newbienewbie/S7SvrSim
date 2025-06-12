@@ -4,5 +4,7 @@
     {
         Add,
         Remove,
+        Replace,
+        Clear,
     }
 }

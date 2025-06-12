@@ -1,22 +1,21 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
 using System;
 using System.Collections.ObjectModel;
-using System.Drawing.Drawing2D;
 
 namespace S7Svr.Simulator.ViewModels
 {
     /// <summary>
     /// S7 Server 的配置
     /// </summary>
-    public class ConfigSnap7ServerVM : ReactiveObject
+    public partial class ConfigSnap7ServerVM : ObservableObject
     {
         /// <summary>
         /// IP Address
         /// </summary>
-        [Reactive]
-        public virtual string IpAddress { get; set; } = "127.0.0.1";
+        [ObservableProperty]
+        private string ipAddress = "127.0.0.1";
 
         /// <summary>
         /// DB Configs
@@ -30,13 +29,13 @@ namespace S7Svr.Simulator.ViewModels
         {
             this.CmdAddArea = ReactiveCommand.Create<Unit>(_ =>
             {
-                var command = new IListChangedCommand<AreaConfigVM>(AreaConfigs, ChangedType.Add, new AreaConfigVM());
+                var command = ListChangedCommand<AreaConfigVM>.Add(AreaConfigs, [new AreaConfigVM()]);
                 CommandEventRegist(command);
                 UndoRedoManager.Run(command);
             });
             this.CmdRemoveArea = ReactiveCommand.Create<AreaConfigVM>(area =>
             {
-                var command = new IListChangedCommand<AreaConfigVM>(AreaConfigs, ChangedType.Remove, area);
+                var command = ListChangedCommand<AreaConfigVM>.Remove(AreaConfigs, [area]);
                 CommandEventRegist(command);
                 UndoRedoManager.Run(command);
             });
@@ -51,6 +50,17 @@ namespace S7Svr.Simulator.ViewModels
         {
             command.AfterExecute += CommandEventHandle;
             command.AfterUndo += CommandEventHandle;
+        }
+
+        partial void OnIpAddressChanged(string oldValue, string newValue)
+        {
+            var command = new ValueChangedCommand((value) =>
+            {
+                ipAddress = (string)value;
+                OnPropertyChanged(nameof(IpAddress));
+            }, oldValue, newValue);
+            CommandEventRegist(command);
+            UndoRedoManager.Regist(command);
         }
     }
 }

@@ -19,3 +19,4 @@ nuget ReactiveUI.Fody >= 19.5.41
 nuget ReactiveUI.WPF >= 19.5.41
 nuget ReactiveUI.Validation >= 3.1.7
 nuget Splat >= 14.8.12  
+nuget CommunityToolkit.MVVM 8.4

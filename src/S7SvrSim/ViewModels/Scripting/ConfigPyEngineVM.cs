@@ -59,7 +59,7 @@ namespace S7SvrSim.ViewModels
             this.CmdSubmitSelectPath = ReactiveCommand.Create(CmdSubmitSelectPath_Impl, canSubmitSelectPath);
             this.CmdDeletePath = ReactiveCommand.Create<string>(path =>
             {
-                var command = new IListChangedCommand<string>(PyEngineSearchPaths, Services.Command.ChangedType.Remove, path);
+                var command = ListChangedCommand<string>.Remove(PyEngineSearchPaths, [path]);
                 CommandEventRegist(command);
                 UndoRedoManager.Run(command);
             });
@@ -112,7 +112,7 @@ namespace S7SvrSim.ViewModels
                 MessageBox.Show($"当前所选择的路径已经在检索路径中！无需重复添加");
                 return;
             }
-            var command = new IListChangedCommand<string>(PyEngineSearchPaths, Services.Command.ChangedType.Add, this.SelectedModulePath);
+            var command = ListChangedCommand<string>.Add(PyEngineSearchPaths, [this.SelectedModulePath]);
             CommandEventRegist(command);
             UndoRedoManager.Run(command);
         }

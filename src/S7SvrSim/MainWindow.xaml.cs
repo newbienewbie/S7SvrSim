@@ -150,7 +150,7 @@ namespace S7Svr.Simulator
         {
             if (e.NewItem is AreaConfigVM areaConfigVM)
             {
-                var command = new IListChangedCommand<AreaConfigVM>(ViewModel.ConfigVM.AreaConfigs, ChangedType.Add, areaConfigVM);
+                var command = ListChangedCommand<AreaConfigVM>.Add(ViewModel.ConfigVM.AreaConfigs, [areaConfigVM]);
                 ViewModel.ConfigVM.CommandEventRegist(command);
                 UndoRedoManager.Regist(command);
             }

@@ -176,7 +176,7 @@
                         </StackPanel>
 
                         <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}"
-                                  CanUserAddRows="True"
+                                  CanUserAddRows="False"
                                   CanUserDeleteRows="False"
                                   InitializingNewItem="AreaConfigGrid_InitializingNewItem"
                                   IsEnabled="{Binding RunningVM.RunningStatus, Converter={StaticResource InvertBooleanConverter}}"
