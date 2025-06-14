@@ -1,10 +1,11 @@
-﻿using S7Svr.Simulator.ViewModels;
+﻿using MediatR;
+using S7Svr.Simulator.ViewModels;
 
 namespace S7SvrSim.ViewModels.Rw;
 
 public class RwUInt64VM : RwVMBase<ulong>
 {
-    public RwUInt64VM(IS7DataBlockService s7ServerService) : base(s7ServerService)
+    public RwUInt64VM(IS7DataBlockService s7ServerService, IMediator mediator) : base(s7ServerService, mediator)
     {
     }
 

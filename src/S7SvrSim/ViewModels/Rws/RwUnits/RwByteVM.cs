@@ -1,11 +1,5 @@
-﻿using S7Svr.Simulator.ViewModels;
-using Splat;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
+﻿using MediatR;
+using S7Svr.Simulator.ViewModels;
 
 namespace S7SvrSim.ViewModels.Rw;
 
@@ -15,7 +9,7 @@ namespace S7SvrSim.ViewModels.Rw;
 /// </summary>
 public class RwByteVM : RwVMBase<byte>
 {
-    public RwByteVM(IS7DataBlockService s7ServerService):base(s7ServerService)
+    public RwByteVM(IS7DataBlockService s7ServerService, IMediator mediator) : base(s7ServerService, mediator)
     {
     }
 

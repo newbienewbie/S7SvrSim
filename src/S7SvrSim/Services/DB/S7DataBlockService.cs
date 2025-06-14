@@ -5,11 +5,7 @@ using S7Svr.Simulator.Messages;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
 {
@@ -35,8 +31,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return default;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
 
             var buffer = config.Bytes;
@@ -51,8 +46,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
 
@@ -66,8 +60,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return default;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
 
             var buffer = config.Bytes;
@@ -82,8 +75,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
 
@@ -91,15 +83,13 @@ namespace S7Svr.Simulator.ViewModels
         }
         #endregion
 
-
         #region Bit
         public bool ReadBit(int dbNumber, int offset, byte bit)
         {
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return default;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
 
             var buffer = config.Bytes;
@@ -114,8 +104,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
 
@@ -129,8 +118,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
             S7.SetStringAt(buffer, offset, maxlen, str);
@@ -141,8 +129,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return String.Empty;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
             var str = S7.GetStringAt(buffer, offset);
@@ -156,8 +143,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
             S7.SetRealAt(buffer, pos, real);
@@ -168,8 +154,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return default;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
             var real = S7.GetRealAt(buffer, pos);
@@ -184,8 +169,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
             S7.SetLRealAt(buffer, pos, real);
@@ -196,8 +180,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return default;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
             var real = S7.GetLRealAt(buffer, pos);
@@ -212,8 +195,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return default;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
 
             var buffer = config.Bytes;
@@ -228,8 +210,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
 
@@ -243,8 +224,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return default;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
 
             var buffer = config.Bytes;
@@ -258,8 +238,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"DBNumber={dbNumber} 不存在！" });
-                return;
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
             }
             var buffer = config.Bytes;
 
@@ -267,6 +246,32 @@ namespace S7Svr.Simulator.ViewModels
         }
         #endregion
 
-    }
+        #region int32(DInt)
+        public int ReadInt(int dbNumber, int pos)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
+            }
 
+            var buffer = config.Bytes;
+
+            var val = S7.GetDIntAt(buffer, pos);
+            return val;
+        }
+
+        public void WriteInt(int dbNumber, int pos, int value)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
+            if (config == null)
+            {
+                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
+            }
+            var buffer = config.Bytes;
+
+            S7.SetDIntAt(buffer, pos, value);
+        }
+        #endregion
+    }
 }
