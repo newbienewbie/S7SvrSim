@@ -11,6 +11,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:scripting="clr-namespace:S7SvrSim.UserControls.Scripting"
         xmlns:shared="clr-namespace:S7SvrSim.Shared"
+        xmlns:commands="clr-namespace:S7SvrSim.Commands"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainVM}"
         Title="Siemens PLC 通讯模拟器"
@@ -43,6 +44,10 @@
                         Executed="CommandBinding_Executed"
                         CanExecute="Redo_CanExecute"
                         />
+        <CommandBinding Command="{x:Static commands:AppCommands.OpenFolder}"
+                        Executed="CommandBinding_Executed"
+                        CanExecute="CanExecuteTrue"
+                        />
     </Window.CommandBindings>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
@@ -59,6 +64,10 @@
                         <MenuItem Header="保存"
                                   Icon="{md:PackIcon Kind=ContentSaveOutline}"
                                   Command="ApplicationCommands.Save"
+                                  />
+                        <Separator />
+                        <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
+                                  Icon="{md:PackIcon Kind=Redo}"
                                   />
                     </MenuItem>
                     <MenuItem Header="编辑">
@@ -106,6 +115,7 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="200" />
             </Grid.RowDefinitions>
             <TabControl TabStripPlacement="Left"
@@ -114,25 +124,9 @@
                 <TabControl.Resources>
                     <Style TargetType="TabItem"
                            BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}"
-                           >
-                        <Style.Triggers />
-                    </Style>
-                    <Style TargetType="Label"
-                           BasedOn="{StaticResource MaterialDesignLabel}"
-                           />
-                    <Style TargetType="TextBox"
-                           BasedOn="{StaticResource MaterialDesignTextBox}"
-                           />
-                    <Style TargetType="TextBlock"
-                           BasedOn="{StaticResource MaterialDesignTextBlock}"
                            />
                 </TabControl.Resources>
                 <TabItem Header="配置">
-                    <TabItem.Resources>
-                        <Style TargetType="Grid">
-                            <Setter Property="Margin" Value="4 8 4 4" />
-                        </Style>
-                    </TabItem.Resources>
                     <DockPanel>
                         <StackPanel DockPanel.Dock="Top">
                             <StackPanel Orientation="Horizontal">
@@ -169,7 +163,6 @@
                                 </Button>
                             </StackPanel>
                         </StackPanel>
-
                         <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}"
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"
@@ -223,36 +216,18 @@
                                            Grid.Column="0"
                                            Grid.ColumnSpan="2"
                                            />
-
-                        <!--<ScrollViewer VerticalScrollBarVisibility="Auto"  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
-                    <HeaderedItemsControl Header="运行" ItemsSource="{Binding RunningVM.RunningsItems}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Expander >
-                                    <Expander.Header>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="{Binding AreaKind,StringFormat={} {0}}"></TextBlock>
-                                            <TextBlock Text="{Binding BlockNumber,StringFormat={}\, Number\={0}}"></TextBlock>
-                                            <TextBlock Text="{Binding BlockSize,StringFormat={}\, Size\={0}}"></TextBlock>
-                                        </StackPanel>
-                                    </Expander.Header>
-                                </Expander>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </HeaderedItemsControl>
-                </ScrollViewer>-->
-
                     </Grid>
                 </TabItem>
-
                 <TabItem Header="脚本">
                     <scripting:ConfigPyEngineView />
                 </TabItem>
             </TabControl>
-
+            <GridSplitter Grid.Row="1"
+                          Height="3"
+                          HorizontalAlignment="Stretch"
+                          />
             <usercontrols:MsgLoggerCtrl DataContext="{Binding LoggerVM}"
-                                        Grid.Row="3"
-                                        Grid.Column="1"
+                                        Grid.Row="2"
                                         />
         </Grid>
     </DockPanel>

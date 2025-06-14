@@ -1,10 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using S7Svr.Simulator.ViewModels;
+using S7SvrSim.Commands;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
 using Splat;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -60,9 +62,6 @@ namespace S7Svr.Simulator
             {
                 SaveProject();
             }
-            else if (e.Command == ApplicationCommands.SaveAs)
-            {
-            }
             else if (e.Command == ApplicationCommands.Undo)
             {
                 UndoRedoManager.Undo();
@@ -70,6 +69,10 @@ namespace S7Svr.Simulator
             else if (e.Command == ApplicationCommands.Redo)
             {
                 UndoRedoManager.Redo();
+            }
+            else if (e.Command == AppCommands.OpenFolder)
+            {
+                Process.Start("explorer.exe", $"/select,{projectManager.ProjectPath}");
             }
         }
 

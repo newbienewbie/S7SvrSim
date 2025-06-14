@@ -31,6 +31,8 @@ namespace S7SvrSim.Services
             }
         }
 
+        public bool IsNew => projectPath == null;
+
         public ProjectManager()
         {
             configS7Model = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
@@ -74,6 +76,7 @@ namespace S7SvrSim.Services
             var project = new ProjectFile();
             project.DefaultInit();
             SetSoftware(project);
+            projectPath = null;
         }
 
         private ProjectFile BuildFromApp()

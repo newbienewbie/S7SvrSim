@@ -52,13 +52,17 @@ namespace S7Svr.Simulator.ViewModels
             command.AfterUndo += CommandEventHandle;
         }
 
+        internal void SetIpAddress(object value)
+        {
+#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
+            ipAddress = (string)value;
+#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
+            OnPropertyChanged(nameof(IpAddress));
+        }
+
         partial void OnIpAddressChanged(string oldValue, string newValue)
         {
-            var command = new ValueChangedCommand((value) =>
-            {
-                ipAddress = (string)value;
-                OnPropertyChanged(nameof(IpAddress));
-            }, oldValue, newValue);
+            var command = new ValueChangedCommand(SetIpAddress, oldValue, newValue);
             CommandEventRegist(command);
             UndoRedoManager.Regist(command);
         }

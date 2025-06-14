@@ -1,4 +1,5 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using ReactiveUI.Fody.Helpers;
 using System.Collections.Generic;
 
 namespace S7Svr.Simulator.ViewModels
@@ -6,11 +7,11 @@ namespace S7Svr.Simulator.ViewModels
     /// <summary>
     /// 正在运行的 S7 Server
     /// </summary>
-    public class RunningSnap7ServerVM : ConfigSnap7ServerVM
+    public partial class RunningSnap7ServerVM : ConfigSnap7ServerVM
     {
 
-        [Reactive]
-        public bool RunningStatus { get; set; }
+        [ObservableProperty]
+        private bool runningStatus;
 
 
         /// <summary>
@@ -20,7 +21,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public RunningSnap7ServerVM()
         {
-            
+
         }
     }
 

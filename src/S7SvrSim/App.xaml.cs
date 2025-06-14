@@ -1,19 +1,11 @@
-﻿using MediatR;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using S7Server.Simulator.ViewModels;
-using S7Svr.Simulator.MessageHandlers;
-using S7Svr.Simulator.ViewModels;
 using S7SvrSim;
 using S7SvrSim.Services;
-using S7SvrSim.ViewModels;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -41,13 +33,15 @@ namespace S7Svr.Simulator
                         .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
                     builder.AddEnvironmentVariables();
                 })
-                .ConfigureLogging((ctx, logging) => {
+                .ConfigureLogging((ctx, logging) =>
+                {
                     if (ctx.HostingEnvironment.IsDevelopment())
                     {
                         logging.AddDebug();
                     }
                 })
-                .ConfigureServices((ctx, services) => {
+                .ConfigureServices((ctx, services) =>
+                {
                     services.AddS7CoreServices();
                 })
                 .Build();
@@ -82,6 +76,16 @@ namespace S7Svr.Simulator
                 MessageBox.Show(ex.Message);
                 this.Shutdown();
             }
+
+            if (e.Args != null && e.Args.Length > 0)
+            {
+                var filePath = e.Args[0];
+                if (File.Exists(filePath))
+                {
+                    var projectManager = ServiceProvider.GetRequiredService<ProjectManager>();
+                    projectManager.Load(filePath);
+                }
+            }
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -93,7 +97,5 @@ namespace S7Svr.Simulator
             }
             Environment.Exit(0);
         }
-
-
     }
 }
