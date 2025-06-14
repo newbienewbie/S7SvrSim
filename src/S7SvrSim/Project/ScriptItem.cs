@@ -6,6 +6,17 @@ namespace S7SvrSim.Project
     public class ScriptItem
     {
         [XmlAttribute]
-        public string Name { get; set; }
+        public string Path { get; set; }
+
+        [XmlAttribute]
+        public bool Recursive { get; set; }
+
+        [XmlAttribute]
+        public bool Remove { get; set; }
+
+        public string AbsolutePath(string path)
+        {
+            return System.IO.Path.GetFullPath(Path, path);
+        }
     }
 }

@@ -10,6 +10,7 @@
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800"
+             d:Background="White"
              >
     <Grid>
 
@@ -107,8 +108,8 @@
         <TabControl Grid.Row="3"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
+                    TabStripPlacement="Top"
                     >
-
             <TabItem Header="Bit">
                 <rxui:ViewModelViewHost Name="bitOps"
                                         MinHeight="150"
@@ -118,7 +119,6 @@
                                         VerticalContentAlignment="Stretch"
                                         />
             </TabItem>
-
             <TabItem Header="Byte">
                 <rxui:ViewModelViewHost Name="byteOps"
                                         MinHeight="150"

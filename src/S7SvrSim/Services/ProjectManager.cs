@@ -9,16 +9,15 @@ using System.Linq;
 
 namespace S7SvrSim.Services
 {
-    public class ProjectManager
+    public class ProjectManager : IDisposable
     {
         private const string DEFAULT_FILENAME = "unamed";
         public const string FILE_EXTENSION = ".s7proj";
 
         private ConfigSnap7ServerVM configS7Model;
         private ConfigPyEngineVM pyConfigModel;
-        private PyScriptRunner pyRunner;
         private string projectPath = null;
-        private ProjectFile currentProject = null;
+        private bool disposedValue;
 
         public string ProjectPath
         {
@@ -26,23 +25,22 @@ namespace S7SvrSim.Services
             {
                 if (projectPath == null)
                 {
-                    return Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), $"{DEFAULT_FILENAME}{FILE_EXTENSION}");
+                    return Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), DEFAULT_FILENAME, $"{DEFAULT_FILENAME}{FILE_EXTENSION}");
                 }
                 return projectPath;
             }
         }
 
-        public ProjectManager(PyScriptRunner pyRunner)
+        public ProjectManager()
         {
             configS7Model = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
-            this.pyRunner = pyRunner;
 
             try
             {
                 if (File.Exists(ProjectPath))
                 {
-                    Load(ProjectPath);
+                    Load(ProjectPath, false);
                 }
                 else
                 {
@@ -66,7 +64,7 @@ namespace S7SvrSim.Services
                 DBNumber = config.BlockNumber,
                 DBSize = config.BlockSize,
             }));
-            configS7Model.IpAddress = string.IsNullOrEmpty(project.IpAddress) ? "127.0.0.1" : project.IpAddress;
+            configS7Model.SetIpAddress(string.IsNullOrEmpty(project.IpAddress) ? "127.0.0.1" : project.IpAddress);
 
             pyConfigModel.PyEngineSearchPaths.AddRange(project.SearchPaths);
         }
@@ -74,13 +72,13 @@ namespace S7SvrSim.Services
         public void New()
         {
             var project = new ProjectFile();
-            project.SearchPaths.Add("$DEFAULT");
+            project.DefaultInit();
             SetSoftware(project);
         }
 
-        public void Save()
+        private ProjectFile BuildFromApp()
         {
-            var project = new ProjectFile()
+            return new ProjectFile()
             {
                 AreaConfigs = configS7Model.AreaConfigs.Select(config => new AreaConfig()
                 {
@@ -91,11 +89,32 @@ namespace S7SvrSim.Services
                 SearchPaths = pyConfigModel.PyEngineSearchPaths.ToList(),
                 IpAddress = configS7Model.IpAddress,
             };
+        }
 
-            project.Save(ProjectPath);
+        public void Save()
+        {
+            SaveAs(ProjectPath);
+        }
+
+        public void Save(string path)
+        {
+            SaveAs(path);
+            projectPath = path;
+        }
+
+        public void SaveAs(string path)
+        {
+            var project = BuildFromApp();
+
+            project.Save(path);
         }
 
         public void Load(string path)
+        {
+            Load(path, true);
+        }
+
+        private void Load(string path, bool replacePath)
         {
             if (!path.EndsWith(FILE_EXTENSION))
             {
@@ -106,7 +125,33 @@ namespace S7SvrSim.Services
 
             SetSoftware(project);
 
-            projectPath = path;
+            if (replacePath)
+            {
+                projectPath = path;
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    if (projectPath == null)
+                    {
+                        Save();
+                    }
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // 不要更改此代码。请将清理代码放入“Dispose(bool disposing)”方法中
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

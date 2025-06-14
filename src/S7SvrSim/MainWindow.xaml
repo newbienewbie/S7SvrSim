@@ -35,10 +35,6 @@
                         Executed="CommandBinding_Executed"
                         CanExecute="CanExecuteTrue"
                         />
-        <CommandBinding Command="ApplicationCommands.SaveAs"
-                        Executed="CommandBinding_Executed"
-                        CanExecute="NotRunningStatus_CanExecute"
-                        />
         <CommandBinding Command="ApplicationCommands.Undo"
                         Executed="CommandBinding_Executed"
                         CanExecute="Undo_CanExecute"
@@ -64,7 +60,6 @@
                                   Icon="{md:PackIcon Kind=ContentSaveOutline}"
                                   Command="ApplicationCommands.Save"
                                   />
-                        <MenuItem Command="ApplicationCommands.SaveAs" />
                     </MenuItem>
                     <MenuItem Header="编辑">
                         <MenuItem Command="ApplicationCommands.Undo"

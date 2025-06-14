@@ -8,9 +8,6 @@ namespace S7SvrSim.Project
     [XmlRoot("Project")]
     public class ProjectFile
     {
-        [XmlAttribute]
-        public string Name { get; set; }
-
         public string IpAddress { get; set; }
 
         [XmlElement("AreaConfig")]
@@ -22,11 +19,27 @@ namespace S7SvrSim.Project
         [XmlElement("SearchPath")]
         public List<string> SearchPaths { get; set; } = new();
 
+        public void DefaultInit()
+        {
+            IpAddress = "127.0.0.1";
+            SearchPaths.Add("$DEFAULT");
+            ScriptItems.Add(new ScriptItem()
+            {
+                Path = "Scripts\\",
+                Recursive = true,
+            });
+        }
+
         public void Save(string path)
         {
             var xml = new XmlSerializer(typeof(ProjectFile));
             var ns = new XmlSerializerNamespaces();
             ns.Add("", "");
+            var directoryPath = Path.GetDirectoryName(path);
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
             using var stream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite, FileShare.Read);
             xml.Serialize(stream, this, ns);
         }
