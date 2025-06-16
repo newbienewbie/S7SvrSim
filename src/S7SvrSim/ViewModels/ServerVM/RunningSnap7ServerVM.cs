@@ -13,7 +13,6 @@ namespace S7Svr.Simulator.ViewModels
         [ObservableProperty]
         private bool runningStatus;
 
-
         /// <summary>
         /// 正在运行的——一旦开始，就不在变化。停止后Clear、再重建。所以这里直接使用了List
         /// </summary>

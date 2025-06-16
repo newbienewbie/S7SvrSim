@@ -1,13 +1,10 @@
 ﻿using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator;
-using S7Svr.Simulator.Messages;
-using S7SvrSim.Shared;
+using S7SvrSim.S7Signal;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
-using System.Linq;
-using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -28,18 +25,6 @@ namespace S7SvrSim.UserControls
             this.WhenActivated(d =>
             {
                 ViewModel = Locator.Current.GetRequiredService<SignalWatchVM>();
-                ViewModel.ScanSpans.Each(span =>
-                {
-                    span.WhenAnyValue(s => s.Boolean)
-                        .Subscribe(enable =>
-                        {
-                            if (enable)
-                            {
-                                ViewModel.ScanSpans.Where(s => s != span).Each(s => s.Boolean = false);
-                            }
-                        })
-                        .DisposeWith(d);
-                });
             });
         }
 
@@ -48,5 +33,34 @@ namespace S7SvrSim.UserControls
 
         public static readonly DependencyProperty ViewModelProperty =
             DependencyProperty.Register("ViewModel", typeof(SignalWatchVM), typeof(SignalWatchCtrl), new PropertyMetadata(null));
+
+        private ValidationResult EventValidation_ValidateEvent(object value, System.Globalization.CultureInfo cultureInfo)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+
+            if (value is string strVal)
+            {
+                try
+                {
+                    _ = new SignalAddress(strVal);
+                }
+                catch (FormatException)
+                {
+                    return new ValidationResult(false, "格式错误");
+                }
+            }
+            else if (value is SignalAddress)
+            {
+                return null;
+            }
+            else
+            {
+                return new ValidationResult(false, "不支持的值类型");
+            }
+            return null;
+        }
     }
 }

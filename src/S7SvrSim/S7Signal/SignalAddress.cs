@@ -23,15 +23,15 @@
             var splits = address.Split('.');
             if (splits.Length >= 1)
             {
-                DbIndex = int.Parse(splits[0]);
+                DbIndex = string.IsNullOrWhiteSpace(splits[0]) ? 0 : int.Parse(splits[0]);
             }
             if (splits.Length >= 2)
             {
-                Index = int.Parse(splits[1]);
+                Index = string.IsNullOrWhiteSpace(splits[1]) ? 0 : int.Parse(splits[1]);
             }
             if (splits.Length >= 3)
             {
-                Offset = byte.Parse(splits[2]);
+                Offset = string.IsNullOrWhiteSpace(splits[2]) ? (byte)0 : byte.Parse(splits[2]);
             }
         }
 

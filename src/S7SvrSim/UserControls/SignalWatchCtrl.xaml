@@ -18,54 +18,53 @@
         <lu:BindingProxy x:Key="DataContextProxy"
                          Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext}"
                          />
-        <shared:AddressConverter x:Key="AddressConverter" />
     </UserControl.Resources>
     <md:DrawerHost>
         <md:DrawerHost.LeftDrawerContent>
             <StackPanel />
         </md:DrawerHost.LeftDrawerContent>
         <DockPanel>
-            <md:Card DockPanel.Dock="Top"
-                     Margin="1"
-                     >
-                <Menu>
-                    <MenuItem Header="新建信号"
-                              ItemsSource="{Binding SignalTypes}"
-                              >
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem"
-                                   BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                   >
-                                <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.NewSignalCommand}" />
-                                <Setter Property="CommandParameter" Value="{Binding .}" />
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                        <MenuItem.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" />
-                            </DataTemplate>
-                        </MenuItem.ItemTemplate>
-                    </MenuItem>
-                    <MenuItem Header="扫描间隔"
-                              ItemsSource="{Binding ScanSpans}"
-                              >
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem"
-                                   BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                   >
-                                <Setter Property="IsCheckable" Value="True" />
-                                <Setter Property="IsChecked" Value="{Binding Boolean}" />
-                                <Setter Property="Header" Value="{Binding Value}" />
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
-                </Menu>
-            </md:Card>
+            <StackPanel DockPanel.Dock="Top">
+                <md:Card Margin="1">
+                    <Menu>
+                        <MenuItem Header="新建信号"
+                                  ItemsSource="{Binding SignalTypes}"
+                                  >
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem"
+                                       BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
+                                       >
+                                    <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.NewSignalCommand}" />
+                                    <Setter Property="CommandParameter" Value="{Binding .}" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                            <MenuItem.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </MenuItem.ItemTemplate>
+                        </MenuItem>
+                    </Menu>
+                </md:Card>
+                <StackPanel Orientation="Horizontal"
+                            Margin="5 5"
+                            >
+                    <TextBlock Text="扫描间隔："
+                               Style="{StaticResource MaterialDesignTextBlock}"
+                               />
+                    <TextBox Text="{Binding ScanSpan}"
+                             Width="80"
+                             d:Text="123"
+                             />
+                    <TextBlock Text="ms"
+                               Style="{StaticResource MaterialDesignTextBlock}"
+                               />
+                </StackPanel>
+            </StackPanel>
             <DataGrid ItemsSource="{Binding Signals}"
                       AutoGenerateColumns="False"
                       CanUserDeleteRows="True"
                       CanUserAddRows="False"
-                      Style="{StaticResource MaterialDesignDataGrid}"
                       >
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Name"
@@ -77,8 +76,16 @@
                                             SelectedItemBinding="{Binding Other}"
                                             />
                     <DataGridTextColumn Header="Address"
-                                        Binding="{Binding Value.FormatAddress}"
-                                        />
+                                        EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                        >
+                        <DataGridTextColumn.Binding>
+                            <Binding Path="Value.FormatAddress">
+                                <Binding.ValidationRules>
+                                    <lu:EventValidation ValidateEvent="EventValidation_ValidateEvent" />
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </DataGridTextColumn.Binding>
+                    </DataGridTextColumn>
                     <DataGridTextColumn Header="Value"
                                         Binding="{Binding Value.Value}"
                                         IsReadOnly="True"

@@ -15,6 +15,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadBit(Address.DbIndex, Address.Index, Address.Offset);
         }
@@ -27,6 +28,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadByte(Address.DbIndex, Address.Index);
         }
@@ -39,6 +41,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadShort(Address.DbIndex, Address.Index);
         }
@@ -51,6 +54,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadInt(Address.DbIndex, Address.Index);
         }
@@ -63,6 +67,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadUInt32(Address.DbIndex, Address.Index);
         }
@@ -75,6 +80,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadULong(Address.DbIndex, Address.Index);
         }
@@ -87,6 +93,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadReal(Address.DbIndex, Address.Index);
         }
@@ -99,6 +106,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadLReal(Address.DbIndex, Address.Index);
         }
@@ -113,6 +121,7 @@ namespace S7SvrSim.S7Signal
             if (Address == null)
             {
                 Value = null;
+                return;
             }
             Value = db.ReadString(Address.DbIndex, Address.Index);
         }

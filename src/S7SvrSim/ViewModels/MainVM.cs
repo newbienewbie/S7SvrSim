@@ -34,8 +34,8 @@ namespace S7Svr.Simulator.ViewModels
             this.SignalWatchVM = Locator.Current.GetRequiredService<SignalWatchVM>();
 
             var watchRunningStatus = this.WhenAnyValue(x => x.RunningVM.RunningStatus);
-            this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl, watchRunningStatus.Select(i => !i));
-            this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl, watchRunningStatus);
+            this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl);
+            this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl);
         }
 
         #region 启停服务器

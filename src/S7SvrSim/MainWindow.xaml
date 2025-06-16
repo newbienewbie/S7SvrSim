@@ -141,6 +141,7 @@
                                          />
                                 <Button Content="启动"
                                         Command="{Binding CmdStartServer}"
+                                        IsEnabled="{Binding RunningVM.RunningStatus, Converter={StaticResource InvertBooleanConverter}}"
                                         Width="100"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
@@ -148,6 +149,7 @@
                                         />
                                 <Button Content="停止"
                                         Command="{Binding CmdStopServer}"
+                                        IsEnabled="{Binding RunningVM.RunningStatus}"
                                         Width="100"
                                         HorizontalAlignment="Center"
                                         VerticalAlignment="Center"

@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MediatR;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace S7SvrSim.ViewModels
 {
-    public partial class SignalWatchVM : ReactiveObject
+    public partial class SignalWatchVM : ViewModelBase
     {
         private readonly IS7DataBlockService db;
         private readonly IMediator mediator;
@@ -21,7 +22,9 @@ namespace S7SvrSim.ViewModels
 
         public ObservableCollection<Type> SignalTypes { get; }
         public ObservableCollection<ObjectWith<ISignal, Type>> Signals { get; } = new ObservableCollection<ObjectWith<ISignal, Type>>();
-        public ObservableCollection<ObjectWithBool<int>> ScanSpans { get; } = new ObservableCollection<ObjectWithBool<int>>(Enumerable.Range(1, 10).Select(c => new ObjectWithBool<int>() { Value = c * 10, Boolean = c * 10 == 50 }));
+
+        [ObservableProperty]
+        private int scanSpan = 50;
 
         public SignalWatchVM(IS7DataBlockService db, IMediator mediator)
         {
@@ -107,11 +110,18 @@ namespace S7SvrSim.ViewModels
                 {
                     if (s.Value is SignalBase bs)
                     {
-                        bs.Refresh(db);
+                        try
+                        {
+                            bs.Refresh(db);
+                        }
+                        catch (Exception e) when (e is ArgumentException || e is IndexOutOfRangeException)
+                        {
+
+                        }
                     }
                 });
                 this.RaisePropertyChanged(nameof(Signals));
-                await Task.Delay(TimeSpan.FromMilliseconds(ScanSpans.FirstOrDefault(c => c.Boolean)?.Value ?? 50), token);
+                await Task.Delay(TimeSpan.FromMilliseconds(ScanSpan >= 0 ? ScanSpan : 50), token);
             }
         }
     }
