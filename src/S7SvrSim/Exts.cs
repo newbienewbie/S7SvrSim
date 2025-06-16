@@ -50,6 +50,7 @@ namespace S7SvrSim
             Locator.CurrentMutable.RegisterLazySingletonEx<RwStringVM>(sp);
 
             Locator.CurrentMutable.RegisterLazySingletonEx<ScriptTaskWindowVM>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<SignalWatchVM>(sp);
 
 
             Locator.CurrentMutable.Register<IViewFor<RwBitVM>, BitOpsView>();

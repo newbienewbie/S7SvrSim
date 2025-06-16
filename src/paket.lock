@@ -376,3 +376,5 @@ NUGET
   remote: https://baget.stdunit.com/v3/index.json
     FutureTech.Snap7 (0.4.3)
       FSharp.Core (>= 4.7.2)
+  remote: https://git.studylessshape.fun/api/packages/studylessshape/nuget/index.json
+    Less.Utils.WPF (1.0.2)

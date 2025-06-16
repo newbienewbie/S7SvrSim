@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
+using S7SvrSim.ViewModels;
 using System;
 using System.Collections.ObjectModel;
 
@@ -9,7 +10,7 @@ namespace S7Svr.Simulator.ViewModels
     /// <summary>
     /// S7 Server 的配置
     /// </summary>
-    public partial class ConfigSnap7ServerVM : ObservableObject
+    public partial class ConfigSnap7ServerVM : ViewModelBase
     {
         /// <summary>
         /// IP Address

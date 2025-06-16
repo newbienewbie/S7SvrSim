@@ -218,6 +218,9 @@
                                            />
                     </Grid>
                 </TabItem>
+                <TabItem Header="监看">
+                    <usercontrols:SignalWatchCtrl DataContext="{Binding SignalWatchVM}" />
+                </TabItem>
                 <TabItem Header="脚本">
                     <scripting:ConfigPyEngineView />
                 </TabItem>

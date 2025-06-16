@@ -19,6 +19,7 @@ namespace S7Svr.Simulator.ViewModels
         public ConfigPyEngineVM ConfigPyEngineVM { get; }
         public RunningSnap7ServerVM RunningVM { get; }
         public OperationVM OperationVM { get; }
+        public SignalWatchVM SignalWatchVM { get; }
 
         public MainVM(IS7ServerService server, ProjectManager projectManager)
         {
@@ -30,7 +31,7 @@ namespace S7Svr.Simulator.ViewModels
             this.RunningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             this.OperationVM = Locator.Current.GetRequiredService<OperationVM>();
             this.ConfigVM = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
-
+            this.SignalWatchVM = Locator.Current.GetRequiredService<SignalWatchVM>();
 
             var watchRunningStatus = this.WhenAnyValue(x => x.RunningVM.RunningStatus);
             this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl, watchRunningStatus.Select(i => !i));
