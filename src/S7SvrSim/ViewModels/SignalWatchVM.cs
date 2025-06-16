@@ -21,7 +21,7 @@ namespace S7SvrSim.ViewModels
         CancellationTokenSource cancelSource;
 
         public ObservableCollection<Type> SignalTypes { get; }
-        public ObservableCollection<ObjectWith<ISignal, Type>> Signals { get; } = new ObservableCollection<ObjectWith<ISignal, Type>>();
+        public ObservableCollection<ObjectWith<SignalBase, Type>> Signals { get; } = new ObservableCollection<ObjectWith<SignalBase, Type>>();
 
         [ObservableProperty]
         private int scanSpan = 50;
@@ -31,22 +31,22 @@ namespace S7SvrSim.ViewModels
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.PropertyChanged += RunningModel_PropertyChanged;
 
-            SignalTypes = new ObservableCollection<Type>(typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.GetInterface(typeof(ISignal).Name) != null));
+            SignalTypes = new ObservableCollection<Type>(typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase))));
             this.db = db;
             this.mediator = mediator;
         }
 
-        private ObjectWith<ISignal, Type> InitSignal(Type signalType)
+        private ObjectWith<SignalBase, Type> InitSignal(Type signalType)
         {
-            var signal = (ISignal)Activator.CreateInstance(signalType);
+            var signal = (SignalBase)Activator.CreateInstance(signalType);
             signal.Name = signalType.Name;
-            var result = new ObjectWith<ISignal, Type>() { Value = signal, Other = signalType };
+            var result = new ObjectWith<SignalBase, Type>() { Value = signal, Other = signalType };
 
             result.OtherChanged += ty =>
             {
                 string name = result.Value.Name;
                 var address = (string)result.Value.FormatAddress?.Clone();
-                result.Value = (ISignal)Activator.CreateInstance(ty);
+                result.Value = (SignalBase)Activator.CreateInstance(ty);
                 result.Value.Name = name;
                 result.Value.FormatAddress = address;
             };

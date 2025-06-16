@@ -6,7 +6,6 @@ namespace S7SvrSim.S7Signal
     public interface ISignal
     {
         string Name { get; set; }
-        object Value { get; set; }
         SignalAddress Address { get; set; }
         string FormatAddress { get; set; }
     }
@@ -26,7 +25,17 @@ namespace S7SvrSim.S7Signal
         public virtual string FormatAddress
         {
             get => Address?.ToString();
-            set => Address = new SignalAddress(value);
+            set
+            {
+                if (value != null)
+                {
+                    Address = new SignalAddress(value);
+                }
+                else
+                {
+                    Address = null;
+                }
+            }
         }
 
         public abstract void Refresh(IS7DataBlockService db);

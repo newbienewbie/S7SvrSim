@@ -19,6 +19,9 @@ namespace S7SvrSim.Project
         [XmlElement("SearchPath")]
         public List<string> SearchPaths { get; set; } = new();
 
+        [XmlElement("Signal")]
+        public List<SignalItem> Signals { get; set; } = new();
+
         public void DefaultInit()
         {
             IpAddress = "127.0.0.1";
