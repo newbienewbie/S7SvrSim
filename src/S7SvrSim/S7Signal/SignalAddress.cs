@@ -1,4 +1,6 @@
-﻿namespace S7SvrSim.S7Signal
+﻿using System;
+
+namespace S7SvrSim.S7Signal
 {
     public class SignalAddress
     {
@@ -62,6 +64,20 @@
             {
                 return $"{DbIndex}.{Index}.{Offset}";
             }
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is SignalAddress address &&
+                   DbIndex == address.DbIndex &&
+                   Index == address.Index &&
+                   Offset == address.Offset &&
+                   HideOffset == address.HideOffset;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(DbIndex, Index, Offset, HideOffset);
         }
 
         public static bool operator ==(SignalAddress address1, SignalAddress address2)
