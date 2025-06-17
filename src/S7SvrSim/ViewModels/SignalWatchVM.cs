@@ -41,17 +41,34 @@ namespace S7SvrSim.ViewModels
             this.mediator = mediator;
         }
 
-        [RelayCommand]
-        private void NewSignal(Type signalType)
-        {
-            var command = ListChangedCommand.Add(Signals, [new SignalEditObj(signalType)]);
-            UndoRedoManager.Run(command);
-        }
-
         private void CommandEventHandle(object _object, EventArgs _args)
         {
             ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
         }
+
+        private void RegistCommandEventHandle(ICommand command)
+        {
+            command.AfterExecute += CommandEventHandle;
+            command.AfterUndo += CommandEventHandle;
+        }
+
+        [RelayCommand]
+        private void NewSignal(Type signalType)
+        {
+            var command = ListChangedCommand.Add(Signals, [new SignalEditObj(signalType)]);
+            RegistCommandEventHandle(command);
+            UndoRedoManager.Run(command);
+        }
+
+        [RelayCommand]
+        private void RemoveSignal(SignalEditObj signal)
+        {
+            var command = ListChangedCommand.Remove(Signals, [signal]);
+            RegistCommandEventHandle(command);
+            UndoRedoManager.Run(command);
+        }
+
+
 
         internal void SetScanSpan(int scanSpan)
         {
@@ -64,8 +81,7 @@ namespace S7SvrSim.ViewModels
         partial void OnScanSpanChanged(int oldValue, int newValue)
         {
             var command = new ValueChangedCommand<int>(SetScanSpan, oldValue, newValue);
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
+            RegistCommandEventHandle(command);
             UndoRedoManager.Run(command);
         }
 

@@ -63,18 +63,30 @@
             </StackPanel>
             <DataGrid ItemsSource="{Binding Signals}"
                       AutoGenerateColumns="False"
-                      CanUserDeleteRows="True"
+                      CanUserDeleteRows="False"
                       CanUserAddRows="False"
                       >
                 <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                        Content="{md:PackIcon Kind=Delete}"
+                                        Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.RemoveSignalCommand}"
+                                        CommandParameter="{Binding .}"
+                                        />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Name"
                                         Binding="{Binding Value.Name}"
+                                        EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                         />
-                    <DataGridComboBoxColumn Header="Type"
-                                            ItemsSource="{Binding Data.SignalTypes, Source={StaticResource DataContextProxy}}"
-                                            DisplayMemberPath="Name"
-                                            SelectedItemBinding="{Binding Other}"
-                                            />
+                    <md:DataGridComboBoxColumn Header="Type"
+                                               ItemsSource="{Binding Data.SignalTypes, Source={StaticResource DataContextProxy}}"
+                                               DisplayMemberPath="Name"
+                                               SelectedItemBinding="{Binding Other}"
+                                               />
                     <DataGridTextColumn Header="Address"
                                         EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                         >
