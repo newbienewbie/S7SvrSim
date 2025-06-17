@@ -8,7 +8,11 @@ namespace S7SvrSim.Project
     [XmlRoot("Project")]
     public class ProjectFile
     {
+        [XmlAttribute]
         public string IpAddress { get; set; }
+
+        [XmlAttribute]
+        public int ScanSpan { get; set; }
 
         [XmlElement("AreaConfig")]
         public List<AreaConfig> AreaConfigs { get; set; } = new List<AreaConfig>();

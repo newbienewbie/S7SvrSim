@@ -26,7 +26,7 @@ namespace S7SvrSim.ViewModels
         CancellationTokenSource cancelSource;
 
         public ObservableCollection<Type> SignalTypes { get; }
-        public ObservableCollection<SignalEditObj> Signals { get; } = new ObservableCollection<SignalEditObj>();
+        public ObservableCollection<SignalEditObj> Signals { get; } = [];
 
         [ObservableProperty]
         private int scanSpan = 50;
@@ -36,7 +36,7 @@ namespace S7SvrSim.ViewModels
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.PropertyChanged += RunningModel_PropertyChanged;
 
-            SignalTypes = new ObservableCollection<Type>(typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase))));
+            SignalTypes = [.. typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase)))];
             this.db = db;
             this.mediator = mediator;
         }
@@ -48,6 +48,28 @@ namespace S7SvrSim.ViewModels
             UndoRedoManager.Run(command);
         }
 
+        private void CommandEventHandle(object _object, EventArgs _args)
+        {
+            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
+        }
+
+        internal void SetScanSpan(int scanSpan)
+        {
+#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
+            this.scanSpan = scanSpan;
+#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
+            OnPropertyChanged(nameof(ScanSpan));
+        }
+
+        partial void OnScanSpanChanged(int oldValue, int newValue)
+        {
+            var command = new ValueChangedCommand<int>(SetScanSpan, oldValue, newValue);
+            command.AfterExecute += CommandEventHandle;
+            command.AfterUndo += CommandEventHandle;
+            UndoRedoManager.Run(command);
+        }
+
+        #region Watch Method
         private void RunningModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (sender is RunningSnap7ServerVM runningModel && e.PropertyName == nameof(RunningSnap7ServerVM.RunningStatus))
@@ -112,6 +134,7 @@ namespace S7SvrSim.ViewModels
                 await Task.Delay(TimeSpan.FromMilliseconds(ScanSpan >= 0 ? ScanSpan : 50), token);
             }
         }
+        #endregion
     }
 
     public partial class SignalEditObj : ObservableObject, IEditableObject
