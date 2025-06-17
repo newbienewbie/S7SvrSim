@@ -9,11 +9,14 @@ using S7SvrSim.Services.Command;
 using S7SvrSim.Shared;
 using Splat;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls.Primitives;
 
 namespace S7SvrSim.ViewModels
 {
@@ -25,8 +28,24 @@ namespace S7SvrSim.ViewModels
 
         CancellationTokenSource cancelSource;
 
+        private class AddressUsed
+        {
+            public AddressUsedAttribute Attribute { get; }
+            public MethodInfo CalcMethod { get; }
+            public AddressUsed(Type ty)
+            {
+                Attribute = ty.GetCustomAttribute<AddressUsedAttribute>();
+                if (Attribute != null && !string.IsNullOrEmpty(Attribute.CalcMethod))
+                {
+                    CalcMethod = ty.GetMethod(Attribute.CalcMethod);
+                }
+            }
+        }
+
         public Type[] SignalTypes { get; }
+        private Dictionary<Type, AddressUsed> SignalAddressUsed { get; }
         public ObservableCollection<SignalEditObj> Signals { get; } = [];
+        public MultiSelector Selector { get; set; }
 
         [ObservableProperty]
         private int scanSpan = 50;
@@ -37,6 +56,7 @@ namespace S7SvrSim.ViewModels
             runningModel.PropertyChanged += RunningModel_PropertyChanged;
 
             SignalTypes = [.. typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase)))];
+            SignalAddressUsed = SignalTypes.Select(ty => (Type: ty, Attr: new AddressUsed(ty))).Where(it => it.Attr.Attribute != null).ToDictionary(it => it.Type, it => it.Attr);
             this.db = db;
             this.mediator = mediator;
         }
@@ -68,7 +88,142 @@ namespace S7SvrSim.ViewModels
             UndoRedoManager.Run(command);
         }
 
+        private void UpdateAddress(IEnumerable<SignalEditObj> signals)
+        {
+            if (signals.Count() <= 1)
+            {
+                return;
+            }
 
+            var preSignal = signals.First();
+            var preAddress = preSignal.Value.Address;
+            if (preAddress == null)
+            {
+                return;
+            }
+
+            AddressUsed preUsed = null;
+
+            try
+            {
+                preUsed = SignalAddressUsed[preSignal.Other];
+            }
+            catch (KeyNotFoundException)
+            {
+
+            }
+
+            if (preUsed == null)
+            {
+                return;
+            }
+
+            UndoRedoManager.StartTransaction();
+            try
+            {
+                foreach (var signal in signals.Skip(1))
+                {
+                    if (SignalAddressUsed.TryGetValue(signal.Other, out var used))
+                    {
+                        var preUsedItem = GetAddressUsedItem(preUsed, preSignal);
+                        var usedItem = GetAddressUsedItem(used, signal);
+
+                        var dbIndex = preAddress.DbIndex;
+                        int index;
+                        byte offset = 0;
+
+                        if (preUsedItem.IndexSize == 0 && usedItem.IndexSize == 0)
+                        {
+                            if (preAddress.Offset >= 7)
+                            {
+                                index = preAddress.Index + 1;
+                                offset = 0;
+                            }
+                            else
+                            {
+                                index = preAddress.Index;
+                                offset = (byte)(preAddress.Offset + preUsedItem.OffsetSize);
+                            }
+                        }
+                        else
+                        {
+                            index = preAddress.Index + (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize);
+                        }
+
+                        if (index % 2 == 1)
+                        {
+                            index += 1;
+                        }
+
+                        var newAddress = new SignalAddress(dbIndex, index, offset)
+                        {
+                            HideOffset = usedItem.IndexSize != 0
+                        };
+
+                        if (newAddress != signal.Value.Address)
+                        {
+                            var command = new ValueChangedCommand<SignalAddress>(address =>
+                            {
+                                signal.Value.Address = address;
+                            }, signal.Value.Address, newAddress);
+                            UndoRedoManager.Run(command);
+                        }
+
+                        preSignal = signal;
+                        preAddress = newAddress;
+                        preUsed = used;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+                UndoRedoManager.EndTransaction();
+            }
+        }
+
+        private AddressUsedItem GetAddressUsedItem(AddressUsed used, SignalEditObj signal)
+        {
+            if (used.CalcMethod == null)
+            {
+                return new AddressUsedItem()
+                {
+                    IndexSize = used.Attribute.IndexSize,
+                    OffsetSize = used.Attribute.OffsetSize
+                };
+            }
+            else
+            {
+                return (AddressUsedItem)used.CalcMethod.Invoke(signal.Value, []);
+            }
+        }
+
+
+        [RelayCommand]
+        private void UpdateAddressFromFirst()
+        {
+            UpdateAddress(Signals);
+        }
+
+        [RelayCommand]
+        private void UpdateAddressFromFirtSelected()
+        {
+            if (Selector.SelectedItems.Count == 0)
+            {
+                return;
+            }
+
+            UpdateAddress(Signals.Skip(Signals.IndexOf(Selector.SelectedItems.Cast<SignalEditObj>().First())));
+        }
+
+        [RelayCommand]
+        private void UpdateAddressFromSelectedItems()
+        {
+            UpdateAddress(Selector.SelectedItems.Cast<SignalEditObj>());
+        }
 
         internal void SetScanSpan(int scanSpan)
         {

@@ -1,14 +1,28 @@
-﻿using System.Collections.Generic;
+﻿using S7SvrSim.Services.Command;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace S7SvrSim.Services
 {
+    public enum TransactionMode
+    {
+        /// <summary>
+        /// 取消上一个，及将所有的命令单独拿出来存储
+        /// </summary>
+        CancelLast,
+        /// <summary>
+        /// 结束上一个，及将上一个命令保存再创建新命令
+        /// </summary>
+        EndLast,
+    }
+
     public class UndoRedoManager
     {
         private UndoRedoManager()
         {
 
         }
+
         public static int MaxOfCommands { get; set; } = 100;
         private static List<ICommand> UndoCommands { get; } = [];
         public static int UndoCount => UndoCommands.Count;
@@ -17,6 +31,41 @@ namespace S7SvrSim.Services
 
         public delegate void UndoRedoChangedEvent();
         public static event UndoRedoChangedEvent UndoRedoChanged;
+
+        private static TransactionCommand TransactionCommand { get; set; }
+
+        public static void StartTransaction(TransactionMode transactionMode = TransactionMode.CancelLast)
+        {
+            if (transactionMode == TransactionMode.CancelLast)
+            {
+                CancelTransaction();
+            }
+            else if (transactionMode == TransactionMode.EndLast)
+            {
+                EndTransaction();
+            }
+            TransactionCommand = new TransactionCommand();
+        }
+
+        public static void CancelTransaction()
+        {
+            if (TransactionCommand != null)
+            {
+                UndoCommands.AddRange(TransactionCommand);
+                UndoRedoChanged?.Invoke();
+            }
+            TransactionCommand = null;
+        }
+
+        public static void EndTransaction()
+        {
+            if (TransactionCommand != null)
+            {
+                UndoCommands.Add(TransactionCommand);
+                UndoRedoChanged?.Invoke();
+            }
+            TransactionCommand = null;
+        }
 
         private static void AddCommand(List<ICommand> target, ICommand command, bool clearRedo = true)
         {
@@ -63,8 +112,15 @@ namespace S7SvrSim.Services
 
         public static void Regist(ICommand command)
         {
-            AddCommand(UndoCommands, command);
-            UndoRedoChanged?.Invoke();
+            if (TransactionCommand != null)
+            {
+                TransactionCommand.Regist(command);
+            }
+            else
+            {
+                AddCommand(UndoCommands, command);
+                UndoRedoChanged?.Invoke();
+            }
         }
 
         public static void Run(ICommand command)

@@ -3,6 +3,7 @@ using S7Svr.Simulator.ViewModels;
 
 namespace S7SvrSim.S7Signal
 {
+    [AddressUsed(OffsetSize = 1)]
     public class Bool : SignalBase
     {
         public override string FormatAddress
@@ -22,6 +23,7 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(IndexSize = 1)]
     public class Byte : SignalBase
     {
         public override void Refresh(IS7DataBlockService db)
@@ -35,6 +37,7 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(IndexSize = 2)]
     public class Int : SignalBase
     {
         public override void Refresh(IS7DataBlockService db)
@@ -48,6 +51,7 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(IndexSize = 4)]
     public class DInt : SignalBase
     {
         public override void Refresh(IS7DataBlockService db)
@@ -61,6 +65,7 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(IndexSize = 4)]
     public class UDInt : SignalBase
     {
         public override void Refresh(IS7DataBlockService db)
@@ -74,6 +79,7 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(IndexSize = 8)]
     public class ULong : SignalBase
     {
         public override void Refresh(IS7DataBlockService db)
@@ -87,6 +93,7 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(IndexSize = 4)]
     public class Real : SignalBase
     {
         public override void Refresh(IS7DataBlockService db)
@@ -100,6 +107,7 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(IndexSize = 8)]
     public class LReal : SignalBase
     {
         public override void Refresh(IS7DataBlockService db)
@@ -113,10 +121,21 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(CalcMethod = nameof(AddressUse))]
     public partial class String : SignalBase
     {
         [ObservableProperty]
         private int maxLen;
+
+        public AddressUsedItem AddressUse()
+        {
+            var remain = (MaxLen + 2) % 10;
+            var number = (MaxLen + 2) - remain;
+            return new AddressUsedItem()
+            {
+                IndexSize = (number < 0 ? 0 : number) + (remain != 0 ? 10 : 0),
+            };
+        }
 
         public override void Refresh(IS7DataBlockService db)
         {

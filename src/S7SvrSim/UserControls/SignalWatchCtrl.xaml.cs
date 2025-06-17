@@ -25,6 +25,7 @@ namespace S7SvrSim.UserControls
             this.WhenActivated(d =>
             {
                 ViewModel = Locator.Current.GetRequiredService<SignalWatchVM>();
+                ViewModel.Selector = signalGrid;
             });
         }
 

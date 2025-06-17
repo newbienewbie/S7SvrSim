@@ -50,7 +50,17 @@
                         </MenuItem>
                         <MenuItem Header="快速地址"
                                   ToolTip="根据前一个地址自动设置下一个地址"
-                                  />
+                                  >
+                            <MenuItem Header="首项开始"
+                                      Command="{Binding UpdateAddressFromFirstCommand}"
+                                      />
+                            <MenuItem Header="从选择项开始"
+                                      Command="{Binding UpdateAddressFromFirtSelectedCommand}"
+                                      />
+                            <MenuItem Header="仅选择项"
+                                      Command="{Binding UpdateAddressFromSelectedItemsCommand}"
+                                      />
+                        </MenuItem>
                     </Menu>
                 </md:Card>
                 <StackPanel Orientation="Horizontal"
@@ -72,6 +82,7 @@
                       AutoGenerateColumns="False"
                       CanUserDeleteRows="False"
                       CanUserAddRows="False"
+                      x:Name="signalGrid"
                       >
                 <DataGrid.Columns>
                     <DataGridTemplateColumn>

@@ -57,13 +57,20 @@ namespace S7Svr.Simulator
 
         private string GetTitle(bool needSave)
         {
-            if (needSave)
+            if (projectManager.IsDefaultProject)
             {
-                return $"* {Path.GetFileName(projectManager.ProjectPath)} - Siemens PLC 通讯模拟器";
+                return "Siemens PLC 通讯模拟器";
             }
             else
             {
-                return $"{Path.GetFileName(projectManager.ProjectPath)} - Siemens PLC 通讯模拟器";
+                if (needSave)
+                {
+                    return $"* {Path.GetFileName(projectManager.ProjectPath)} - Siemens PLC 通讯模拟器";
+                }
+                else
+                {
+                    return $"{Path.GetFileName(projectManager.ProjectPath)} - Siemens PLC 通讯模拟器";
+                }
             }
         }
 
