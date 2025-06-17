@@ -8,6 +8,9 @@ namespace S7SvrSim.Services.Command
         private readonly T oldValue;
         private readonly T newValue;
 
+        public T OldValue => oldValue;
+        public T NewValue => newValue;
+
         public ValueChangedCommand(Action<T> set, T oldValue, T newValue)
         {
             this.set = set;

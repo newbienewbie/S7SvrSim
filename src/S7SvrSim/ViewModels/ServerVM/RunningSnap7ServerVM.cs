@@ -9,7 +9,6 @@ namespace S7Svr.Simulator.ViewModels
     /// </summary>
     public partial class RunningSnap7ServerVM : ConfigSnap7ServerVM
     {
-
         [ObservableProperty]
         private bool runningStatus;
 
@@ -20,7 +19,7 @@ namespace S7Svr.Simulator.ViewModels
 
         public RunningSnap7ServerVM()
         {
-
+            registCommand = false;
         }
     }
 

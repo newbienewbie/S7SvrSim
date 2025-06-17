@@ -130,7 +130,7 @@ namespace S7Svr.Simulator.ViewModels
                     this.DBNumber = config.BlockNumber;
                     this.DBSize = config.BlockSize;
                 }, (AreaConfig)this._bakeup.Clone(), (AreaConfig)this._currentConfig.Clone());
-                command.AfterExecute += this.CommandEventHandle;
+                command.AfterExecute += CommandEventHandle;
                 command.AfterUndo += CommandEventHandle;
                 UndoRedoManager.Regist(command);
             }

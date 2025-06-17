@@ -1,18 +1,23 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
+using S7Svr.Simulator;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
+using S7SvrSim.Services;
+using S7SvrSim.Services.Command;
 using S7SvrSim.Shared;
 using Splat;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace S7SvrSim.ViewModels
 {
+    using SignalWithType = ObjectWith<SignalBase, Type>;
     public partial class SignalWatchVM : ViewModelBase
     {
         private readonly IS7DataBlockService db;
@@ -21,7 +26,7 @@ namespace S7SvrSim.ViewModels
         CancellationTokenSource cancelSource;
 
         public ObservableCollection<Type> SignalTypes { get; }
-        public ObservableCollection<ObjectWith<SignalBase, Type>> Signals { get; } = new ObservableCollection<ObjectWith<SignalBase, Type>>();
+        public ObservableCollection<SignalEditObj> Signals { get; } = new ObservableCollection<SignalEditObj>();
 
         [ObservableProperty]
         private int scanSpan = 50;
@@ -36,28 +41,11 @@ namespace S7SvrSim.ViewModels
             this.mediator = mediator;
         }
 
-        private ObjectWith<SignalBase, Type> InitSignal(Type signalType)
-        {
-            var signal = (SignalBase)Activator.CreateInstance(signalType);
-            signal.Name = signalType.Name;
-            var result = new ObjectWith<SignalBase, Type>() { Value = signal, Other = signalType };
-
-            result.OtherChanged += ty =>
-            {
-                string name = result.Value.Name;
-                var address = (string)result.Value.FormatAddress?.Clone();
-                result.Value = (SignalBase)Activator.CreateInstance(ty);
-                result.Value.Name = name;
-                result.Value.FormatAddress = address;
-            };
-
-            return result;
-        }
-
         [RelayCommand]
         private void NewSignal(Type signalType)
         {
-            Signals.Add(InitSignal(signalType));
+            var command = ListChangedCommand.Add(Signals, [new SignalEditObj(signalType)]);
+            UndoRedoManager.Run(command);
         }
 
         private void RunningModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -123,6 +111,96 @@ namespace S7SvrSim.ViewModels
                 this.RaisePropertyChanged(nameof(Signals));
                 await Task.Delay(TimeSpan.FromMilliseconds(ScanSpan >= 0 ? ScanSpan : 50), token);
             }
+        }
+    }
+
+    public partial class SignalEditObj : ObservableObject, IEditableObject
+    {
+        private SignalWithType _bakup;
+
+        [ObservableProperty]
+        private Type other;
+
+        [ObservableProperty]
+        private SignalBase value;
+
+        public SignalEditObj(Type type)
+        {
+            Other = type;
+        }
+
+        partial void OnOtherChanged(Type value)
+        {
+            var newVal = (SignalBase)Activator.CreateInstance(value);
+
+            if (Value != null)
+            {
+                newVal.Name = Value.Name;
+            }
+            else
+            {
+                newVal.Name = value.Name;
+            }
+
+            newVal.FormatAddress = (string)Value?.FormatAddress?.Clone();
+
+            Value = newVal;
+        }
+
+        private SignalBase CloneValue()
+        {
+            var value = (SignalBase)Activator.CreateInstance(Other);
+            value.Value = Value.Value;
+            value.Address = Value.Address == null ? null : new SignalAddress(Value.FormatAddress);
+            value.Name = Value.Name;
+
+            if (value is S7Signal.String strSignal && Value is S7Signal.String curStrSignal)
+            {
+                strSignal.MaxLen = curStrSignal.MaxLen;
+            }
+
+            return value;
+        }
+
+        private SignalWithType CloneCurrent()
+        {
+            return new SignalWithType()
+            {
+                Other = Other,
+                Value = CloneValue()
+            };
+        }
+
+        public void BeginEdit()
+        {
+            _bakup = CloneCurrent();
+        }
+
+        public void CancelEdit()
+        {
+            Other = _bakup.Other;
+            Value = _bakup.Value;
+        }
+
+        private void CommandEventHandle(object _object, EventArgs _args)
+        {
+            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
+        }
+
+        public void EndEdit()
+        {
+            if (_bakup != null && (Other != _bakup.Other || Value.FormatAddress != _bakup.Value.FormatAddress || Value.Name != _bakup.Value.Name))
+            {
+                var command = new ValueChangedCommand<SignalWithType>(signal =>
+                {
+                    Other = signal.Other;
+                    Value = signal.Value;
+                }, _bakup, CloneCurrent());
+                command.AfterExecute += CommandEventHandle;
+                command.AfterUndo += CommandEventHandle;
+                UndoRedoManager.Regist(command);
+            }
+            _bakup = default;
         }
     }
 }

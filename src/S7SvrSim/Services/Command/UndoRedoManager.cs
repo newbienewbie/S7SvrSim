@@ -78,5 +78,29 @@ namespace S7SvrSim.Services
             UndoCommands.Clear();
             RedoCommands.Clear();
         }
+
+        public static T GetLastUndoCommands<T>()
+            where T : ICommand
+        {
+            return UndoCommands.Where(c => c is T).Cast<T>().LastOrDefault();
+        }
+
+        public static T GetLastRedoCommands<T>()
+            where T : ICommand
+        {
+            return RedoCommands.Where(c => c is T).Cast<T>().LastOrDefault();
+        }
+
+        public static T[] GetUndoCommands<T>()
+            where T : ICommand
+        {
+            return UndoCommands.Where(c => c is T).Cast<T>().ToArray();
+        }
+
+        public static T[] GetRedoCommands<T>()
+            where T : ICommand
+        {
+            return RedoCommands.Where(c => c is T).Cast<T>().ToArray();
+        }
     }
 }

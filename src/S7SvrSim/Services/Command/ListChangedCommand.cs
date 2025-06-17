@@ -157,4 +157,12 @@ namespace S7SvrSim.Services.Command
             AfterUndo?.Invoke(this, EventArgs.Empty);
         }
     }
+
+    internal static class ListChangedCommand
+    {
+        public static ListChangedCommand<T> Add<T>(IList<T> list, IEnumerable<T> added) where T : class => ListChangedCommand<T>.Add(list, added);
+        public static ListChangedCommand<T> Remove<T>(IList<T> list, IEnumerable<T> remove) where T : class => ListChangedCommand<T>.Remove(list, remove);
+        public static ListChangedCommand<T> Clear<T>(IList<T> list) where T : class => ListChangedCommand<T>.Clear(list);
+        public static ListChangedCommand<T> Replace<T>(IList<T> list, IEnumerable<(T OldItem, T NewItem)> pairs) where T : class => ListChangedCommand<T>.Replace(list, pairs);
+    }
 }

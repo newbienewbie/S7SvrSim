@@ -12,6 +12,8 @@ namespace S7Svr.Simulator.ViewModels
     /// </summary>
     public partial class ConfigSnap7ServerVM : ViewModelBase
     {
+        protected bool registCommand = true;
+
         /// <summary>
         /// IP Address
         /// </summary>
@@ -63,9 +65,12 @@ namespace S7Svr.Simulator.ViewModels
 
         partial void OnIpAddressChanged(string oldValue, string newValue)
         {
-            var command = new ValueChangedCommand(SetIpAddress, oldValue, newValue);
-            CommandEventRegist(command);
-            UndoRedoManager.Regist(command);
+            if (registCommand)
+            {
+                var command = new ValueChangedCommand(SetIpAddress, oldValue, newValue);
+                CommandEventRegist(command);
+                UndoRedoManager.Regist(command);
+            }
         }
     }
 }

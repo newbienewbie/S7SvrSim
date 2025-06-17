@@ -3,6 +3,8 @@ using System;
 
 namespace S7SvrSim.Shared
 {
+    public delegate void PropertyChanged<T>(T oldValue, T newValue);
+
     public partial class ObjectWithBool<T> : ObservableObject
     {
         [ObservableProperty]
@@ -24,17 +26,17 @@ namespace S7SvrSim.Shared
         [ObservableProperty]
         private S other;
 
-        public event Action<T> ValueChanged;
-        public event Action<S> OtherChanged;
+        public event PropertyChanged<T> ValueChanged;
+        public event PropertyChanged<S> OtherChanged;
 
-        partial void OnValueChanged(T value)
+        partial void OnValueChanged(T oldValue, T newValue)
         {
-            ValueChanged?.Invoke(value);
+            ValueChanged?.Invoke(oldValue, newValue);
         }
 
-        partial void OnOtherChanged(S value)
+        partial void OnOtherChanged(S oldValue, S newValue)
         {
-            OtherChanged?.Invoke(value);
+            OtherChanged?.Invoke(oldValue, newValue);
         }
     }
 }
