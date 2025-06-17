@@ -21,19 +21,21 @@ namespace S7SvrSim.Services
         private string projectPath = null;
         private bool disposedValue;
 
+        public static string DefaultProjectPath => Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), DEFAULT_FILENAME, $"{DEFAULT_FILENAME}{FILE_EXTENSION}");
+
         public string ProjectPath
         {
             get
             {
                 if (projectPath == null)
                 {
-                    return Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), DEFAULT_FILENAME, $"{DEFAULT_FILENAME}{FILE_EXTENSION}");
+                    return DefaultProjectPath;
                 }
                 return projectPath;
             }
         }
 
-        public bool IsNew => projectPath == null;
+        public bool IsDefaultProject => projectPath == null;
 
         public ProjectManager()
         {
@@ -99,6 +101,14 @@ namespace S7SvrSim.Services
             project.DefaultInit();
             SetSoftware(project);
             projectPath = null;
+        }
+
+        public void New(string path)
+        {
+            var project = new ProjectFile();
+            project.DefaultInit();
+            SetSoftware(project);
+            Save(path);
         }
 
         /// <summary>

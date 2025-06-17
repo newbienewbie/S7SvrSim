@@ -1,8 +1,10 @@
-﻿using S7Server.Simulator.ViewModels;
+﻿using ReactiveUI.Fody.Helpers;
+using S7Server.Simulator.ViewModels;
 using S7SvrSim.Services;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
+using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,6 +22,9 @@ namespace S7Svr.Simulator.ViewModels
         public RunningSnap7ServerVM RunningVM { get; }
         public OperationVM OperationVM { get; }
         public SignalWatchVM SignalWatchVM { get; }
+
+        [Reactive]
+        public bool NeedSave { get; set; }
 
         public MainVM(IS7ServerService server, ProjectManager projectManager)
         {
