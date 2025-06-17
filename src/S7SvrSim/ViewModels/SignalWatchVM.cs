@@ -25,7 +25,7 @@ namespace S7SvrSim.ViewModels
 
         CancellationTokenSource cancelSource;
 
-        public ObservableCollection<Type> SignalTypes { get; }
+        public Type[] SignalTypes { get; }
         public ObservableCollection<SignalEditObj> Signals { get; } = [];
 
         [ObservableProperty]
@@ -224,6 +224,15 @@ namespace S7SvrSim.ViewModels
                 UndoRedoManager.Regist(command);
             }
             _bakup = default;
+        }
+
+
+        public static implicit operator SignalEditObj(SignalWithType signal)
+        {
+            return new SignalEditObj(signal.Other)
+            {
+                Value = signal.Value
+            };
         }
     }
 }

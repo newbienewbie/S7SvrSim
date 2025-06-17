@@ -1,6 +1,7 @@
 ﻿using DynamicData;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Project;
+using S7SvrSim.S7Signal;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
@@ -14,8 +15,9 @@ namespace S7SvrSim.Services
         private const string DEFAULT_FILENAME = "unamed";
         public const string FILE_EXTENSION = ".s7proj";
 
-        private ConfigSnap7ServerVM configS7Model;
-        private ConfigPyEngineVM pyConfigModel;
+        private readonly ConfigSnap7ServerVM configS7Model;
+        private readonly ConfigPyEngineVM pyConfigModel;
+        private readonly SignalWatchVM signalWatchModel;
         private string projectPath = null;
         private bool disposedValue;
 
@@ -37,6 +39,7 @@ namespace S7SvrSim.Services
         {
             configS7Model = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
+            signalWatchModel = Locator.Current.GetRequiredService<SignalWatchVM>();
 
             try
             {
@@ -55,10 +58,15 @@ namespace S7SvrSim.Services
             }
         }
 
+        /// <summary>
+        /// 用文件数据去配置软件数据
+        /// </summary>
+        /// <param name="project"></param>
         private void SetSoftware(ProjectFile project)
         {
             configS7Model.AreaConfigs.Clear();
             pyConfigModel.PyEngineSearchPaths.Clear();
+            signalWatchModel.Signals.Clear();
 
             configS7Model.AreaConfigs.AddRange(project.AreaConfigs.Select(config => new AreaConfigVM()
             {
@@ -69,6 +77,20 @@ namespace S7SvrSim.Services
             configS7Model.SetIpAddress(string.IsNullOrEmpty(project.IpAddress) ? "127.0.0.1" : project.IpAddress);
 
             pyConfigModel.PyEngineSearchPaths.AddRange(project.SearchPaths);
+
+            signalWatchModel.SetScanSpan(project.ScanSpan ?? 50);
+
+            signalWatchModel.Signals.AddRange(project.Signals.Select(signalCfg =>
+            {
+                var signalType = signalWatchModel.SignalTypes.First(ty => ty.Name == signalCfg.Type);
+                var signal = (SignalBase)Activator.CreateInstance(signalType);
+                signal.Name = signalCfg.Name;
+                signal.FormatAddress = signalCfg.FormatAddress;
+                return new SignalEditObj(signalType)
+                {
+                    Value = signal
+                };
+            }));
         }
 
         public void New()
@@ -79,6 +101,10 @@ namespace S7SvrSim.Services
             projectPath = null;
         }
 
+        /// <summary>
+        /// 使用软件数据生成文件数据
+        /// </summary>
+        /// <returns></returns>
         private ProjectFile BuildFromApp()
         {
             return new ProjectFile()
@@ -91,9 +117,12 @@ namespace S7SvrSim.Services
                 }).ToList(),
                 SearchPaths = pyConfigModel.PyEngineSearchPaths.ToList(),
                 IpAddress = configS7Model.IpAddress,
+                Signals = signalWatchModel.Signals.Select(signal => new SignalItem(signal)).ToList(),
+                ScanSpan = signalWatchModel.ScanSpan,
             };
         }
 
+        #region 保存加载文件
         public void Save()
         {
             SaveAs(ProjectPath);
@@ -156,5 +185,6 @@ namespace S7SvrSim.Services
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+        #endregion
     }
 }

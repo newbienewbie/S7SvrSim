@@ -1,4 +1,5 @@
 ﻿using S7SvrSim.S7Signal;
+using S7SvrSim.ViewModels;
 using System.Xml.Serialization;
 
 namespace S7SvrSim.Project
@@ -25,16 +26,26 @@ namespace S7SvrSim.Project
                 }
             }
         }
+        [XmlAttribute]
+        public string Type { get; set; }
 
         public SignalItem()
         {
 
         }
 
-        public SignalItem(ISignal signal)
+        public SignalItem(SignalBase signal)
         {
             Name = signal.Name;
             FormatAddress = signal.FormatAddress;
+            Type = signal.GetType().Name;
+        }
+
+        public SignalItem(SignalEditObj signal)
+        {
+            Name = signal.Value.Name;
+            FormatAddress = signal.Value.FormatAddress;
+            Type = signal.Other.Name;
         }
     }
 }

@@ -1,6 +1,10 @@
 ﻿using S7Svr.Simulator.ViewModels;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Xml.Schema;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace S7SvrSim.Project
@@ -11,8 +15,7 @@ namespace S7SvrSim.Project
         [XmlAttribute]
         public string IpAddress { get; set; }
 
-        [XmlAttribute]
-        public int ScanSpan { get; set; }
+        public int? ScanSpan { get; set; }
 
         [XmlElement("AreaConfig")]
         public List<AreaConfig> AreaConfigs { get; set; } = new List<AreaConfig>();
