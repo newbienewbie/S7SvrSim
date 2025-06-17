@@ -1,4 +1,5 @@
-﻿using S7Svr.Simulator.ViewModels;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using S7Svr.Simulator.ViewModels;
 
 namespace S7SvrSim.S7Signal
 {
@@ -112,9 +113,10 @@ namespace S7SvrSim.S7Signal
         }
     }
 
-    public class String : SignalBase
+    public partial class String : SignalBase
     {
-        public int MaxLen { get; set; }
+        [ObservableProperty]
+        private int maxLen;
 
         public override void Refresh(IS7DataBlockService db)
         {

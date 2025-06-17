@@ -228,7 +228,7 @@ namespace S7SvrSim.ViewModels
 
         public void EndEdit()
         {
-            if (_bakup != null && (Other != _bakup.Other || Value.FormatAddress != _bakup.Value.FormatAddress || Value.Name != _bakup.Value.Name))
+            if (_bakup != null && (Other != _bakup.Other || Value.FormatAddress != _bakup.Value.FormatAddress || Value.Name != _bakup.Value.Name || (_bakup.Value is S7Signal.String bakStr && Value is S7Signal.String strSignal && bakStr.MaxLen != strSignal.MaxLen)))
             {
                 var command = new ValueChangedCommand<SignalWithType>(signal =>
                 {

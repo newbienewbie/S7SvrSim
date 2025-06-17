@@ -63,4 +63,19 @@ namespace S7SvrSim.UserControls
             return null;
         }
     }
+
+    public class DataGridMaxLenTextColumn : DataGridTextColumn
+    {
+        protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
+        {
+            if (dataItem is SignalEditObj editObj && editObj.Value is S7Signal.String)
+            {
+                return base.GenerateEditingElement(cell, dataItem);
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
 }

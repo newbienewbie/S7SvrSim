@@ -8,6 +8,7 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:lu="clr-namespace:Less.Utils.WPF;assembly=Less.Utils.WPF"
              xmlns:shared="clr-namespace:S7SvrSim.Shared"
+             xmlns:signal="clr-namespace:S7SvrSim.S7Signal"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800"
@@ -18,6 +19,9 @@
         <lu:BindingProxy x:Key="DataContextProxy"
                          Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext}"
                          />
+        <shared:IsTypeValueConverter x:Key="IsStringTypeValueConverter"
+                                     Type="{x:Type signal:String}"
+                                     />
     </UserControl.Resources>
     <md:DrawerHost>
         <md:DrawerHost.LeftDrawerContent>
@@ -44,6 +48,9 @@
                                 </DataTemplate>
                             </MenuItem.ItemTemplate>
                         </MenuItem>
+                        <MenuItem Header="快速地址"
+                                  ToolTip="根据前一个地址自动设置下一个地址"
+                                  />
                     </Menu>
                 </md:Card>
                 <StackPanel Orientation="Horizontal"
@@ -98,6 +105,10 @@
                             </Binding>
                         </DataGridTextColumn.Binding>
                     </DataGridTextColumn>
+                    <local:DataGridMaxLenTextColumn Header="MaxLen"
+                                                    Binding="{Binding Value.MaxLen}"
+                                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                                    />
                     <DataGridTextColumn Header="Value"
                                         Binding="{Binding Value.Value}"
                                         IsReadOnly="True"
