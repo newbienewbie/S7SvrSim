@@ -73,7 +73,7 @@ namespace S7SvrSim.ViewModels
         private void CommandEventHandle(object _object, EventArgs _args)
         {
             SetSearchPaths(_pyRunner.PyEngine);
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
+            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(3);
         }
 
         private void CommandEventRegist(ICommand command)

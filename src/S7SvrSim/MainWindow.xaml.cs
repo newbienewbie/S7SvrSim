@@ -228,7 +228,8 @@ namespace S7Svr.Simulator
         {
             if (ViewModel?.RunningVM != null)
             {
-                e.CanExecute = UndoRedoManager.UndoCount > 0 && !ViewModel.RunningVM.RunningStatus && Keyboard.FocusedElement is not TextBoxBase;
+                var keyboardFocus = Keyboard.FocusedElement;
+                e.CanExecute = UndoRedoManager.UndoCount > 0 && !ViewModel.RunningVM.RunningStatus && (keyboardFocus is not TextBoxBase || (keyboardFocus is TextBoxBase textBox && textBox.IsReadOnly));
                 e.Handled = true;
             }
         }
@@ -237,7 +238,8 @@ namespace S7Svr.Simulator
         {
             if (ViewModel?.RunningVM != null)
             {
-                e.CanExecute = UndoRedoManager.RedoCount > 0 && !ViewModel.RunningVM.RunningStatus && Keyboard.FocusedElement is not TextBoxBase;
+                var keyboardFocus = Keyboard.FocusedElement;
+                e.CanExecute = UndoRedoManager.RedoCount > 0 && !ViewModel.RunningVM.RunningStatus && (keyboardFocus is not TextBoxBase || (keyboardFocus is TextBoxBase textBox && textBox.IsReadOnly));
                 e.Handled = true;
             }
         }
