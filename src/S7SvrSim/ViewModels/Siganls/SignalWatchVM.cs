@@ -7,26 +7,28 @@ using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
 using S7SvrSim.Shared;
+using S7SvrSim.UserControls.Signals;
 using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls.Primitives;
 
 namespace S7SvrSim.ViewModels
 {
-    using SignalWithType = ObjectWith<SignalBase, Type>;
     public partial class SignalWatchVM : ViewModelBase
     {
         private readonly IS7DataBlockService db;
         private readonly IMediator mediator;
 
         CancellationTokenSource cancelSource;
+
+        public Type[] SignalTypes { get; }
 
         private class AddressUsed
         {
@@ -41,14 +43,17 @@ namespace S7SvrSim.ViewModels
                 }
             }
         }
-
-        public Type[] SignalTypes { get; }
         private Dictionary<Type, AddressUsed> SignalAddressUsed { get; }
+
         public ObservableCollection<SignalEditObj> Signals { get; } = [];
+
         public MultiSelector Selector { get; set; }
 
         [ObservableProperty]
         private int scanSpan = 50;
+
+        [ObservableProperty]
+        private SignalEditObj selectedEditObj;
 
         public SignalWatchVM(IS7DataBlockService db, IMediator mediator)
         {
@@ -72,6 +77,7 @@ namespace S7SvrSim.ViewModels
             command.AfterUndo += CommandEventHandle;
         }
 
+        #region Signal Edit
         [RelayCommand]
         private void NewSignal(Type signalType)
         {
@@ -87,7 +93,9 @@ namespace S7SvrSim.ViewModels
             RegistCommandEventHandle(command);
             UndoRedoManager.Run(command);
         }
+        #endregion
 
+        #region Quick Cal Address
         private void UpdateAddress(IEnumerable<SignalEditObj> signals)
         {
             if (signals.Count() <= 1)
@@ -224,7 +232,23 @@ namespace S7SvrSim.ViewModels
         {
             UpdateAddress(Selector.SelectedItems.Cast<SignalEditObj>());
         }
+        #endregion
 
+        public void OpenValueSet()
+        {
+            if (SelectedEditObj == null || !IsInWatch)
+            {
+                return;
+            }
+            var setWindow = new SetSignalValueWindow();
+            setWindow.viewModel.SelectedSignal = SelectedEditObj;
+
+            
+
+            setWindow.ShowDialog();
+        }
+
+        #region ScanSpan For UndoRedo
         internal void SetScanSpan(int scanSpan)
         {
 #pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
@@ -239,8 +263,11 @@ namespace S7SvrSim.ViewModels
             RegistCommandEventHandle(command);
             UndoRedoManager.Run(command);
         }
+        #endregion
 
         #region Watch Method
+        Task watchTask;
+        public bool IsInWatch => watchTask != null && cancelSource != null && !cancelSource.IsCancellationRequested;
         private void RunningModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (sender is RunningSnap7ServerVM runningModel && e.PropertyName == nameof(RunningSnap7ServerVM.RunningStatus))
@@ -256,7 +283,6 @@ namespace S7SvrSim.ViewModels
             }
         }
 
-        Task task;
         private void StartWatch()
         {
             if (cancelSource != null && !cancelSource.IsCancellationRequested)
@@ -265,7 +291,7 @@ namespace S7SvrSim.ViewModels
             }
 
             cancelSource = new CancellationTokenSource();
-            task = WatchTask(cancelSource.Token);
+            watchTask = WatchTask(cancelSource.Token);
         }
 
         private void EndWatch()
@@ -279,6 +305,10 @@ namespace S7SvrSim.ViewModels
                 catch (Exception)
                 {
 
+                }
+                finally
+                {
+                    watchTask = null;
                 }
             }
         }
@@ -301,109 +331,9 @@ namespace S7SvrSim.ViewModels
                         }
                     }
                 });
-                this.RaisePropertyChanged(nameof(Signals));
                 await Task.Delay(TimeSpan.FromMilliseconds(ScanSpan >= 0 ? ScanSpan : 50), token);
             }
         }
         #endregion
-    }
-
-    public partial class SignalEditObj : ObservableObject, IEditableObject
-    {
-        private SignalWithType _bakup;
-
-        [ObservableProperty]
-        private Type other;
-
-        [ObservableProperty]
-        private SignalBase value;
-
-        public SignalEditObj(Type type)
-        {
-            Other = type;
-        }
-
-        partial void OnOtherChanged(Type value)
-        {
-            var newVal = (SignalBase)Activator.CreateInstance(value);
-
-            if (Value != null)
-            {
-                newVal.Name = Value.Name;
-            }
-            else
-            {
-                newVal.Name = value.Name;
-            }
-
-            newVal.FormatAddress = (string)Value?.FormatAddress?.Clone();
-
-            Value = newVal;
-        }
-
-        private SignalBase CloneValue()
-        {
-            var value = (SignalBase)Activator.CreateInstance(Other);
-            value.Value = Value.Value;
-            value.Address = Value.Address == null ? null : new SignalAddress(Value.FormatAddress);
-            value.Name = Value.Name;
-
-            if (value is S7Signal.String strSignal && Value is S7Signal.String curStrSignal)
-            {
-                strSignal.MaxLen = curStrSignal.MaxLen;
-            }
-
-            return value;
-        }
-
-        private SignalWithType CloneCurrent()
-        {
-            return new SignalWithType()
-            {
-                Other = Other,
-                Value = CloneValue()
-            };
-        }
-
-        public void BeginEdit()
-        {
-            _bakup = CloneCurrent();
-        }
-
-        public void CancelEdit()
-        {
-            Other = _bakup.Other;
-            Value = _bakup.Value;
-        }
-
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
-        }
-
-        public void EndEdit()
-        {
-            if (_bakup != null && (Other != _bakup.Other || Value.FormatAddress != _bakup.Value.FormatAddress || Value.Name != _bakup.Value.Name || (_bakup.Value is S7Signal.String bakStr && Value is S7Signal.String strSignal && bakStr.MaxLen != strSignal.MaxLen)))
-            {
-                var command = new ValueChangedCommand<SignalWithType>(signal =>
-                {
-                    Other = signal.Other;
-                    Value = signal.Value;
-                }, _bakup, CloneCurrent());
-                command.AfterExecute += CommandEventHandle;
-                command.AfterUndo += CommandEventHandle;
-                UndoRedoManager.Regist(command);
-            }
-            _bakup = default;
-        }
-
-
-        public static implicit operator SignalEditObj(SignalWithType signal)
-        {
-            return new SignalEditObj(signal.Other)
-            {
-                Value = signal.Value
-            };
-        }
     }
 }

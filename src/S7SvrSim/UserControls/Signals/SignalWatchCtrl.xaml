@@ -19,14 +19,8 @@
         <lu:BindingProxy x:Key="DataContextProxy"
                          Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext}"
                          />
-        <shared:IsTypeValueConverter x:Key="IsStringTypeValueConverter"
-                                     Type="{x:Type signal:String}"
-                                     />
     </UserControl.Resources>
-    <md:DrawerHost>
-        <md:DrawerHost.LeftDrawerContent>
-            <StackPanel />
-        </md:DrawerHost.LeftDrawerContent>
+    <md:DrawerHost OpenMode="Standard">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <md:Card Margin="1">
@@ -61,6 +55,9 @@
                                       Command="{Binding UpdateAddressFromSelectedItemsCommand}"
                                       />
                         </MenuItem>
+                        <MenuItem Header="重置排序"
+                                  Click="Reorder_MenuItem_Click"
+                                  />
                     </Menu>
                 </md:Card>
                 <StackPanel Orientation="Horizontal"
@@ -83,6 +80,9 @@
                       CanUserDeleteRows="False"
                       CanUserAddRows="False"
                       x:Name="signalGrid"
+                      MouseDoubleClick="signalGrid_MouseDoubleClick"
+                      SelectedItem="{Binding SelectedEditObj}"
+                      GridLinesVisibility="All"
                       >
                 <DataGrid.Columns>
                     <DataGridTemplateColumn>
@@ -123,6 +123,7 @@
                     <DataGridTextColumn Header="Value"
                                         Binding="{Binding Value.Value}"
                                         IsReadOnly="True"
+                                        Width="240"
                                         />
                 </DataGrid.Columns>
             </DataGrid>

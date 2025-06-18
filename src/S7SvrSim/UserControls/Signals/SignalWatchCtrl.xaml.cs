@@ -2,11 +2,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator;
 using S7SvrSim.S7Signal;
+using S7SvrSim.Shared;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace S7SvrSim.UserControls
 {
@@ -62,6 +64,25 @@ namespace S7SvrSim.UserControls
                 return new ValidationResult(false, "不支持的值类型");
             }
             return null;
+        }
+
+        private void signalGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var currentCell = signalGrid.CurrentCell;
+            if ((string)currentCell.Column?.Header == "Value")
+            {
+                ViewModel.OpenValueSet();
+            }
+        }
+
+        private void Reorder_MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var cvSignals = CollectionViewSource.GetDefaultView(signalGrid.ItemsSource);
+            if (cvSignals != null)
+            {
+                cvSignals.SortDescriptions.Clear();
+                signalGrid.Columns.Each(col => col.SortDirection = null);
+            }
         }
     }
 
