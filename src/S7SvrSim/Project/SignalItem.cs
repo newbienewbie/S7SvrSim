@@ -18,7 +18,7 @@ namespace S7SvrSim.Project
             {
                 if (value != null)
                 {
-                    Address = new SignalAddress(value);
+                    Address = SignalAddress.Parse(value);
                 }
                 else
                 {

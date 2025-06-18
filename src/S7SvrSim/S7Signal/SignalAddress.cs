@@ -54,6 +54,32 @@ namespace S7SvrSim.S7Signal
         public byte Offset { get; set; }
         public bool HideOffset { get; set; } = true;
 
+        public static SignalAddress Parse(string address)
+        {
+            var signalAddress = new SignalAddress();
+            if (string.IsNullOrEmpty(address))
+            {
+                return signalAddress;
+            }
+
+            var splits = address.Split('.');
+            if (splits.Length >= 1)
+            {
+                signalAddress.DbIndex = string.IsNullOrWhiteSpace(splits[0]) ? 0 : int.Parse(splits[0]);
+            }
+            if (splits.Length >= 2)
+            {
+                signalAddress.Index = string.IsNullOrWhiteSpace(splits[1]) ? 0 : int.Parse(splits[1]);
+            }
+            if (splits.Length >= 3)
+            {
+                signalAddress.Offset = string.IsNullOrWhiteSpace(splits[2]) ? (byte)0 : byte.Parse(splits[2]);
+                signalAddress.HideOffset = false;
+            }
+
+            return signalAddress;
+        }
+
         public override string ToString()
         {
             if (HideOffset)

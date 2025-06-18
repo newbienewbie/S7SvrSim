@@ -10,7 +10,17 @@ namespace S7SvrSim.S7Signal
         public override string FormatAddress
         {
             get => base.FormatAddress;
-            set => Address = new SignalAddress(value) { HideOffset = false };
+            set
+            {
+                if (value == null)
+                {
+                    Address = null;
+                }
+                else
+                {
+                    Address = new SignalAddress(value) { HideOffset = false };
+                }
+            }
         }
 
         public override void Refresh(IS7DataBlockService db)
