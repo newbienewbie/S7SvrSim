@@ -5,9 +5,22 @@ namespace S7SvrSim.S7Signal
 {
     public interface ISignal
     {
+        /// <summary>
+        /// 信号名
+        /// </summary>
         string Name { get; set; }
+        /// <summary>
+        /// 信号地址
+        /// </summary>
         SignalAddress Address { get; set; }
+        /// <summary>
+        /// 格式化地址
+        /// </summary>
         string FormatAddress { get; set; }
+        /// <summary>
+        /// 备注
+        /// </summary>
+        string Remark { get; set; }
     }
 
     public abstract partial class SignalBase : ObservableObject, ISignal
@@ -21,6 +34,9 @@ namespace S7SvrSim.S7Signal
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(FormatAddress))]
         private SignalAddress address;
+
+        [ObservableProperty]
+        private string remark;
 
         public virtual string FormatAddress
         {

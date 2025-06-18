@@ -48,6 +48,7 @@ namespace S7SvrSim.ViewModels
             value.Value = Value.Value;
             value.Address = Value.Address == null ? null : new SignalAddress(Value.FormatAddress);
             value.Name = Value.Name;
+            value.Remark = Value.Remark;
 
             if (value is S7Signal.String strSignal && Value is S7Signal.String curStrSignal)
             {
@@ -84,7 +85,7 @@ namespace S7SvrSim.ViewModels
 
         public void EndEdit()
         {
-            if (_bakup != null && (Other != _bakup.Other || Value.FormatAddress != _bakup.Value.FormatAddress || Value.Name != _bakup.Value.Name || (_bakup.Value is S7Signal.String bakStr && Value is S7Signal.String strSignal && bakStr.MaxLen != strSignal.MaxLen)))
+            if (_bakup != null && (Other != _bakup.Other || Value.FormatAddress != _bakup.Value.FormatAddress || Value.Name != _bakup.Value.Name || Value.Remark != _bakup.Value.Remark || (_bakup.Value is S7Signal.String bakStr && Value is S7Signal.String strSignal && bakStr.MaxLen != strSignal.MaxLen)))
             {
                 var command = new ValueChangedCommand<SignalWithType>(signal =>
                 {
@@ -97,7 +98,6 @@ namespace S7SvrSim.ViewModels
             }
             _bakup = default;
         }
-
 
         public static implicit operator SignalEditObj(SignalWithType signal)
         {

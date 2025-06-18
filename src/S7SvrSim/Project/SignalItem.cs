@@ -31,6 +31,8 @@ namespace S7SvrSim.Project
 
         public int? MaxLen { get; set; }
 
+        public string Remark { get; set; }
+
         public SignalItem()
         {
 
@@ -41,6 +43,7 @@ namespace S7SvrSim.Project
             Name = signal.Name;
             FormatAddress = signal.FormatAddress;
             Type = signal.GetType().Name;
+            Remark = signal.Remark;
             if (signal is S7Signal.String str)
             {
                 MaxLen = str.MaxLen;
@@ -52,6 +55,7 @@ namespace S7SvrSim.Project
             Name = signal.Value.Name;
             FormatAddress = signal.Value.FormatAddress;
             Type = signal.Other.Name;
+            Remark = signal.Value.Remark;
             if (signal.Value is S7Signal.String str)
             {
                 MaxLen = str.MaxLen;

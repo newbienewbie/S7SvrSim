@@ -76,6 +76,11 @@ namespace S7Svr.Simulator
 
         private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if (e.Handled)
+            {
+                return;
+            }
+
             if (e.Command == ApplicationCommands.New)
             {
                 SaveDefaultProject();
