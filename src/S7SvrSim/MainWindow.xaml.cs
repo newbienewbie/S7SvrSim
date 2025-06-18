@@ -120,9 +120,22 @@ namespace S7Svr.Simulator
 
         private void NewProject()
         {
+            if (ViewModel.NeedSave && !projectManager.IsDefaultProject)
+            {
+                var result = MessageBox.Show("当前项目未保存，是否保存？", "未保存项目", MessageBoxButton.YesNoCancel);
+                if (result == MessageBoxResult.Yes)
+                {
+                    SaveProject();
+                }
+                else if (result == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
+            }
+
             SaveFileDialog saveFileDialog = new SaveFileDialog()
             {
-                Title = "选择保存路径",
+                Title = "选择新项目保存路径",
                 Filter = $"S7模拟项目|*{ProjectManager.FILE_EXTENSION}",
                 FileName = Path.GetFileName(projectManager.ProjectPath),
                 RestoreDirectory = true,
@@ -182,6 +195,19 @@ namespace S7Svr.Simulator
 
         private void OpenProject()
         {
+            if (ViewModel.NeedSave && !projectManager.IsDefaultProject)
+            {
+                var result = MessageBox.Show("当前项目未保存，是否保存？", "未保存项目", MessageBoxButton.YesNoCancel);
+                if (result == MessageBoxResult.Yes)
+                {
+                    SaveProject();
+                }
+                else if (result == MessageBoxResult.Cancel)
+                {
+                    return;
+                }
+            }
+
             OpenFileDialog openFileDialog = new OpenFileDialog()
             {
                 Title = "选择项目文件",
