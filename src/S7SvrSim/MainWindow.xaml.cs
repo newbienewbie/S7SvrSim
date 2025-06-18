@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace S7Svr.Simulator
@@ -227,7 +228,7 @@ namespace S7Svr.Simulator
         {
             if (ViewModel?.RunningVM != null)
             {
-                e.CanExecute = UndoRedoManager.UndoCount > 0 && !ViewModel.RunningVM.RunningStatus;
+                e.CanExecute = UndoRedoManager.UndoCount > 0 && !ViewModel.RunningVM.RunningStatus && Keyboard.FocusedElement is not TextBoxBase;
                 e.Handled = true;
             }
         }
@@ -236,7 +237,7 @@ namespace S7Svr.Simulator
         {
             if (ViewModel?.RunningVM != null)
             {
-                e.CanExecute = UndoRedoManager.RedoCount > 0 && !ViewModel.RunningVM.RunningStatus;
+                e.CanExecute = UndoRedoManager.RedoCount > 0 && !ViewModel.RunningVM.RunningStatus && Keyboard.FocusedElement is not TextBoxBase;
                 e.Handled = true;
             }
         }
