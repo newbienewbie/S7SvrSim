@@ -149,6 +149,7 @@ namespace S7Svr.Simulator
             projectManager.New(saveFileDialog.FileName);
             UndoRedoManager.Reset();
 
+            ViewModel.NeedSave = true;
             ViewModel.NeedSave = false;
         }
 
@@ -232,6 +233,8 @@ namespace S7Svr.Simulator
             }
 
             UndoRedoManager.Reset();
+
+            ViewModel.NeedSave = true;
             ViewModel.NeedSave = false;
         }
 
