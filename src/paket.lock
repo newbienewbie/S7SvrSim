@@ -191,6 +191,7 @@ NUGET
       System.Memory (>= 4.5.4) - restriction: || (&& (== net6.0-windows10.0.17763.0) (< netcoreapp2.0)) (&& (== net6.0-windows10.0.17763.0) (< netcoreapp2.1)) (&& (== net6.0-windows10.0.17763.0) (>= uap10.1)) (== netstandard2.0) (== netstandard2.1)
       System.Security.AccessControl (>= 5.0)
       System.Security.Principal.Windows (>= 5.0)
+    Microsoft.Xaml.Behaviors.Wpf (1.1.135)
     Mono.Unix (7.1.0-final.1.21458.1)
     ReactiveUI (20.1.63)
       DynamicData (>= 9.0.4)

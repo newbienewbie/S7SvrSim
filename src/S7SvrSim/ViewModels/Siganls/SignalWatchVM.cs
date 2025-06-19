@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
+using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
@@ -16,7 +17,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls.Primitives;
 
 namespace S7SvrSim.ViewModels
@@ -55,6 +55,9 @@ namespace S7SvrSim.ViewModels
         [ObservableProperty]
         private SignalEditObj selectedEditObj;
 
+        [Reactive]
+        public bool IsUserReorder { get; set; }
+
         public SignalWatchVM(IS7DataBlockService db, IMediator mediator)
         {
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
@@ -78,6 +81,20 @@ namespace S7SvrSim.ViewModels
         }
 
         #region Signal Edit
+        public void OpenValueSet()
+        {
+            if (SelectedEditObj == null || !IsInWatch)
+            {
+                return;
+            }
+            var setWindow = new SetSignalValueWindow();
+            setWindow.viewModel.SelectedSignal = SelectedEditObj;
+
+
+
+            setWindow.ShowDialog();
+        }
+
         [RelayCommand]
         private void NewSignal(Type signalType)
         {
@@ -92,6 +109,19 @@ namespace S7SvrSim.ViewModels
             var command = ListChangedCommand.Remove(Signals, [signal]);
             RegistCommandEventHandle(command);
             UndoRedoManager.Run(command);
+        }
+
+        public void ReplaceSignal(SignalEditObj oldItem, SignalEditObj newItem)
+        {
+            int oldIndex = Signals.IndexOf(oldItem);
+            int newIndex = Signals.IndexOf(newItem);
+
+            if (oldIndex != newIndex)
+            {
+                var command = ListChangedCommand.Replace(Signals, [(oldItem, newItem), (newItem, oldItem)]);
+                RegistCommandEventHandle(command);
+                UndoRedoManager.Run(command);
+            }
         }
         #endregion
 
@@ -233,20 +263,6 @@ namespace S7SvrSim.ViewModels
             UpdateAddress(Selector.SelectedItems.Cast<SignalEditObj>());
         }
         #endregion
-
-        public void OpenValueSet()
-        {
-            if (SelectedEditObj == null || !IsInWatch)
-            {
-                return;
-            }
-            var setWindow = new SetSignalValueWindow();
-            setWindow.viewModel.SelectedSignal = SelectedEditObj;
-
-            
-
-            setWindow.ShowDialog();
-        }
 
         #region ScanSpan For UndoRedo
         internal void SetScanSpan(int scanSpan)

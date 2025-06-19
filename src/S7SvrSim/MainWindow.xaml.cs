@@ -118,7 +118,7 @@ namespace S7Svr.Simulator
             }
         }
 
-        private void NewProject()
+        private MessageBoxResult? NotifyIfSave()
         {
             if (ViewModel.NeedSave && !projectManager.IsDefaultProject)
             {
@@ -127,10 +127,16 @@ namespace S7Svr.Simulator
                 {
                     SaveProject();
                 }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    return;
-                }
+                return result;
+            }
+            return null;
+        }
+
+        private void NewProject()
+        {
+            if (NotifyIfSave() == MessageBoxResult.Cancel)
+            {
+                return;
             }
 
             SaveFileDialog saveFileDialog = new SaveFileDialog()
@@ -196,17 +202,9 @@ namespace S7Svr.Simulator
 
         private void OpenProject()
         {
-            if (ViewModel.NeedSave && !projectManager.IsDefaultProject)
+            if (NotifyIfSave() == MessageBoxResult.Cancel)
             {
-                var result = MessageBox.Show("当前项目未保存，是否保存？", "未保存项目", MessageBoxButton.YesNoCancel);
-                if (result == MessageBoxResult.Yes)
-                {
-                    SaveProject();
-                }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    return;
-                }
+                return;
             }
 
             OpenFileDialog openFileDialog = new OpenFileDialog()
@@ -285,17 +283,9 @@ namespace S7Svr.Simulator
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            if (ViewModel.NeedSave && !projectManager.IsDefaultProject)
+            if (NotifyIfSave() == MessageBoxResult.Cancel)
             {
-                var result = MessageBox.Show("当前项目未保存，是否保存？", "未保存项目", MessageBoxButton.YesNoCancel);
-                if (result == MessageBoxResult.Yes)
-                {
-                    SaveProject();
-                }
-                else if (result == MessageBoxResult.Cancel)
-                {
-                    e.Cancel = true;
-                }
+                e.Cancel = true;
             }
 
             base.OnClosing(e);

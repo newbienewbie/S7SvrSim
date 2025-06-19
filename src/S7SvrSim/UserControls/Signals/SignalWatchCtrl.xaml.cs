@@ -9,6 +9,7 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace S7SvrSim.UserControls
 {
@@ -28,6 +29,16 @@ namespace S7SvrSim.UserControls
             {
                 ViewModel = Locator.Current.GetRequiredService<SignalWatchVM>();
                 ViewModel.Selector = signalGrid;
+                this.Bind(ViewModel, vm => vm.IsUserReorder, ctrl => ctrl.signalGrid, _ => signalGrid, grid =>
+                {
+                    var cvSignals = CollectionViewSource.GetDefaultView(grid.ItemsSource);
+                    if (cvSignals != null)
+                    {
+                        return cvSignals.SortDescriptions != null && cvSignals.SortDescriptions.Count > 0;
+                    }
+
+                    return false;
+                });
             });
         }
 
@@ -84,9 +95,66 @@ namespace S7SvrSim.UserControls
                 signalGrid.Columns.Each(col => col.SortDirection = null);
             }
         }
+
+        private void IsUserSortGrid_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
+        {
+            var cvSignals = CollectionViewSource.GetDefaultView(signalGrid.ItemsSource);
+            if (cvSignals != null)
+            {
+                e.CanExecute = cvSignals.SortDescriptions != null && cvSignals.SortDescriptions.Count > 0;
+            }
+            else
+            {
+                e.CanExecute = true;
+            }
+
+            e.Handled = true;
+        }
+
+        private void DataGridRow_DragOver(object sender, DragEventArgs e)
+        {
+            e.Effects = DragDropEffects.Move;
+            e.Handled = true;
+        }
+
+        private void DataGridRow_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetData(typeof(SignalEditObj)) is SignalEditObj draggedItem &&
+                sender is DataGridRow targetRow && targetRow.DataContext is SignalEditObj targetItem)
+            {
+                targetRow.Background = Brushes.Transparent;
+                ViewModel.ReplaceSignal(draggedItem, targetItem);
+            }
+        }
+
+        private void DrapButton_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (sender is Button icon && icon.DataContext is SignalEditObj item)
+            {
+                signalGrid.SelectedItem = item;
+                DragDrop.DoDragDrop(icon, item, DragDropEffects.Move);
+                e.Handled = true;
+            }
+        }
+
+        private void DataGridRow_DragEnter(object sender, DragEventArgs e)
+        {
+            if (sender is DataGridRow row)
+            {
+                row.Background = Brushes.Gold;
+            }
+        }
+
+        private void DataGridRow_DragLeave(object sender, DragEventArgs e)
+        {
+            if (sender is DataGridRow row)
+            {
+                row.Background = Brushes.Transparent;
+            }
+        }
     }
 
-    public class DataGridMaxLenTextColumn : DataGridTextColumn
+    public class DataGridMaxLenTextColumn : System.Windows.Controls.DataGridTextColumn
     {
         protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
         {

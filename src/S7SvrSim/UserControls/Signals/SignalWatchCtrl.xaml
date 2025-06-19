@@ -9,6 +9,7 @@
              xmlns:lu="clr-namespace:Less.Utils.WPF;assembly=Less.Utils.WPF"
              xmlns:shared="clr-namespace:S7SvrSim.Shared"
              xmlns:signal="clr-namespace:S7SvrSim.S7Signal"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800"
@@ -20,117 +21,155 @@
                          Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext}"
                          />
     </UserControl.Resources>
-    <md:DrawerHost OpenMode="Standard">
-        <DockPanel>
-            <StackPanel DockPanel.Dock="Top">
-                <md:Card Margin="1">
-                    <Menu>
-                        <MenuItem Header="新建信号"
-                                  ItemsSource="{Binding SignalTypes}"
-                                  >
-                            <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem"
-                                       BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                       >
-                                    <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.NewSignalCommand}" />
-                                    <Setter Property="CommandParameter" Value="{Binding .}" />
-                                </Style>
-                            </MenuItem.ItemContainerStyle>
-                            <MenuItem.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}" />
-                                </DataTemplate>
-                            </MenuItem.ItemTemplate>
-                        </MenuItem>
-                        <MenuItem Header="快速地址"
-                                  ToolTip="根据前一个地址自动设置下一个地址"
-                                  >
-                            <MenuItem Header="首项开始"
-                                      Command="{Binding UpdateAddressFromFirstCommand}"
-                                      />
-                            <MenuItem Header="从选择项开始"
-                                      Command="{Binding UpdateAddressFromFirtSelectedCommand}"
-                                      />
-                            <MenuItem Header="仅选择项"
-                                      Command="{Binding UpdateAddressFromSelectedItemsCommand}"
-                                      />
-                        </MenuItem>
-                        <MenuItem Header="重置排序"
-                                  Click="Reorder_MenuItem_Click"
-                                  />
-                    </Menu>
-                </md:Card>
-                <StackPanel Orientation="Horizontal"
-                            Margin="5 5"
-                            >
-                    <TextBlock Text="扫描间隔："
-                               Style="{StaticResource MaterialDesignTextBlock}"
-                               />
-                    <TextBox Text="{Binding ScanSpan}"
-                             Width="80"
-                             d:Text="123"
-                             />
-                    <TextBlock Text="ms"
-                               Style="{StaticResource MaterialDesignTextBlock}"
-                               />
-                </StackPanel>
-            </StackPanel>
-            <DataGrid ItemsSource="{Binding Signals}"
-                      AutoGenerateColumns="False"
-                      CanUserDeleteRows="False"
-                      CanUserAddRows="False"
-                      x:Name="signalGrid"
-                      MouseDoubleClick="signalGrid_MouseDoubleClick"
-                      SelectedItem="{Binding SelectedEditObj}"
-                      GridLinesVisibility="All"
-                      >
-                <DataGrid.Columns>
-                    <DataGridTemplateColumn>
-                        <DataGridTemplateColumn.CellTemplate>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <md:Card Margin="1">
+                <Menu>
+                    <MenuItem Header="新建信号"
+                              ItemsSource="{Binding SignalTypes}"
+                              >
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem"
+                                   BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
+                                   >
+                                <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.NewSignalCommand}" />
+                                <Setter Property="CommandParameter" Value="{Binding .}" />
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                        <MenuItem.ItemTemplate>
                             <DataTemplate>
-                                <Button Style="{StaticResource MaterialDesignFlatButton}"
-                                        Content="{md:PackIcon Kind=Delete}"
-                                        Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.RemoveSignalCommand}"
-                                        CommandParameter="{Binding .}"
-                                        />
+                                <TextBlock Text="{Binding Name}" />
                             </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <DataGridTextColumn Header="Name"
-                                        Binding="{Binding Value.Name}"
-                                        EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                        </MenuItem.ItemTemplate>
+                    </MenuItem>
+                    <MenuItem Header="快速地址"
+                              ToolTip="根据前一个地址自动设置下一个地址"
+                              >
+                        <MenuItem Header="首项开始"
+                                  Command="{Binding UpdateAddressFromFirstCommand}"
+                                  />
+                        <MenuItem Header="从选择项开始"
+                                  Command="{Binding UpdateAddressFromFirtSelectedCommand}"
+                                  />
+                        <MenuItem Header="仅选择项"
+                                  Command="{Binding UpdateAddressFromSelectedItemsCommand}"
+                                  />
+                    </MenuItem>
+                    <MenuItem Header="重置排序"
+                              Click="Reorder_MenuItem_Click"
+                              />
+                </Menu>
+            </md:Card>
+            <StackPanel Orientation="Horizontal"
+                        Margin="5 5"
+                        >
+                <TextBlock Text="扫描间隔："
+                           Style="{StaticResource MaterialDesignTextBlock}"
+                           />
+                <TextBox Text="{Binding ScanSpan}"
+                         Width="80"
+                         d:Text="123"
+                         />
+                <TextBlock Text="ms"
+                           Style="{StaticResource MaterialDesignTextBlock}"
+                           />
+            </StackPanel>
+        </StackPanel>
+        <DataGrid ItemsSource="{Binding Signals}"
+                  AutoGenerateColumns="False"
+                  CanUserDeleteRows="False"
+                  CanUserAddRows="False"
+                  x:Name="signalGrid"
+                  MouseDoubleClick="signalGrid_MouseDoubleClick"
+                  SelectedItem="{Binding SelectedEditObj}"
+                  GridLinesVisibility="All"
+                  d:ItemsSource="{d:SampleData}"
+                  CanUserSortColumns="False"
+                  >
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow"
+                       BasedOn="{StaticResource ResourceKey={x:Type DataGridRow}}"
+                       >
+                    <Setter Property="AllowDrop" Value="True" />
+                    <EventSetter Event="DragOver"
+                                 Handler="DataGridRow_DragOver"
+                                 />
+                    <EventSetter Event="Drop"
+                                 Handler="DataGridRow_Drop"
+                                 />
+                    <EventSetter Event="DragEnter"
+                                 Handler="DataGridRow_DragEnter"
+                                 />
+                    <EventSetter Event="DragLeave"
+                                 Handler="DataGridRow_DragLeave"
+                                 />
+                </Style>
+            </DataGrid.RowStyle>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Cursor="Hand"
+                                    PreviewMouseLeftButtonDown="DrapButton_PreviewMouseLeftButtonDown"
+                                    Content="{md:PackIcon Kind=Drag,
+                                                          Size=24}"
+                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                    Padding="0"
+                                    Height="24"
+                                    />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{md:PackIcon Kind=Delete}"
+                                        Command="{Binding Data.RemoveSignalCommand, Source={StaticResource DataContextProxy}}"
+                                        CommandParameter="{Binding .}"
+                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                        Padding="0"
+                                        Height="24"
+                                        Width="24"
                                         />
-                    <md:DataGridComboBoxColumn Header="Type"
-                                               ItemsSource="{Binding Data.SignalTypes, Source={StaticResource DataContextProxy}}"
-                                               DisplayMemberPath="Name"
-                                               SelectedItemBinding="{Binding Other}"
-                                               />
-                    <DataGridTextColumn Header="Address"
-                                        EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                        >
-                        <DataGridTextColumn.Binding>
-                            <Binding Path="Value.FormatAddress">
-                                <Binding.ValidationRules>
-                                    <lu:EventValidation ValidateEvent="EventValidation_ValidateEvent" />
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </DataGridTextColumn.Binding>
-                    </DataGridTextColumn>
-                    <local:DataGridMaxLenTextColumn Header="MaxLen"
-                                                    Binding="{Binding Value.MaxLen}"
-                                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                                    />
-                    <DataGridTextColumn Header="Value"
-                                        Binding="{Binding Value.Value}"
-                                        IsReadOnly="True"
-                                        Width="180"
-                                        />
-                    <DataGridTextColumn Header="Remark"
-                                        Binding="{Binding Value.Remark}"
-                                        EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                        />
-                </DataGrid.Columns>
-            </DataGrid>
-        </DockPanel>
-    </md:DrawerHost>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Name"
+                                    Binding="{Binding Value.Name}"
+                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                    />
+                <md:DataGridComboBoxColumn Header="Type"
+                                           ItemsSource="{Binding Data.SignalTypes, Source={StaticResource DataContextProxy}}"
+                                           DisplayMemberPath="Name"
+                                           SelectedItemBinding="{Binding Other}"
+                                           />
+                <DataGridTextColumn Header="Address"
+                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                    >
+                    <DataGridTextColumn.Binding>
+                        <Binding Path="Value.FormatAddress">
+                            <Binding.ValidationRules>
+                                <lu:EventValidation ValidateEvent="EventValidation_ValidateEvent" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>
+                <local:DataGridMaxLenTextColumn Header="MaxLen"
+                                                Binding="{Binding Value.MaxLen}"
+                                                EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                                />
+                <DataGridTextColumn Header="Value"
+                                    Binding="{Binding Value.Value}"
+                                    IsReadOnly="True"
+                                    Width="160"
+                                    />
+                <DataGridTextColumn Header="Remark"
+                                    Binding="{Binding Value.Remark}"
+                                    EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
+                                    />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
 </UserControl>
