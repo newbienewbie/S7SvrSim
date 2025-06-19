@@ -83,9 +83,21 @@ namespace S7SvrSim.ViewModels
             ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
         }
 
+        private bool IsChanged()
+        {
+            if (_bakup == null)
+            {
+                return false;
+            }
+
+            return Other != _bakup.Other
+                || Value != _bakup.Value
+                || (Value is S7Signal.String valStr && _bakup.Value is S7Signal.String bakStr && valStr != bakStr);
+        }
+
         public void EndEdit()
         {
-            if (_bakup != null && (Other != _bakup.Other || Value.FormatAddress != _bakup.Value.FormatAddress || Value.Name != _bakup.Value.Name || Value.Remark != _bakup.Value.Remark || (_bakup.Value is S7Signal.String bakStr && Value is S7Signal.String strSignal && bakStr.MaxLen != strSignal.MaxLen)))
+            if (IsChanged())
             {
                 var command = new ValueChangedCommand<SignalWithType>(signal =>
                 {

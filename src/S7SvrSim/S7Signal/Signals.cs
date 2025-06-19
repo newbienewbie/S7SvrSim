@@ -70,7 +70,7 @@ namespace S7SvrSim.S7Signal
 
             }
 
-                
+
         }
     }
 
@@ -235,6 +235,18 @@ namespace S7SvrSim.S7Signal
             };
         }
 
+        public override bool Equals(object obj)
+        {
+            return obj is String @string &&
+                   base.Equals(obj) &&
+                   MaxLen == @string.MaxLen;
+        }
+
+        public override int GetHashCode()
+        {
+            return System.HashCode.Combine(base.GetHashCode(), MaxLen);
+        }
+
         public override void Refresh(IS7DataBlockService db)
         {
             if (Address == null)
@@ -252,6 +264,20 @@ namespace S7SvrSim.S7Signal
                 db.WriteString(Address.DbIndex, Address.Index, MaxLen, stringValue);
                 Value = stringValue;
             }
+        }
+
+        public static bool operator ==(String lhs, String rhs)
+        {
+            if (lhs is null || rhs is null)
+            {
+                return lhs is null && rhs is null;
+            }
+            return lhs.MaxLen == rhs.MaxLen && lhs == (SignalBase)rhs;
+        }
+
+        public static bool operator !=(String lhs, String rhs)
+        {
+            return !(lhs == rhs);
         }
     }
 }

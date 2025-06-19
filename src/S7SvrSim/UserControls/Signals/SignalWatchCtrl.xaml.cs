@@ -86,31 +86,6 @@ namespace S7SvrSim.UserControls
             }
         }
 
-        private void Reorder_MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var cvSignals = CollectionViewSource.GetDefaultView(signalGrid.ItemsSource);
-            if (cvSignals != null)
-            {
-                cvSignals.SortDescriptions.Clear();
-                signalGrid.Columns.Each(col => col.SortDirection = null);
-            }
-        }
-
-        private void IsUserSortGrid_CanExecute(object sender, System.Windows.Input.CanExecuteRoutedEventArgs e)
-        {
-            var cvSignals = CollectionViewSource.GetDefaultView(signalGrid.ItemsSource);
-            if (cvSignals != null)
-            {
-                e.CanExecute = cvSignals.SortDescriptions != null && cvSignals.SortDescriptions.Count > 0;
-            }
-            else
-            {
-                e.CanExecute = true;
-            }
-
-            e.Handled = true;
-        }
-
         private void DataGridRow_DragOver(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.Move;

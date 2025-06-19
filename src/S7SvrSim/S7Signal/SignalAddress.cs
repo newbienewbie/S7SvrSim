@@ -117,11 +117,7 @@ namespace S7SvrSim.S7Signal
 
         public static bool operator !=(SignalAddress address1, SignalAddress address2)
         {
-            if (address1 is null || address2 is null)
-            {
-                return (address1 is null && address2 is not null) || (address1 is not null && address2 is null);
-            }
-            return address1.DbIndex != address2.DbIndex || address1.Index != address2.Index || address1.Offset != address2.Offset;
+            return !(address1 == address2);
         }
     }
 }

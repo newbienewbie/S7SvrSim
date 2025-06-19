@@ -55,9 +55,6 @@
                                   Command="{Binding UpdateAddressFromSelectedItemsCommand}"
                                   />
                     </MenuItem>
-                    <MenuItem Header="重置排序"
-                              Click="Reorder_MenuItem_Click"
-                              />
                 </Menu>
             </md:Card>
             <StackPanel Orientation="Horizontal"
