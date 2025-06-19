@@ -18,7 +18,6 @@ namespace S7SvrSim.Services.Command
         protected readonly ChangedType changedType;
         protected readonly IList<ListItem> newItems;
         protected readonly IList<ListItem> oldItems;
-
         private ListChangedCommand(IList<T> list, ChangedType changedType, IEnumerable<T> newItems, IEnumerable<T> oldItems)
         {
             this.list = list;
@@ -87,14 +86,26 @@ namespace S7SvrSim.Services.Command
             }
         }
 
-        private void Replace(IEnumerable<T> @from, IEnumerable<T> to)
+        private void Replace(IEnumerable<ListItem> @from, IEnumerable<ListItem> to)
         {
-            var pairs = from old in @from
-                        from @new in to
-                        select (From: old, To: @new);
-            foreach (var (oldItem, newItem) in pairs)
+            var pair = from f in @from.Select((f, i) => (Item: f, Index: i))
+                       join t in to.Select((t, i) => (Item: t, Index: i)) on f.Index equals t.Index
+                       select (Old: f.Item, New: t.Item);
+
+
+            foreach (var (oldItem, newItem) in pair)
             {
-                list.Replace(oldItem, newItem);
+                if (oldItem.Index == -1 || list.Count <= oldItem.Index)
+                {
+                    newItem.Index = -1;
+                    continue;
+                }
+
+                list[oldItem.Index] = newItem.Item;
+                if (newItem.Index != oldItem.Index)
+                {
+                    newItem.Index = oldItem.Index;
+                }
             }
         }
 
@@ -123,7 +134,7 @@ namespace S7SvrSim.Services.Command
                     Remove();
                     break;
                 case ChangedType.Replace:
-                    Replace(oldItems.Select(p => p.Item), newItems.Select(p => p.Item));
+                    Replace(oldItems, newItems);
                     break;
                 case ChangedType.Clear:
                     Clear();
@@ -146,7 +157,7 @@ namespace S7SvrSim.Services.Command
                     RemoveBack();
                     break;
                 case ChangedType.Replace:
-                    Replace(newItems.Select(p => p.Item), oldItems.Select(p => p.Item));
+                    Replace(newItems, oldItems);
                     break;
                 case ChangedType.Clear:
                     ClearBack();

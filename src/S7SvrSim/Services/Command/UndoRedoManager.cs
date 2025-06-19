@@ -55,6 +55,7 @@ namespace S7SvrSim.Services
                 UndoRedoChanged?.Invoke();
             }
             TransactionCommand = null;
+            RedoCommands.Clear();
         }
 
         public static void EndTransaction()
@@ -65,6 +66,7 @@ namespace S7SvrSim.Services
                 UndoRedoChanged?.Invoke();
             }
             TransactionCommand = null;
+            RedoCommands.Clear();
         }
 
         private static void AddCommand(List<ICommand> target, ICommand command, bool clearRedo = true)
