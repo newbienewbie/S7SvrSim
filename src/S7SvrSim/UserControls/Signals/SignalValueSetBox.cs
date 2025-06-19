@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
@@ -16,6 +15,9 @@ namespace S7SvrSim.UserControls.Signals
         public static DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(SignalValueSetBox), new PropertyMetadata(null));
         public static DependencyProperty TextBoxWidthProperty = DependencyProperty.Register("TextBoxWidth", typeof(int), typeof(SignalValueSetBox), new PropertyMetadata(-1));
         public static DependencyProperty HasValidationErrorProperty = DependencyProperty.Register("HasValidationError", typeof(bool), typeof(SignalValueSetBox), new PropertyMetadata(false));
+        public static DependencyProperty TextBoxStyleProperty = DependencyProperty.Register("TextBoxStyle", typeof(Style), typeof(SignalValueSetBox), new FrameworkPropertyMetadata(OnTextBoxStyleChanged));
+
+
 
         public Type ValueType
         {
@@ -41,6 +43,12 @@ namespace S7SvrSim.UserControls.Signals
             set => SetValue(HasValidationErrorProperty, value);
         }
 
+        public Style TextBoxStyle
+        {
+            get => (Style)GetValue(TextBoxStyleProperty);
+            set => SetValue(TextBoxStyleProperty, value);
+        }
+
         private ContentPresenter contentPresenter;
         private CheckBox checkBox;
         private TextBox textBox;
@@ -58,6 +66,10 @@ namespace S7SvrSim.UserControls.Signals
             base.OnGotFocus(e);
 
             FocusManager.SetFocusedElement(this, currentDisplayControl);
+            if (currentDisplayControl is TextBox textbox)
+            {
+                textbox.SelectAll();
+            }
         }
 
         public override void OnApplyTemplate()
@@ -70,6 +82,7 @@ namespace S7SvrSim.UserControls.Signals
             BindingOperations.SetBinding(checkBox, System.Windows.Controls.Primitives.ToggleButton.IsCheckedProperty, binding);
 
             SetContentElement(ValueType);
+            textBox.Style = TextBoxStyle;
         }
 
         private void SetContentElement(Type newType)
@@ -192,9 +205,12 @@ namespace S7SvrSim.UserControls.Signals
             }
         }
 
-        public IEnumerable GetErrors(string propertyName)
+        private static void OnTextBoxStyleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (d is SignalValueSetBox box)
+            {
+                box.textBox.Style = (Style)e.NewValue;
+            }
         }
     }
 }

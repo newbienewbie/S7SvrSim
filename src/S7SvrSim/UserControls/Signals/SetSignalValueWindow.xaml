@@ -39,13 +39,13 @@
                     />
     </Window.InputBindings>
     <Border Background="White"
-            Padding="8 2"
+            Padding="8 0"
             BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}"
             BorderThickness="1"
-            CornerRadius="3"
+            CornerRadius="5"
             >
         <StackPanel Orientation="Horizontal"
-                    VerticalAlignment="Top"
+                    VerticalAlignment="Center"
                     >
             <StackPanel.Resources>
                 <Style TargetType="TextBlock">
@@ -69,7 +69,15 @@
                                      VerticalAlignment="Center"
                                      HasValidationError="{Binding HasValidationError, Mode=TwoWay}"
                                      x:Name="setValueBox"
-                                     />
+                                     >
+                <local:SignalValueSetBox.TextBoxStyle>
+                    <Style TargetType="TextBox"
+                           BasedOn="{StaticResource MaterialDesignTextBox}"
+                           >
+                        <Setter Property="md:ValidationAssist.UsePopup" Value="True" />
+                    </Style>
+                </local:SignalValueSetBox.TextBoxStyle>
+            </local:SignalValueSetBox>
             <Border Width="1"
                     Style="{StaticResource SepectorBorder}"
                     />

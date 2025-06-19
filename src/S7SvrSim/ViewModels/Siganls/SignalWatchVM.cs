@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
-using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
@@ -54,9 +53,6 @@ namespace S7SvrSim.ViewModels
 
         [ObservableProperty]
         private SignalEditObj selectedEditObj;
-
-        [Reactive]
-        public bool IsUserReorder { get; set; }
 
         public SignalWatchVM(IS7DataBlockService db, IMediator mediator)
         {

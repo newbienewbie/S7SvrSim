@@ -51,39 +51,41 @@
     </Window.CommandBindings>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
-            <md:Card Margin="5 0">
-                <Menu>
-                    <MenuItem Header="文件">
-                        <MenuItem Command="ApplicationCommands.New"
-                                  Icon="{md:PackIcon Kind=FileOutline}"
-                                  />
-                        <MenuItem Header="打开"
-                                  Icon="{md:PackIcon Kind=FolderOpenOutline}"
-                                  Command="ApplicationCommands.Open"
-                                  />
-                        <MenuItem Header="保存"
-                                  Icon="{md:PackIcon Kind=ContentSaveOutline}"
-                                  Command="ApplicationCommands.Save"
-                                  />
-                        <Separator />
-                        <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
-                                  Icon="{md:PackIcon Kind=Redo}"
-                                  />
-                    </MenuItem>
-                    <MenuItem Header="编辑">
-                        <MenuItem Command="ApplicationCommands.Undo"
-                                  Icon="{md:PackIcon Kind=UndoVariant}"
-                                  />
-                        <MenuItem Command="ApplicationCommands.Redo"
-                                  Icon="{md:PackIcon Kind=RedoVariant}"
-                                  />
-                    </MenuItem>
-                    <MenuItem Header="服务">
-                        <MenuItem Command="commands:AppCommands.StartServer" />
-                        <MenuItem Command="commands:AppCommands.StopServer" />
-                    </MenuItem>
-                </Menu>
-            </md:Card>
+            <Menu>
+                <MenuItem Header="文件">
+                    <MenuItem Command="ApplicationCommands.New"
+                              Icon="{md:PackIcon Kind=FileOutline}"
+                              />
+                    <MenuItem Header="打开"
+                              Icon="{md:PackIcon Kind=FolderOpenOutline}"
+                              Command="ApplicationCommands.Open"
+                              />
+                    <MenuItem Header="保存"
+                              Icon="{md:PackIcon Kind=ContentSaveOutline}"
+                              Command="ApplicationCommands.Save"
+                              />
+                    <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
+                              Icon="{md:PackIcon Kind=Redo}"
+                              />
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="编辑">
+                    <MenuItem Command="ApplicationCommands.Undo"
+                              Icon="{md:PackIcon Kind=UndoVariant}"
+                              />
+                    <MenuItem Command="ApplicationCommands.Redo"
+                              Icon="{md:PackIcon Kind=RedoVariant}"
+                              />
+                </MenuItem>
+                <MenuItem Header="服务">
+                    <MenuItem Command="commands:AppCommands.StartServer"
+                              Icon="{md:PackIcon Kind=Play}"
+                              />
+                    <MenuItem Command="commands:AppCommands.StopServer"
+                              Icon="{md:PackIcon Kind=Stop}"
+                              />
+                </MenuItem>
+            </Menu>
             <ToolBarTray>
                 <ToolBarTray.Resources>
                     <Thickness x:Key="ButtonPadding">10</Thickness>
@@ -119,17 +121,23 @@
                             shared:RoutedCommandTooltip.Enabled="True"
                             />
                 </ToolBar>
-                <ToolBar>
-                    <Button Command="ApplicationCommands.Undo"
-                            Content="{md:PackIcon Kind=UndoVariant}"
-                            Padding="{StaticResource ButtonPadding}"
-                            shared:RoutedCommandTooltip.Enabled="True"
-                            />
-                    <Button Command="ApplicationCommands.Redo"
-                            Content="{md:PackIcon Kind=RedoVariant}"
-                            Padding="{StaticResource ButtonPadding}"
-                            shared:RoutedCommandTooltip.Enabled="True"
-                            />
+                <ToolBar ClipToBounds="False">
+                    <md:Badged Badge="{Binding UndoCount}">
+                        <Button Command="ApplicationCommands.Undo"
+                                Content="{md:PackIcon Kind=UndoVariant}"
+                                Padding="{StaticResource ButtonPadding}"
+                                shared:RoutedCommandTooltip.Enabled="True"
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                />
+                    </md:Badged>
+                    <md:Badged Badge="{Binding RedoCount}">
+                        <Button Command="ApplicationCommands.Redo"
+                                Content="{md:PackIcon Kind=RedoVariant}"
+                                Padding="{StaticResource ButtonPadding}"
+                                shared:RoutedCommandTooltip.Enabled="True"
+                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                />
+                    </md:Badged>
                 </ToolBar>
             </ToolBarTray>
         </StackPanel>

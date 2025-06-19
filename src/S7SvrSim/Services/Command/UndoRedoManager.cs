@@ -49,24 +49,24 @@ namespace S7SvrSim.Services
 
         public static void CancelTransaction()
         {
-            if (TransactionCommand != null)
+            if (TransactionCommand != null && TransactionCommand.Any())
             {
                 UndoCommands.AddRange(TransactionCommand);
+                RedoCommands.Clear();
                 UndoRedoChanged?.Invoke();
             }
             TransactionCommand = null;
-            RedoCommands.Clear();
         }
 
         public static void EndTransaction()
         {
-            if (TransactionCommand != null)
+            if (TransactionCommand != null && TransactionCommand.Any())
             {
                 UndoCommands.Add(TransactionCommand);
+                RedoCommands.Clear();
                 UndoRedoChanged?.Invoke();
             }
             TransactionCommand = null;
-            RedoCommands.Clear();
         }
 
         private static void AddCommand(List<ICommand> target, ICommand command, bool clearRedo = true)

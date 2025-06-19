@@ -2,13 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator;
 using S7SvrSim.S7Signal;
-using S7SvrSim.Shared;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Media;
 
 namespace S7SvrSim.UserControls
@@ -29,16 +27,6 @@ namespace S7SvrSim.UserControls
             {
                 ViewModel = Locator.Current.GetRequiredService<SignalWatchVM>();
                 ViewModel.Selector = signalGrid;
-                this.Bind(ViewModel, vm => vm.IsUserReorder, ctrl => ctrl.signalGrid, _ => signalGrid, grid =>
-                {
-                    var cvSignals = CollectionViewSource.GetDefaultView(grid.ItemsSource);
-                    if (cvSignals != null)
-                    {
-                        return cvSignals.SortDescriptions != null && cvSignals.SortDescriptions.Count > 0;
-                    }
-
-                    return false;
-                });
             });
         }
 

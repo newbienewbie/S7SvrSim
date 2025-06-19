@@ -23,40 +23,38 @@
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
-            <md:Card Margin="1">
-                <Menu>
-                    <MenuItem Header="新建信号"
-                              ItemsSource="{Binding SignalTypes}"
-                              >
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem"
-                                   BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                   >
-                                <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.NewSignalCommand}" />
-                                <Setter Property="CommandParameter" Value="{Binding .}" />
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                        <MenuItem.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}" />
-                            </DataTemplate>
-                        </MenuItem.ItemTemplate>
-                    </MenuItem>
-                    <MenuItem Header="快速地址"
-                              ToolTip="根据前一个地址自动设置下一个地址"
-                              >
-                        <MenuItem Header="首项开始"
-                                  Command="{Binding UpdateAddressFromFirstCommand}"
-                                  />
-                        <MenuItem Header="从选择项开始"
-                                  Command="{Binding UpdateAddressFromFirtSelectedCommand}"
-                                  />
-                        <MenuItem Header="仅选择项"
-                                  Command="{Binding UpdateAddressFromSelectedItemsCommand}"
-                                  />
-                    </MenuItem>
-                </Menu>
-            </md:Card>
+            <Menu>
+                <MenuItem Header="新建信号"
+                          ItemsSource="{Binding SignalTypes}"
+                          >
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem"
+                               BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
+                               >
+                            <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.NewSignalCommand}" />
+                            <Setter Property="CommandParameter" Value="{Binding .}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
+                <MenuItem Header="快速地址"
+                          ToolTip="根据前一个地址自动设置下一个地址"
+                          >
+                    <MenuItem Header="首项开始"
+                              Command="{Binding UpdateAddressFromFirstCommand}"
+                              />
+                    <MenuItem Header="从选择项开始"
+                              Command="{Binding UpdateAddressFromFirtSelectedCommand}"
+                              />
+                    <MenuItem Header="仅选择项"
+                              Command="{Binding UpdateAddressFromSelectedItemsCommand}"
+                              />
+                </MenuItem>
+            </Menu>
             <StackPanel Orientation="Horizontal"
                         Margin="5 5"
                         >

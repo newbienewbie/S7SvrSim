@@ -25,6 +25,12 @@ namespace S7Svr.Simulator.ViewModels
         [Reactive]
         public bool NeedSave { get; set; }
 
+        [Reactive]
+        public int UndoCount { get; set; }
+
+        [Reactive]
+        public int RedoCount { get; set; }
+
         public MainVM(IS7ServerService server, ProjectManager projectManager)
         {
             this._server = server;
@@ -40,6 +46,12 @@ namespace S7Svr.Simulator.ViewModels
             var watchRunningStatus = this.WhenAnyValue(vm => vm.RunningVM.RunningStatus);
             this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl);
             this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl);
+
+            UndoRedoManager.UndoRedoChanged += () =>
+            {
+                UndoCount = UndoRedoManager.UndoCount;
+                RedoCount = UndoRedoManager.RedoCount;
+            };
         }
 
         #region 启停服务器
