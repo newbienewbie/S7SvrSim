@@ -33,6 +33,8 @@ namespace S7Svr.Simulator
                 this.ViewModel = Locator.Current.GetRequiredService<MainVM>();
                 this.DataContext = this.ViewModel;
                 this.OneWayBind(ViewModel, vm => vm.NeedSave, w => w.Title, GetTitle);
+                this.CommandBindings.Add(new CommandBinding(AppCommands.StartServer, (_, _) => ViewModel.CmdStartServer.Execute(), (_, e) => e.CanExecute = !ViewModel.RunningVM.RunningStatus));
+                this.CommandBindings.Add(new CommandBinding(AppCommands.StopServer, (_, _) => ViewModel.CmdStopServer.Execute(), (_, e) => e.CanExecute = ViewModel.RunningVM.RunningStatus));
             });
 
             projectManager = ((App)Application.Current).ServiceProvider.GetRequiredService<ProjectManager>();

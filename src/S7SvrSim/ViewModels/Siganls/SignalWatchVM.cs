@@ -90,8 +90,6 @@ namespace S7SvrSim.ViewModels
             var setWindow = new SetSignalValueWindow();
             setWindow.viewModel.SelectedSignal = SelectedEditObj;
 
-
-
             setWindow.ShowDialog();
         }
 

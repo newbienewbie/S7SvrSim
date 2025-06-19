@@ -78,39 +78,60 @@
                                   Icon="{md:PackIcon Kind=RedoVariant}"
                                   />
                     </MenuItem>
+                    <MenuItem Header="服务">
+                        <MenuItem Command="commands:AppCommands.StartServer" />
+                        <MenuItem Command="commands:AppCommands.StopServer" />
+                    </MenuItem>
                 </Menu>
             </md:Card>
-            <ToolBar>
-                <ToolBar.Resources>
+            <ToolBarTray>
+                <ToolBarTray.Resources>
                     <Thickness x:Key="ButtonPadding">10</Thickness>
-                </ToolBar.Resources>
-                <Button Command="ApplicationCommands.New"
-                        Content="{md:PackIcon Kind=FileOutline}"
-                        Padding="{StaticResource ButtonPadding}"
-                        shared:RoutedCommandTooltip.Enabled="True"
-                        />
-                <Button Command="ApplicationCommands.Open"
-                        Content="{md:PackIcon Kind=FolderOpenOutline}"
-                        Padding="{StaticResource ButtonPadding}"
-                        shared:RoutedCommandTooltip.Enabled="True"
-                        />
-                <Button Command="ApplicationCommands.Save"
-                        Content="{md:PackIcon Kind=ContentSaveOutline}"
-                        Padding="{StaticResource ButtonPadding}"
-                        shared:RoutedCommandTooltip.Enabled="True"
-                        />
-                <Separator />
-                <Button Command="ApplicationCommands.Undo"
-                        Content="{md:PackIcon Kind=UndoVariant}"
-                        Padding="{StaticResource ButtonPadding}"
-                        shared:RoutedCommandTooltip.Enabled="True"
-                        />
-                <Button Command="ApplicationCommands.Redo"
-                        Content="{md:PackIcon Kind=RedoVariant}"
-                        Padding="{StaticResource ButtonPadding}"
-                        shared:RoutedCommandTooltip.Enabled="True"
-                        />
-            </ToolBar>
+                </ToolBarTray.Resources>
+                <ToolBar>
+                    <Button Command="commands:AppCommands.StartServer"
+                            Content="{md:PackIcon Kind=Play}"
+                            Padding="{StaticResource ButtonPadding}"
+                            shared:RoutedCommandTooltip.Enabled="True"
+                            Foreground="Green"
+                            />
+                    <Button Command="commands:AppCommands.StopServer"
+                            Content="{md:PackIcon Kind=Stop}"
+                            Padding="{StaticResource ButtonPadding}"
+                            shared:RoutedCommandTooltip.Enabled="True"
+                            Foreground="MediumVioletRed"
+                            />
+                </ToolBar>
+                <ToolBar>
+                    <Button Command="ApplicationCommands.New"
+                            Content="{md:PackIcon Kind=FileOutline}"
+                            Padding="{StaticResource ButtonPadding}"
+                            shared:RoutedCommandTooltip.Enabled="True"
+                            />
+                    <Button Command="ApplicationCommands.Open"
+                            Content="{md:PackIcon Kind=FolderOpenOutline}"
+                            Padding="{StaticResource ButtonPadding}"
+                            shared:RoutedCommandTooltip.Enabled="True"
+                            />
+                    <Button Command="ApplicationCommands.Save"
+                            Content="{md:PackIcon Kind=ContentSaveOutline}"
+                            Padding="{StaticResource ButtonPadding}"
+                            shared:RoutedCommandTooltip.Enabled="True"
+                            />
+                </ToolBar>
+                <ToolBar>
+                    <Button Command="ApplicationCommands.Undo"
+                            Content="{md:PackIcon Kind=UndoVariant}"
+                            Padding="{StaticResource ButtonPadding}"
+                            shared:RoutedCommandTooltip.Enabled="True"
+                            />
+                    <Button Command="ApplicationCommands.Redo"
+                            Content="{md:PackIcon Kind=RedoVariant}"
+                            Padding="{StaticResource ButtonPadding}"
+                            shared:RoutedCommandTooltip.Enabled="True"
+                            />
+                </ToolBar>
+            </ToolBarTray>
         </StackPanel>
         <Grid>
             <Grid.RowDefinitions>
@@ -139,27 +160,12 @@
                                          Width="160"
                                          VerticalAlignment="Center"
                                          />
-                                <Button Content="启动"
-                                        Command="{Binding CmdStartServer}"
-                                        IsEnabled="{Binding RunningVM.RunningStatus, Converter={StaticResource InvertBooleanConverter}}"
-                                        Width="100"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Margin="10 0"
-                                        />
-                                <Button Content="停止"
-                                        Command="{Binding CmdStopServer}"
-                                        IsEnabled="{Binding RunningVM.RunningStatus}"
-                                        Width="100"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal"
                                         Margin="0 10"
                                         >
                                 <Button Command="{Binding ConfigVM.CmdAddArea}"
-                                        Style="{DynamicResource MaterialDesignFlatLightBgButton}"
+                                        Style="{StaticResource MaterialDesignOutlinedButton}"
                                         >
                                     添加
                                 </Button>
@@ -179,9 +185,12 @@
                                                     CommandParameter="{Binding .}"
                                                     Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid, Mode=FindAncestor}, Path=DataContext.ConfigVM.CmdRemoveArea}"
                                                     Visibility="{Binding ., Converter={StaticResource IsAreaConfigVM}}"
-                                                    >
-                                                删除
-                                            </Button>
+                                                    Content="{md:PackIcon Kind=Delete}"
+                                                    Style="{StaticResource MaterialDesignFlatButton}"
+                                                    Padding="0"
+                                                    Height="24"
+                                                    Width="24"
+                                                    />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>

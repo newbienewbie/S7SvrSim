@@ -4,7 +4,6 @@ using S7SvrSim.Services;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
-using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -38,7 +37,7 @@ namespace S7Svr.Simulator.ViewModels
             this.ConfigVM = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
             this.SignalWatchVM = Locator.Current.GetRequiredService<SignalWatchVM>();
 
-            var watchRunningStatus = this.WhenAnyValue(x => x.RunningVM.RunningStatus);
+            var watchRunningStatus = this.WhenAnyValue(vm => vm.RunningVM.RunningStatus);
             this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl);
             this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl);
         }
@@ -50,6 +49,10 @@ namespace S7Svr.Simulator.ViewModels
         public ReactiveCommand<Unit, Unit> CmdStartServer { get; }
         private async Task CmdStartServer_Impl()
         {
+            if (RunningVM.RunningStatus)
+            {
+                return;
+            }
             if (this.ConfigVM.AreaConfigs.Count == 0)
             {
                 MessageBox.Show("当前未指定DB配置！");
@@ -71,6 +74,10 @@ namespace S7Svr.Simulator.ViewModels
         public ReactiveCommand<Unit, Unit> CmdStopServer { get; }
         private async Task CmdStopServer_Impl()
         {
+            if (!RunningVM.RunningStatus)
+            {
+                return;
+            }
             this.RunningVM.IpAddress = string.Empty;
             this.RunningVM.AreaConfigs.Clear();
             await this._server.StopServerAsync();

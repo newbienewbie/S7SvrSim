@@ -106,7 +106,7 @@
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Cursor="Hand"
+                            <Button Cursor="SizeAll"
                                     PreviewMouseLeftButtonDown="DrapButton_PreviewMouseLeftButtonDown"
                                     Content="{md:PackIcon Kind=Drag,
                                                           Size=24}"
@@ -121,9 +121,9 @@
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="{md:PackIcon Kind=Delete}"
-                                        Command="{Binding Data.RemoveSignalCommand, Source={StaticResource DataContextProxy}}"
+                                <Button Command="{Binding Data.RemoveSignalCommand, Source={StaticResource DataContextProxy}}"
                                         CommandParameter="{Binding .}"
+                                        Content="{md:PackIcon Kind=Delete}"
                                         Style="{StaticResource MaterialDesignFlatButton}"
                                         Padding="0"
                                         Height="24"
