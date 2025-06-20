@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
+using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
@@ -22,31 +23,14 @@ namespace S7SvrSim.ViewModels
 {
     public partial class SignalWatchVM : ViewModelBase
     {
+        #region DI
         private readonly IS7DataBlockService db;
         private readonly IMediator mediator;
-
-        CancellationTokenSource cancelSource;
+        #endregion
 
         public Type[] SignalTypes { get; }
 
-        private class AddressUsed
-        {
-            public AddressUsedAttribute Attribute { get; }
-            public MethodInfo CalcMethod { get; }
-            public AddressUsed(Type ty)
-            {
-                Attribute = ty.GetCustomAttribute<AddressUsedAttribute>();
-                if (Attribute != null && !string.IsNullOrEmpty(Attribute.CalcMethod))
-                {
-                    CalcMethod = ty.GetMethod(Attribute.CalcMethod);
-                }
-            }
-        }
-        private Dictionary<Type, AddressUsed> SignalAddressUsed { get; }
-
         public ObservableCollection<SignalEditObj> Signals { get; } = [];
-
-        public MultiSelector Selector { get; set; }
 
         [ObservableProperty]
         private int scanSpan = 50;
@@ -59,25 +43,39 @@ namespace S7SvrSim.ViewModels
         [NotifyPropertyChangedFor(nameof(CanMoveBefore))]
         private SignalEditObj dragTargetSignal;
 
+        [Reactive]
+        public bool AllowBoolIndexHasOddNumber { get; set; } = true;
+
+        [Reactive]
+        public bool ForbidIndexHasOddNumber { get; set; } = true;
+
+        [Reactive]
+        public bool UpdateAddressByDbIndex { get; set; } = false;
+
+        [Reactive]
+        public bool StringUseTenCeiling { get; set; } = S7Signal.String.UseTenCeiling;
+
         public ObservableCollection<SignalEditObj> DragSignals { get; } = [];
 
         public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;
 
         public SignalWatchVM(IS7DataBlockService db, IMediator mediator)
         {
+            this.db = db;
+            this.mediator = mediator;
+
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.PropertyChanged += RunningModel_PropertyChanged;
 
             SignalTypes = [.. typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase)))];
             SignalAddressUsed = SignalTypes.Select(ty => (Type: ty, Attr: new AddressUsed(ty))).Where(it => it.Attr.Attribute != null).ToDictionary(it => it.Type, it => it.Attr);
-            this.db = db;
-            this.mediator = mediator;
             DragSignals.CollectionChanged += (_, _) =>
             {
                 OnPropertyChanged(nameof(DragSignalsIsOne));
                 OnPropertyChanged(nameof(CanMoveAfter));
                 OnPropertyChanged(nameof(CanMoveBefore));
             };
+            this.WhenAnyValue(vm => vm.StringUseTenCeiling).Subscribe(u => S7Signal.String.UseTenCeiling = u);
         }
 
         private void CommandEventHandle(object _object, EventArgs _args)
@@ -186,12 +184,7 @@ namespace S7SvrSim.ViewModels
                     return false;
                 }
 
-                if (IsDragsContinuous() && (Signals.IndexOf(DragTargetSignal) - Signals.IndexOf(DragSignals.OrderBy(d => Signals.IndexOf(d)).Last())) == 1)
-                {
-                    return false;
-                }
-
-                return true;
+                return !IsDragsContinuous() || (Signals.IndexOf(DragTargetSignal) - Signals.IndexOf(DragSignals.OrderBy(Signals.IndexOf).Last())) != 1;
             }
         }
 
@@ -210,12 +203,7 @@ namespace S7SvrSim.ViewModels
                     return false;
                 }
 
-                if (IsDragsContinuous() && (Signals.IndexOf(DragSignals.OrderBy(d => Signals.IndexOf(d)).First()) - Signals.IndexOf(DragTargetSignal)) == 1)
-                {
-                    return false;
-                }
-
-                return true;
+                return !IsDragsContinuous() || (Signals.IndexOf(DragSignals.OrderBy(Signals.IndexOf).First()) - Signals.IndexOf(DragTargetSignal)) != 1;
             }
         }
 
@@ -258,6 +246,24 @@ namespace S7SvrSim.ViewModels
         #endregion
 
         #region Quick Cal Address
+        public MultiSelector Selector { get; set; }
+
+        private class AddressUsed
+        {
+            public AddressUsedAttribute Attribute { get; }
+            public MethodInfo CalcMethod { get; }
+            public AddressUsed(Type ty)
+            {
+                Attribute = ty.GetCustomAttribute<AddressUsedAttribute>();
+                if (Attribute != null && !string.IsNullOrEmpty(Attribute.CalcMethod))
+                {
+                    CalcMethod = ty.GetMethod(Attribute.CalcMethod);
+                }
+            }
+        }
+
+        private Dictionary<Type, AddressUsed> SignalAddressUsed { get; }
+
         private void UpdateAddress(IEnumerable<SignalEditObj> signals)
         {
             if (signals.Count() <= 1)
@@ -288,70 +294,63 @@ namespace S7SvrSim.ViewModels
                 return;
             }
 
-            UndoRedoManager.StartTransaction();
-            try
+
+            foreach (var signal in signals.Skip(1))
             {
-                foreach (var signal in signals.Skip(1))
+                if (SignalAddressUsed.TryGetValue(signal.Other, out var used))
                 {
-                    if (SignalAddressUsed.TryGetValue(signal.Other, out var used))
+                    var preUsedItem = GetAddressUsedItem(preUsed, preSignal);
+                    var usedItem = GetAddressUsedItem(used, signal);
+
+                    var dbIndex = preAddress.DbIndex;
+                    int index;
+                    byte offset = 0;
+
+                    if (preUsedItem.IndexSize == 0 && usedItem.IndexSize == 0)
                     {
-                        var preUsedItem = GetAddressUsedItem(preUsed, preSignal);
-                        var usedItem = GetAddressUsedItem(used, signal);
-
-                        var dbIndex = preAddress.DbIndex;
-                        int index;
-                        byte offset = 0;
-
-                        if (preUsedItem.IndexSize == 0 && usedItem.IndexSize == 0)
+                        if (preAddress.Offset >= 7)
                         {
-                            if (preAddress.Offset >= 7)
-                            {
-                                index = preAddress.Index + 1;
-                                offset = 0;
-                            }
-                            else
-                            {
-                                index = preAddress.Index;
-                                offset = (byte)(preAddress.Offset + preUsedItem.OffsetSize);
-                            }
+                            index = preAddress.Index + 1;
+                            offset = 0;
                         }
                         else
                         {
-                            index = preAddress.Index + (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize);
+                            index = preAddress.Index;
+                            offset = (byte)(preAddress.Offset + preUsedItem.OffsetSize);
                         }
-
-                        if (index % 2 == 1)
-                        {
-                            index += 1;
-                        }
-
-                        var newAddress = new SignalAddress(dbIndex, index, offset)
-                        {
-                            HideOffset = usedItem.IndexSize != 0
-                        };
-
-                        if (newAddress != signal.Value.Address)
-                        {
-                            var command = new ValueChangedCommand<SignalAddress>(address =>
-                            {
-                                signal.Value.Address = address;
-                            }, signal.Value.Address, newAddress);
-                            UndoRedoManager.Run(command);
-                        }
-
-                        preSignal = signal;
-                        preAddress = newAddress;
-                        preUsed = used;
                     }
                     else
                     {
-                        break;
+                        index = preAddress.Index + (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize);
                     }
+
+                    if (index % 2 == 1 && (signal.Value is not Bool || !AllowBoolIndexHasOddNumber) && ForbidIndexHasOddNumber)
+                    {
+                        index += 1;
+                    }
+
+                    var newAddress = new SignalAddress(dbIndex, index, offset)
+                    {
+                        HideOffset = usedItem.IndexSize != 0
+                    };
+
+                    if (newAddress != signal.Value.Address)
+                    {
+                        var command = new ValueChangedCommand<SignalAddress>(address =>
+                        {
+                            signal.Value.Address = address;
+                        }, signal.Value.Address, newAddress);
+                        UndoRedoManager.Run(command);
+                    }
+
+                    preSignal = signal;
+                    preAddress = newAddress;
+                    preUsed = used;
                 }
-            }
-            finally
-            {
-                UndoRedoManager.EndTransaction();
+                else
+                {
+                    break;
+                }
             }
         }
 
@@ -371,11 +370,51 @@ namespace S7SvrSim.ViewModels
             }
         }
 
+        private IEnumerable<IEnumerable<SignalEditObj>> AssembleSignalByAddress(IEnumerable<SignalEditObj> target)
+        {
+            Dictionary<int, List<SignalEditObj>> signalGroupByDbIndex = new Dictionary<int, List<SignalEditObj>>();
+            int preDbIndex = -1;
+            foreach (var signal in target)
+            {
+                if (signal.Value.Address == null)
+                {
+                    if (preDbIndex != -1)
+                    {
+                        signalGroupByDbIndex[preDbIndex].Add(signal);
+                    }
+                    continue;
+                }
+
+                if (signalGroupByDbIndex.TryGetValue(signal.Value.Address.DbIndex, out var dbSignals))
+                {
+                    dbSignals.Add(signal);
+                }
+                else
+                {
+                    signalGroupByDbIndex.Add(signal.Value.Address.DbIndex, new List<SignalEditObj> { signal });
+                }
+                preDbIndex = signal.Value.Address.DbIndex;
+            }
+            return signalGroupByDbIndex.Values;
+        }
 
         [RelayCommand]
         private void UpdateAddressFromFirst()
         {
-            UpdateAddress(Signals);
+            UndoRedoManager.StartTransaction();
+
+            if (UpdateAddressByDbIndex)
+            {
+                var dbSignals = AssembleSignalByAddress(Signals);
+                dbSignals.Each(UpdateAddress);
+            }
+            else
+            {
+                UpdateAddress(Signals);
+            }
+
+            var command = UndoRedoManager.EndTransaction();
+            RegistCommandEventHandle(command);
         }
 
         [RelayCommand]
@@ -386,13 +425,67 @@ namespace S7SvrSim.ViewModels
                 return;
             }
 
-            UpdateAddress(Signals.Skip(Signals.IndexOf(Selector.SelectedItems.Cast<SignalEditObj>().First())));
+            UndoRedoManager.StartTransaction();
+
+            var signals = Signals.Skip(Signals.IndexOf(Selector.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf).First()));
+            if (UpdateAddressByDbIndex)
+            {
+                var dbSignals = AssembleSignalByAddress(signals);
+                dbSignals.Each(UpdateAddress);
+            }
+            else
+            {
+                UpdateAddress(signals);
+            }
+
+            var command = UndoRedoManager.EndTransaction();
+            RegistCommandEventHandle(command);
         }
 
         [RelayCommand]
         private void UpdateAddressFromSelectedItems()
         {
-            UpdateAddress(Selector.SelectedItems.Cast<SignalEditObj>());
+            var signals = Selector.SelectedItems.Cast<SignalEditObj>();
+            if (!signals.Any())
+            {
+                return;
+            }
+
+            UndoRedoManager.StartTransaction();
+
+            if (UpdateAddressByDbIndex)
+            {
+                var dbSignals = AssembleSignalByAddress(signals);
+                dbSignals.Each(UpdateAddress);
+            }
+            else
+            {
+                UpdateAddress(signals);
+            }
+
+            var command = UndoRedoManager.EndTransaction();
+            RegistCommandEventHandle(command);
+        }
+
+        [RelayCommand]
+        private void ClearAddress()
+        {
+            UndoRedoManager.StartTransaction();
+
+            Signals.Each(s =>
+            {
+                if (s.Value.Address != null)
+                {
+                    var command = new ValueChangedCommand<SignalAddress>(address =>
+                    {
+                        s.Value.Address = address;
+                    }, s.Value.Address, null);
+                    UndoRedoManager.Run(command);
+                }
+            });
+
+            var command = UndoRedoManager.EndTransaction();
+            RegistCommandEventHandle(command);
         }
         #endregion
 
@@ -414,8 +507,9 @@ namespace S7SvrSim.ViewModels
         #endregion
 
         #region Watch Method
+        CancellationTokenSource watchCancelSource;
         Task watchTask;
-        public bool IsInWatch => watchTask != null && cancelSource != null && !cancelSource.IsCancellationRequested;
+        public bool IsInWatch => watchTask != null && watchCancelSource != null && !watchCancelSource.IsCancellationRequested;
         private void RunningModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (sender is RunningSnap7ServerVM runningModel && e.PropertyName == nameof(RunningSnap7ServerVM.RunningStatus))
@@ -433,22 +527,22 @@ namespace S7SvrSim.ViewModels
 
         private void StartWatch()
         {
-            if (cancelSource != null && !cancelSource.IsCancellationRequested)
+            if (watchCancelSource != null && !watchCancelSource.IsCancellationRequested)
             {
                 EndWatch();
             }
 
-            cancelSource = new CancellationTokenSource();
-            watchTask = WatchTask(cancelSource.Token);
+            watchCancelSource = new CancellationTokenSource();
+            watchTask = WatchTask(watchCancelSource.Token);
         }
 
         private void EndWatch()
         {
-            if (cancelSource != null)
+            if (watchCancelSource != null)
             {
                 try
                 {
-                    cancelSource.Cancel();
+                    watchCancelSource.Cancel();
                 }
                 catch (Exception)
                 {

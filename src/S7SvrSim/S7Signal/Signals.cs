@@ -12,7 +12,7 @@ namespace S7SvrSim.S7Signal
             get => base.FormatAddress;
             set
             {
-                if (value == null)
+                if (string.IsNullOrEmpty(value))
                 {
                     Address = null;
                 }
@@ -67,10 +67,9 @@ namespace S7SvrSim.S7Signal
             else if (value is string stringValue)
             {
                 byte val = byte.Parse(stringValue);
-
+                db.WriteByte(Address.DbIndex, Address.Index, val);
+                Value = val;
             }
-
-
         }
     }
 
@@ -222,17 +221,29 @@ namespace S7SvrSim.S7Signal
     [SignalVaueType(typeof(string))]
     public partial class String : SignalBase
     {
+        public static bool UseTenCeiling = false;
+
         [ObservableProperty]
         private int maxLen;
 
         public AddressUsedItem AddressUse()
         {
-            var remain = (MaxLen + 2) % 10;
-            var number = (MaxLen + 2) - remain;
-            return new AddressUsedItem()
+            if (UseTenCeiling)
             {
-                IndexSize = (number < 0 ? 0 : number) + (remain != 0 ? 10 : 0),
-            };
+                var remain = (MaxLen + 2) % 10;
+                var number = (MaxLen + 2) - remain;
+                return new AddressUsedItem()
+                {
+                    IndexSize = (number < 0 ? 0 : number) + (remain != 0 ? 10 : 0),
+                };
+            }
+            else
+            {
+                return new AddressUsedItem()
+                {
+                    IndexSize = MaxLen + 2,
+                };
+            }
         }
 
         public override bool Equals(object obj)

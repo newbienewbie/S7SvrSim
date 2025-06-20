@@ -47,7 +47,7 @@ namespace S7SvrSim.Services
             TransactionCommand = new TransactionCommand();
         }
 
-        public static void CancelTransaction()
+        public static IEnumerable<ICommand> CancelTransaction()
         {
             if (TransactionCommand != null && TransactionCommand.Any())
             {
@@ -55,10 +55,12 @@ namespace S7SvrSim.Services
                 RedoCommands.Clear();
                 UndoRedoChanged?.Invoke();
             }
+            var resCmd = TransactionCommand.AsEnumerable();
             TransactionCommand = null;
+            return resCmd;
         }
 
-        public static void EndTransaction()
+        public static ICommand EndTransaction()
         {
             if (TransactionCommand != null && TransactionCommand.Any())
             {
@@ -66,7 +68,9 @@ namespace S7SvrSim.Services
                 RedoCommands.Clear();
                 UndoRedoChanged?.Invoke();
             }
+            var resCmd = TransactionCommand;
             TransactionCommand = null;
+            return resCmd;
         }
 
         private static void AddCommand(List<ICommand> target, ICommand command, bool clearRedo = true)

@@ -45,13 +45,13 @@ namespace S7SvrSim.S7Signal
             get => Address?.ToString();
             set
             {
-                if (value != null)
+                if (string.IsNullOrEmpty(value))
                 {
-                    Address = new SignalAddress(value);
+                    Address = null;
                 }
                 else
                 {
-                    Address = null;
+                    Address = new SignalAddress(value);
                 }
             }
         }
