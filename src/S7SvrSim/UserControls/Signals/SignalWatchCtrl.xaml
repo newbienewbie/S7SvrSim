@@ -87,19 +87,11 @@
                               Command="{Binding ReplaceSignalCommand}"
                               />
                     <MenuItem Header="移动到之前"
-                              Command="{Binding MoveSignalsCommand}"
-                              >
-                        <MenuItem.CommandParameter>
-                            <sys:Boolean>False</sys:Boolean>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
+                              Command="{Binding MoveSignlsBeforeCommand}"
+                              />
                     <MenuItem Header="移动到之后"
-                              Command="{Binding MoveSignalsCommand}"
-                              >
-                        <MenuItem.CommandParameter>
-                            <sys:Boolean>True</sys:Boolean>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
+                              Command="{Binding MoveSignalsAfterCommand}"
+                              />
                 </ContextMenu>
             </DataGrid.ContextMenu>
             <DataGrid.RowStyle>

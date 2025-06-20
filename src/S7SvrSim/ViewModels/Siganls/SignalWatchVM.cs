@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
-using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
@@ -55,11 +54,10 @@ namespace S7SvrSim.ViewModels
         [ObservableProperty]
         private SignalEditObj selectedEditObj;
 
-        [Reactive]
-        public bool IsGridContextMenuVisible { get; set; }
-
-        [Reactive]
-        public SignalEditObj DragTargetSignal { get; set; }
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CanMoveAfter))]
+        [NotifyPropertyChangedFor(nameof(CanMoveBefore))]
+        private SignalEditObj dragTargetSignal;
 
         public ObservableCollection<SignalEditObj> DragSignals { get; } = [];
 
@@ -74,7 +72,12 @@ namespace S7SvrSim.ViewModels
             SignalAddressUsed = SignalTypes.Select(ty => (Type: ty, Attr: new AddressUsed(ty))).Where(it => it.Attr.Attribute != null).ToDictionary(it => it.Type, it => it.Attr);
             this.db = db;
             this.mediator = mediator;
-            DragSignals.CollectionChanged += (_, _) => OnPropertyChanged(nameof(DragSignalsIsOne));
+            DragSignals.CollectionChanged += (_, _) =>
+            {
+                OnPropertyChanged(nameof(DragSignalsIsOne));
+                OnPropertyChanged(nameof(CanMoveAfter));
+                OnPropertyChanged(nameof(CanMoveBefore));
+            };
         }
 
         private void CommandEventHandle(object _object, EventArgs _args)
@@ -131,7 +134,6 @@ namespace S7SvrSim.ViewModels
             var newItem = DragSignals[0];
 
             ReplaceSignal(oldItem, newItem);
-            IsGridContextMenuVisible = false;
         }
 
         public void ReplaceSignal(SignalEditObj oldItem, SignalEditObj newItem)
@@ -158,26 +160,77 @@ namespace S7SvrSim.ViewModels
             }
         }
 
-        [RelayCommand]
-        private void MoveSignals(bool after)
+        /// <summary>
+        /// 判断拖拽的项在原列表中是否是连续的
+        /// </summary>
+        /// <returns></returns>
+        private bool IsDragsContinuous()
+        {
+            var query = Signals.Select((signal, index) => (Signal: signal, Index: index)).IntersectBy(DragSignals, s => s.Signal).Select(s => s.Index).OrderBy(i => i);
+            var preIndex = query.First();
+            var skipQuery = query.Skip(1);
+            return !skipQuery.Any() || skipQuery.All(i =>
+            {
+                var result = Math.Abs(i - preIndex) == 1;
+                preIndex = i;
+                return result;
+            });
+        }
+
+        public bool CanMoveBefore
+        {
+            get
+            {
+                if (DragTargetSignal == null || DragSignals.Count == 0)
+                {
+                    return false;
+                }
+
+                if (IsDragsContinuous() && (Signals.IndexOf(DragTargetSignal) - Signals.IndexOf(DragSignals.OrderBy(d => Signals.IndexOf(d)).Last())) == 1)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(CanMoveBefore))]
+        private void MoveSignlsBefore()
+        {
+            MoveSignals(DragTargetSignal, DragSignals.ToArray());
+        }
+
+        public bool CanMoveAfter
+        {
+            get
+            {
+                if (DragTargetSignal == null || DragSignals.Count == 0)
+                {
+                    return false;
+                }
+
+                if (IsDragsContinuous() && (Signals.IndexOf(DragSignals.OrderBy(d => Signals.IndexOf(d)).First()) - Signals.IndexOf(DragTargetSignal)) == 1)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(CanMoveAfter))]
+        private void MoveSignalsAfter()
         {
             var dragItems = DragSignals.ToArray();
-            if (after)
+            if (Signals.Last() == DragTargetSignal)
             {
-                if (Signals.Last() == DragTargetSignal)
-                {
-                    MoveSignals(null, dragItems);
-                }
-                else
-                {
-                    MoveSignals(Signals[Signals.IndexOf(DragTargetSignal) + 1], dragItems);
-                }
+                MoveSignals(null, dragItems);
             }
             else
             {
-                MoveSignals(DragTargetSignal, dragItems);
+                MoveSignals(Signals[Signals.IndexOf(DragTargetSignal) + 1], dragItems);
             }
-            IsGridContextMenuVisible = false;
         }
 
         public void MoveSignals(SignalEditObj signal, IEnumerable<SignalEditObj> moved)
