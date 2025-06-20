@@ -29,9 +29,8 @@ namespace S7SvrSim.UserControls
             this.WhenActivated(d =>
             {
                 ViewModel = Locator.Current.GetRequiredService<SignalWatchVM>();
-                ViewModel.Selector = signalGrid;
+                ViewModel.Grid = signalGrid;
                 ViewModel.AfterDragEvent += ViewModel_AfterDragEvent;
-                signalGrid.ContextMenu.Visibility = Visibility.Hidden;
                 signalGrid.ContextMenu.PlacementTarget = signalGrid;
             });
         }
@@ -87,7 +86,7 @@ namespace S7SvrSim.UserControls
             {
                 signalGrid.SelectedItems.Add(item);
             }
-            signalGrid.ContextMenu.Visibility = Visibility.Hidden;
+            ViewModel.IsDragSignals = false;
             signalGrid.ContextMenu.IsOpen = false;
         }
 
@@ -110,8 +109,8 @@ namespace S7SvrSim.UserControls
                 }
 
                 ViewModel.DragTargetSignal = targetItem;
+                ViewModel.IsDragSignals = true;
 
-                signalGrid.ContextMenu.Visibility = Visibility.Visible;
                 signalGrid.ContextMenu.IsOpen = true;
             }
         }
@@ -154,20 +153,31 @@ namespace S7SvrSim.UserControls
                 row.Background = Brushes.Transparent;
             }
         }
+
+        private void SignalGridContextMenu_Closed(object sender, RoutedEventArgs e)
+        {
+            ViewModel.IsDragSignals = false;
+        }
     }
 
-    public class DataGridMaxLenTextColumn : System.Windows.Controls.DataGridTextColumn
+    public class DataGridMaxLenTextColumn : DataGridTextColumn
     {
         protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
         {
-            if (dataItem is SignalEditObj editObj && editObj.Value is S7Signal.SignalWithLengthBase)
+            if (dataItem is SignalEditObj editObj && editObj.Value is SignalWithLengthBase)
             {
                 return base.GenerateEditingElement(cell, dataItem);
             }
-            else
+            return null;
+        }
+
+        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
+        {
+            if (dataItem is SignalEditObj editObj && editObj.Value is SignalWithLengthBase)
             {
-                return null;
+                return base.GenerateElement(cell, dataItem);
             }
+            return null;
         }
     }
 }

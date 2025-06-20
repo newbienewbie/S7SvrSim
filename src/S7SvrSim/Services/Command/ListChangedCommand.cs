@@ -49,7 +49,7 @@ namespace S7SvrSim.Services.Command
             var first = newItems[0].Index;
             if (first >= 0)
             {
-                list.AddRange(newItems.Select(item => item.Item), first);
+                list.AddOrInsertRange(newItems.Select(item => item.Item), first);
             }
             else
             {
@@ -85,7 +85,7 @@ namespace S7SvrSim.Services.Command
                 return;
             }
 
-            foreach (var item in oldItems)
+            foreach (var item in oldItems.OrderBy(o => o.Index))
             {
                 list.Insert(item.Index, item.Item);
             }

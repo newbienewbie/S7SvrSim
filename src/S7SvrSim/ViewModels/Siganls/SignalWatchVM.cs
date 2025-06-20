@@ -17,7 +17,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls.Primitives;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace S7SvrSim.ViewModels
 {
@@ -27,6 +28,8 @@ namespace S7SvrSim.ViewModels
         private readonly IS7DataBlockService db;
         private readonly IMediator mediator;
         #endregion
+
+        public DataGrid Grid { get; set; }
 
         public Type[] SignalTypes { get; }
 
@@ -55,6 +58,8 @@ namespace S7SvrSim.ViewModels
         [Reactive]
         public bool StringUseTenCeiling { get; set; } = S7Signal.String.UseTenCeiling;
 
+        [Reactive]
+        public bool IsDragSignals { get; set; }
         public ObservableCollection<SignalEditObj> DragSignals { get; } = [];
 
         public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;
@@ -89,6 +94,19 @@ namespace S7SvrSim.ViewModels
             command.AfterUndo += CommandEventHandle;
         }
 
+        private void SetGridSelectedItems(IEnumerable<SignalEditObj> signals)
+        {
+            Grid.UnselectAll();
+            foreach (var item in signals)
+            {
+                Grid.SelectedItems.Add(item);
+            }
+            if (signals.Any())
+            {
+                Grid.ScrollIntoView(signals.First());
+            }
+        }
+
         #region Signal Edit
         public void OpenValueSet()
         {
@@ -105,8 +123,22 @@ namespace S7SvrSim.ViewModels
         [RelayCommand]
         private void NewSignal(Type signalType)
         {
-            var command = ListChangedCommand.Add(Signals, [new SignalEditObj(signalType)]);
+            Grid.CommitEdit(DataGridEditingUnit.Row, true);
+            var newSignal = new SignalEditObj(signalType);
+            var command = ListChangedCommand.Add(Signals, [newSignal]);
             RegistCommandEventHandle(command);
+            command.AfterExecute += (_, _) => SetGridSelectedItems([newSignal]);
+            UndoRedoManager.Run(command);
+        }
+
+        [RelayCommand]
+        private void InsertSignal(Type signalType)
+        {
+            Grid.CommitEdit(DataGridEditingUnit.Row, true);
+            var newSignal = new SignalEditObj(signalType);
+            var command = ListChangedCommand.Insert(Signals, Grid.SelectedItems.Count == 0 ? -1 : Signals.IndexOf(Grid.SelectedItems.Cast<SignalEditObj>().First()), [newSignal]);
+            RegistCommandEventHandle(command);
+            command.AfterExecute += (_, _) => SetGridSelectedItems([newSignal]);
             UndoRedoManager.Run(command);
         }
 
@@ -114,6 +146,39 @@ namespace S7SvrSim.ViewModels
         private void RemoveSignal(SignalEditObj signal)
         {
             var command = ListChangedCommand.Remove(Signals, [signal]);
+            RegistCommandEventHandle(command);
+            command.AfterUndo += (_, _) => SetGridSelectedItems([signal]);
+            UndoRedoManager.Run(command);
+        }
+
+        [RelayCommand]
+        private void RemoveSelectedSignals()
+        {
+            if (Signals.Count == 0 || Grid.SelectedItems.Count == 0)
+            {
+                return;
+            }
+            var removed = Grid.SelectedItems.Cast<SignalEditObj>().ToArray();
+            var command = ListChangedCommand.Remove(Signals, removed);
+            RegistCommandEventHandle(command);
+            command.AfterUndo += (_, _) => SetGridSelectedItems(removed);
+            UndoRedoManager.Run(command);
+        }
+
+        [RelayCommand]
+        private void ClearSignals()
+        {
+            if (Signals.Count == 0)
+            {
+                return;
+            }
+
+            if (MessageBox.Show("确认要删除所有信号吗？", "警告", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+            {
+                return;
+            }
+
+            var command = ListChangedCommand.Clear(Signals);
             RegistCommandEventHandle(command);
             UndoRedoManager.Run(command);
         }
@@ -164,6 +229,10 @@ namespace S7SvrSim.ViewModels
         /// <returns></returns>
         private bool IsDragsContinuous()
         {
+            if (Signals.Count == 0)
+            {
+                return false;
+            }
             var query = Signals.Select((signal, index) => (Signal: signal, Index: index)).IntersectBy(DragSignals, s => s.Signal).Select(s => s.Index).OrderBy(i => i);
             var preIndex = query.First();
             var skipQuery = query.Skip(1);
@@ -246,8 +315,6 @@ namespace S7SvrSim.ViewModels
         #endregion
 
         #region Quick Cal Address
-        public MultiSelector Selector { get; set; }
-
         private class AddressUsed
         {
             public AddressUsedAttribute Attribute { get; }
@@ -327,7 +394,7 @@ namespace S7SvrSim.ViewModels
                         }
                         else
                         {
-                            index = preAddress.Index + ((preSignal.Value is Holding) ? preUsedItem.IndexSize : (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize));
+                            index = preAddress.Index + (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize);
                         }
 
                         if (index % 2 == 1 && (signal.Value is not Bool || !AllowBoolIndexHasOddNumber) && ForbidIndexHasOddNumber)
@@ -408,6 +475,8 @@ namespace S7SvrSim.ViewModels
         [RelayCommand]
         private void UpdateAddressFromFirst()
         {
+            Grid.CommitEdit(DataGridEditingUnit.Row, true);
+
             UndoRedoManager.StartTransaction();
 
             if (UpdateAddressByDbIndex)
@@ -427,14 +496,17 @@ namespace S7SvrSim.ViewModels
         [RelayCommand]
         private void UpdateAddressFromFirtSelected()
         {
-            if (Selector.SelectedItems.Count == 0)
+            if (Grid.SelectedItems.Count == 0)
             {
                 return;
             }
 
+            Grid.CommitEdit(DataGridEditingUnit.Row, true);
+
+            var signals = Signals.Skip(Signals.IndexOf(Grid.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf).First()));
+
             UndoRedoManager.StartTransaction();
 
-            var signals = Signals.Skip(Signals.IndexOf(Selector.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf).First()));
             if (UpdateAddressByDbIndex)
             {
                 var dbSignals = AssembleSignalByAddress(signals);
@@ -452,11 +524,13 @@ namespace S7SvrSim.ViewModels
         [RelayCommand]
         private void UpdateAddressFromSelectedItems()
         {
-            var signals = Selector.SelectedItems.Cast<SignalEditObj>();
+            var signals = Grid.SelectedItems.Cast<SignalEditObj>();
             if (!signals.Any())
             {
                 return;
             }
+
+            Grid.CommitEdit(DataGridEditingUnit.Row, true);
 
             UndoRedoManager.StartTransaction();
 
@@ -477,6 +551,8 @@ namespace S7SvrSim.ViewModels
         [RelayCommand]
         private void ClearAddress()
         {
+            Grid.CommitEdit(DataGridEditingUnit.Row, true);
+
             UndoRedoManager.StartTransaction();
 
             Signals.Each(s =>

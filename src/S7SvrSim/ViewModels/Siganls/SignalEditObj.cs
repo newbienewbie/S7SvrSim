@@ -46,7 +46,7 @@ namespace S7SvrSim.ViewModels
         {
             var value = (SignalBase)Activator.CreateInstance(Other);
             value.Value = Value.Value;
-            value.Address = Value.Address == null ? null : new SignalAddress(Value.FormatAddress);
+            value.Address = Value.Address ?? null;
             value.Name = Value.Name;
             value.Remark = Value.Remark;
 
