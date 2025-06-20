@@ -6,5 +6,6 @@
         Remove,
         Replace,
         Clear,
+        Move,
     }
 }

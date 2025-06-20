@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MediatR;
+using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
@@ -54,6 +55,16 @@ namespace S7SvrSim.ViewModels
         [ObservableProperty]
         private SignalEditObj selectedEditObj;
 
+        [Reactive]
+        public bool IsGridContextMenuVisible { get; set; }
+
+        [Reactive]
+        public SignalEditObj DragTargetSignal { get; set; }
+
+        public ObservableCollection<SignalEditObj> DragSignals { get; } = [];
+
+        public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;
+
         public SignalWatchVM(IS7DataBlockService db, IMediator mediator)
         {
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
@@ -63,6 +74,7 @@ namespace S7SvrSim.ViewModels
             SignalAddressUsed = SignalTypes.Select(ty => (Type: ty, Attr: new AddressUsed(ty))).Where(it => it.Attr.Attribute != null).ToDictionary(it => it.Type, it => it.Attr);
             this.db = db;
             this.mediator = mediator;
+            DragSignals.CollectionChanged += (_, _) => OnPropertyChanged(nameof(DragSignalsIsOne));
         }
 
         private void CommandEventHandle(object _object, EventArgs _args)
@@ -105,6 +117,23 @@ namespace S7SvrSim.ViewModels
             UndoRedoManager.Run(command);
         }
 
+        public bool DragSignalsIsOne => DragSignals.Count == 1;
+
+        [RelayCommand(CanExecute = nameof(DragSignalsIsOne))]
+        private void ReplaceSignal()
+        {
+            if (DragSignals.Count != 1)
+            {
+                return;
+            }
+
+            var oldItem = DragTargetSignal;
+            var newItem = DragSignals[0];
+
+            ReplaceSignal(oldItem, newItem);
+            IsGridContextMenuVisible = false;
+        }
+
         public void ReplaceSignal(SignalEditObj oldItem, SignalEditObj newItem)
         {
             int oldIndex = Signals.IndexOf(oldItem);
@@ -114,8 +143,64 @@ namespace S7SvrSim.ViewModels
             {
                 var command = ListChangedCommand.Replace(Signals, [(oldItem, newItem), (newItem, oldItem)]);
                 RegistCommandEventHandle(command);
+                if (AfterDragEvent != null)
+                {
+                    command.AfterExecute += (_, _) =>
+                    {
+                        AfterDragEvent?.Invoke([newItem]);
+                    };
+                    command.AfterUndo += (_, _) =>
+                    {
+                        AfterDragEvent?.Invoke([newItem]);
+                    };
+                }
                 UndoRedoManager.Run(command);
             }
+        }
+
+        [RelayCommand]
+        private void MoveSignals(bool after)
+        {
+            var dragItems = DragSignals.ToArray();
+            if (after)
+            {
+                if (Signals.Last() == DragTargetSignal)
+                {
+                    MoveSignals(null, dragItems);
+                }
+                else
+                {
+                    MoveSignals(Signals[Signals.IndexOf(DragTargetSignal) + 1], dragItems);
+                }
+            }
+            else
+            {
+                MoveSignals(DragTargetSignal, dragItems);
+            }
+            IsGridContextMenuVisible = false;
+        }
+
+        public void MoveSignals(SignalEditObj signal, IEnumerable<SignalEditObj> moved)
+        {
+            if (moved.Contains(signal))
+            {
+                return;
+            }
+
+            var command = ListChangedCommand.Move(Signals, signal, moved);
+            RegistCommandEventHandle(command);
+            if (AfterDragEvent != null)
+            {
+                command.AfterExecute += (_, _) =>
+                {
+                    AfterDragEvent?.Invoke(moved);
+                };
+                command.AfterUndo += (_, _) =>
+                {
+                    AfterDragEvent?.Invoke(moved);
+                };
+            }
+            UndoRedoManager.Run(command);
         }
         #endregion
 

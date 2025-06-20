@@ -1,10 +1,13 @@
-﻿using MediatR;
+﻿using DynamicData;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator;
 using S7SvrSim.S7Signal;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -27,6 +30,9 @@ namespace S7SvrSim.UserControls
             {
                 ViewModel = Locator.Current.GetRequiredService<SignalWatchVM>();
                 ViewModel.Selector = signalGrid;
+                ViewModel.AfterDragEvent += ViewModel_AfterDragEvent;
+                signalGrid.ContextMenu.Visibility = Visibility.Hidden;
+                signalGrid.ContextMenu.PlacementTarget = signalGrid;
             });
         }
 
@@ -74,6 +80,17 @@ namespace S7SvrSim.UserControls
             }
         }
 
+        private void ViewModel_AfterDragEvent(IEnumerable<SignalEditObj> dragObjs)
+        {
+            signalGrid.UnselectAll();
+            foreach (var item in dragObjs)
+            {
+                signalGrid.SelectedItems.Add(item);
+            }
+            signalGrid.ContextMenu.Visibility = Visibility.Hidden;
+            signalGrid.ContextMenu.IsOpen = false;
+        }
+
         private void DataGridRow_DragOver(object sender, DragEventArgs e)
         {
             e.Effects = DragDropEffects.Move;
@@ -82,11 +99,20 @@ namespace S7SvrSim.UserControls
 
         private void DataGridRow_Drop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetData(typeof(SignalEditObj)) is SignalEditObj draggedItem &&
+            if (e.Data.GetData(typeof(List<SignalEditObj>)) is List<SignalEditObj> draggedItems &&
                 sender is DataGridRow targetRow && targetRow.DataContext is SignalEditObj targetItem)
             {
                 targetRow.Background = Brushes.Transparent;
-                ViewModel.ReplaceSignal(draggedItem, targetItem);
+
+                if (draggedItems.Contains(targetItem))
+                {
+                    return;
+                }
+
+                ViewModel.DragTargetSignal = targetItem;
+
+                signalGrid.ContextMenu.Visibility = Visibility.Visible;
+                signalGrid.ContextMenu.IsOpen = true;
             }
         }
 
@@ -94,8 +120,21 @@ namespace S7SvrSim.UserControls
         {
             if (sender is Button icon && icon.DataContext is SignalEditObj item)
             {
-                signalGrid.SelectedItem = item;
-                DragDrop.DoDragDrop(icon, item, DragDropEffects.Move);
+                var list = new List<SignalEditObj>();
+                if (signalGrid.SelectedItems.Count > 1 && signalGrid.SelectedItems.Contains(item))
+                {
+                    list.AddRange(signalGrid.SelectedItems.Cast<SignalEditObj>());
+                }
+                else
+                {
+                    signalGrid.UnselectAll();
+                    signalGrid.SelectedItem = item;
+                    list.Add(item);
+                }
+
+                ViewModel.DragSignals.Clear();
+                ViewModel.DragSignals.AddRange(list);
+                DragDrop.DoDragDrop(icon, list, DragDropEffects.Move);
                 e.Handled = true;
             }
         }
