@@ -88,9 +88,9 @@ namespace S7SvrSim.Services
                 var signal = (SignalBase)Activator.CreateInstance(signalType);
                 signal.Name = signalCfg.Name;
                 signal.FormatAddress = signalCfg.FormatAddress;
-                if (signal is S7Signal.String strSignal && signalCfg.MaxLen != null)
+                if (signal is S7Signal.String strSignal && signalCfg.Length != null)
                 {
-                    strSignal.MaxLen = signalCfg.MaxLen.Value;
+                    strSignal.Length = signalCfg.Length.Value;
                 }
                 return new SignalEditObj(signalType)
                 {

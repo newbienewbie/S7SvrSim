@@ -50,9 +50,9 @@ namespace S7SvrSim.ViewModels
             value.Name = Value.Name;
             value.Remark = Value.Remark;
 
-            if (value is S7Signal.String strSignal && Value is S7Signal.String curStrSignal)
+            if (value is S7Signal.SignalWithLengthBase lenSignal && Value is S7Signal.SignalWithLengthBase curLenSignal)
             {
-                strSignal.MaxLen = curStrSignal.MaxLen;
+                lenSignal.Length = curLenSignal.Length;
             }
 
             return value;
@@ -92,7 +92,7 @@ namespace S7SvrSim.ViewModels
 
             return Other != _bakup.Other
                 || Value != _bakup.Value
-                || (Value is S7Signal.String valStr && _bakup.Value is S7Signal.String bakStr && valStr != bakStr);
+                || (Value is S7Signal.SignalWithLengthBase valLen && _bakup.Value is S7Signal.SignalWithLengthBase bakLen && valLen != bakLen);
         }
 
         public void EndEdit()

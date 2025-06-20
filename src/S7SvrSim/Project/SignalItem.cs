@@ -29,7 +29,7 @@ namespace S7SvrSim.Project
         [XmlAttribute]
         public string Type { get; set; }
 
-        public int? MaxLen { get; set; }
+        public int? Length { get; set; }
 
         public string Remark { get; set; }
 
@@ -44,9 +44,9 @@ namespace S7SvrSim.Project
             FormatAddress = signal.FormatAddress;
             Type = signal.GetType().Name;
             Remark = signal.Remark;
-            if (signal is S7Signal.String str)
+            if (signal is S7Signal.SignalWithLengthBase str)
             {
-                MaxLen = str.MaxLen;
+                Length = str.Length;
             }
         }
 
@@ -56,9 +56,9 @@ namespace S7SvrSim.Project
             FormatAddress = signal.Value.FormatAddress;
             Type = signal.Other.Name;
             Remark = signal.Value.Remark;
-            if (signal.Value is S7Signal.String str)
+            if (signal.Value is S7Signal.SignalWithLengthBase str)
             {
-                MaxLen = str.MaxLen;
+                Length = str.Length;
             }
         }
     }

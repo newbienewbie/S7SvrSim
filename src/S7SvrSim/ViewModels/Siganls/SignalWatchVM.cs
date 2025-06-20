@@ -92,7 +92,7 @@ namespace S7SvrSim.ViewModels
         #region Signal Edit
         public void OpenValueSet()
         {
-            if (SelectedEditObj == null || !IsInWatch)
+            if (SelectedEditObj == null || !IsInWatch || SelectedEditObj.Value is Holding)
             {
                 return;
             }
@@ -306,32 +306,39 @@ namespace S7SvrSim.ViewModels
                     int index;
                     byte offset = 0;
 
-                    if (preUsedItem.IndexSize == 0 && usedItem.IndexSize == 0)
+                    if (signal.Value is Holding)
                     {
-                        if (preAddress.Offset >= 7)
-                        {
-                            index = preAddress.Index + 1;
-                            offset = 0;
-                        }
-                        else
-                        {
-                            index = preAddress.Index;
-                            offset = (byte)(preAddress.Offset + preUsedItem.OffsetSize);
-                        }
+                        index = preAddress.Index + preUsedItem.IndexSize;
                     }
                     else
                     {
-                        index = preAddress.Index + (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize);
-                    }
+                        if (preUsedItem.IndexSize == 0 && usedItem.IndexSize == 0 && preSignal.Value is Bool && signal.Value is Bool)
+                        {
+                            if (preAddress.Offset >= 7)
+                            {
+                                index = preAddress.Index + 1;
+                                offset = 0;
+                            }
+                            else
+                            {
+                                index = preAddress.Index;
+                                offset = (byte)(preAddress.Offset + preUsedItem.OffsetSize);
+                            }
+                        }
+                        else
+                        {
+                            index = preAddress.Index + ((preSignal.Value is Holding) ? preUsedItem.IndexSize : (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize));
+                        }
 
-                    if (index % 2 == 1 && (signal.Value is not Bool || !AllowBoolIndexHasOddNumber) && ForbidIndexHasOddNumber)
-                    {
-                        index += 1;
+                        if (index % 2 == 1 && (signal.Value is not Bool || !AllowBoolIndexHasOddNumber) && ForbidIndexHasOddNumber)
+                        {
+                            index += 1;
+                        }
                     }
 
                     var newAddress = new SignalAddress(dbIndex, index, offset)
                     {
-                        HideOffset = usedItem.IndexSize != 0
+                        HideOffset = usedItem.IndexSize != 0 || signal.Value is Holding
                     };
 
                     if (newAddress != signal.Value.Address)

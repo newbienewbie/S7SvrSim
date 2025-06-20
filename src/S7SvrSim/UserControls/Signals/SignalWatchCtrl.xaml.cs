@@ -160,7 +160,7 @@ namespace S7SvrSim.UserControls
     {
         protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
         {
-            if (dataItem is SignalEditObj editObj && editObj.Value is S7Signal.String)
+            if (dataItem is SignalEditObj editObj && editObj.Value is S7Signal.SignalWithLengthBase)
             {
                 return base.GenerateEditingElement(cell, dataItem);
             }

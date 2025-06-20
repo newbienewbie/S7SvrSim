@@ -1,5 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using S7Svr.Simulator.ViewModels;
+﻿using S7Svr.Simulator.ViewModels;
+using System.ComponentModel;
 
 namespace S7SvrSim.S7Signal
 {
@@ -219,19 +219,16 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(CalcMethod = nameof(AddressUse))]
     [SignalVaueType(typeof(string))]
-    public partial class String : SignalBase
+    public partial class String : SignalWithLengthBase
     {
         public static bool UseTenCeiling = false;
-
-        [ObservableProperty]
-        private int maxLen;
 
         public AddressUsedItem AddressUse()
         {
             if (UseTenCeiling)
             {
-                var remain = (MaxLen + 2) % 10;
-                var number = (MaxLen + 2) - remain;
+                var remain = (Length + 2) % 10;
+                var number = (Length + 2) - remain;
                 return new AddressUsedItem()
                 {
                     IndexSize = (number < 0 ? 0 : number) + (remain != 0 ? 10 : 0),
@@ -241,21 +238,9 @@ namespace S7SvrSim.S7Signal
             {
                 return new AddressUsedItem()
                 {
-                    IndexSize = MaxLen + 2,
+                    IndexSize = Length + 2,
                 };
             }
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is String @string &&
-                   base.Equals(obj) &&
-                   MaxLen == @string.MaxLen;
-        }
-
-        public override int GetHashCode()
-        {
-            return System.HashCode.Combine(base.GetHashCode(), MaxLen);
         }
 
         public override void Refresh(IS7DataBlockService db)
@@ -272,23 +257,30 @@ namespace S7SvrSim.S7Signal
         {
             if (value is string stringValue)
             {
-                db.WriteString(Address.DbIndex, Address.Index, MaxLen, stringValue);
+                db.WriteString(Address.DbIndex, Address.Index, Length, stringValue);
                 Value = stringValue;
             }
         }
-
-        public static bool operator ==(String lhs, String rhs)
+    }
+    /// <summary>
+    /// 地址占用
+    /// </summary>
+    [AddressUsed(CalcMethod = nameof(AddressUse))]
+    [SignalVaueType(typeof(string))]
+    [Description("Holding 是一个特殊类型，用于占用对应长度的字节")]
+    public class Holding : SignalWithLengthBase
+    {
+        public AddressUsedItem AddressUse()
         {
-            if (lhs is null || rhs is null)
+            return new AddressUsedItem()
             {
-                return lhs is null && rhs is null;
-            }
-            return lhs.MaxLen == rhs.MaxLen && lhs == (SignalBase)rhs;
+                IndexSize = Length
+            };
         }
 
-        public static bool operator !=(String lhs, String rhs)
+        public override void Refresh(IS7DataBlockService db)
         {
-            return !(lhs == rhs);
+
         }
     }
 }

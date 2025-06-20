@@ -9,6 +9,7 @@
              xmlns:lu="clr-namespace:Less.Utils.WPF;assembly=Less.Utils.WPF"
              xmlns:shared="clr-namespace:S7SvrSim.Shared"
              xmlns:signal="clr-namespace:S7SvrSim.S7Signal"
+             xmlns:ucs="clr-namespace:S7SvrSim.UserControls.Signals"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
@@ -21,6 +22,7 @@
         <lu:BindingProxy x:Key="DataContextProxy"
                          Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext}"
                          />
+        <ucs:DescriptionConverter x:Key="DescriptionConverter" />
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
@@ -34,6 +36,7 @@
                                >
                             <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.NewSignalCommand}" />
                             <Setter Property="CommandParameter" Value="{Binding .}" />
+                            <Setter Property="ToolTip" Value="{Binding ., Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
                         </Style>
                     </MenuItem.ItemContainerStyle>
                     <MenuItem.ItemTemplate>
@@ -191,8 +194,8 @@
                         </Binding>
                     </DataGridTextColumn.Binding>
                 </DataGridTextColumn>
-                <local:DataGridMaxLenTextColumn Header="MaxLen"
-                                                Binding="{Binding Value.MaxLen}"
+                <local:DataGridMaxLenTextColumn Header="Length"
+                                                Binding="{Binding Value.Length}"
                                                 EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                                 />
                 <DataGridTextColumn Header="Value"

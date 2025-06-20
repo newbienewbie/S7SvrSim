@@ -90,4 +90,36 @@ namespace S7SvrSim.S7Signal
             return !(lhs == rhs);
         }
     }
+
+    public abstract partial class SignalWithLengthBase : SignalBase
+    {
+        [ObservableProperty]
+        private int length;
+
+        public override bool Equals(object obj)
+        {
+            return obj is SignalWithLengthBase @string &&
+                   base.Equals(obj) &&
+                   Length == @string.Length;
+        }
+
+        public override int GetHashCode()
+        {
+            return System.HashCode.Combine(base.GetHashCode(), Length);
+        }
+
+        public static bool operator ==(SignalWithLengthBase lhs, SignalWithLengthBase rhs)
+        {
+            if (lhs is null || rhs is null)
+            {
+                return lhs is null && rhs is null;
+            }
+            return lhs.Length == rhs.Length && lhs == (SignalBase)rhs;
+        }
+
+        public static bool operator !=(SignalWithLengthBase lhs, SignalWithLengthBase rhs)
+        {
+            return !(lhs == rhs);
+        }
+    }
 }
