@@ -1,0 +1,18 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:uc="clr-namespace:S7SvrSim.UserControls.Signals"
+                    xmlns:shared="clr-namespace:S7SvrSim.Shared"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                    >
+    <Style TargetType="uc:SignalValueSetBox"
+           x:Key="{x:Type uc:SignalValueSetBox}"
+           >
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="uc:SignalValueSetBox">
+                    <ContentPresenter Name="PART_Content" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

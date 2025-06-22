@@ -1,5 +1,6 @@
 source https://api.nuget.org/v3/index.json
 source https://baget.stdunit.com/v3/index.json
+source https://git.studylessshape.fun/api/packages/studylessshape/nuget/index.json
 
 storage: none
 framework: net6.0-windows10.0.17763, netstandard2.0, netstandard2.1
@@ -19,3 +20,7 @@ nuget ReactiveUI.Fody >= 19.5.41
 nuget ReactiveUI.WPF >= 19.5.41
 nuget ReactiveUI.Validation >= 3.1.7
 nuget Splat >= 14.8.12  
+nuget CommunityToolkit.MVVM 8.4
+
+nuget Less.Utils.WPF 1.0.2
+nuget Microsoft.Xaml.Behaviors.Wpf

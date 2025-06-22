@@ -1,11 +1,12 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using MediatR;
+using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator.ViewModels;
 
 namespace S7SvrSim.ViewModels.Rw;
 
 public class RwStringVM : RwVMBase<string>
 {
-    public RwStringVM(IS7DataBlockService s7ServerService) : base(s7ServerService)
+    public RwStringVM(IS7DataBlockService s7ServerService, IMediator mediator) : base(s7ServerService, mediator)
     {
     }
 

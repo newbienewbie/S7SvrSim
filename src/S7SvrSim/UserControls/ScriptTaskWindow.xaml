@@ -5,22 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:S7SvrSim.UserControls"
         mc:Ignorable="d"
-        Title="任务管理器" Height="450" Width="600" Name="Taskwin" WindowStartupLocation="CenterScreen" WindowStyle="ToolWindow"
+        Title="任务管理器"
+        Height="450"
+        Width="600"
+        Name="Taskwin"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="ToolWindow"
         >
     <Window.Resources>
         <Style TargetType="Button"
-               BasedOn="{StaticResource MaterialDesignOutlinedButton}">
-            <Setter Property="VerticalAlignment"
-                    Value="Center"></Setter>
+               BasedOn="{StaticResource MaterialDesignOutlinedButton}"
+               >
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
     </Window.Resources>
-    <DataGrid Name="datagrid" CanUserAddRows="False" IsReadOnly="True" AutoGenerateColumns="False">
+    <DataGrid Name="datagrid"
+              CanUserAddRows="False"
+              IsReadOnly="True"
+              AutoGenerateColumns="False"
+              >
         <DataGrid.Columns>
             <DataGridTextColumn Header="序号"
                                 Binding="{Binding Order}"
-                                Width="80" />
+                                Width="80"
+                                />
             <DataGridTextColumn Header="文件路径"
-                                Binding="{Binding FilePath}" Width="350"/>
+                                Binding="{Binding FilePath}"
+                                Width="350"
+                                />
             <DataGridTemplateColumn>
                 <DataGridTemplateColumn.Header>
                     <TextBlock Text="操作" />
@@ -28,8 +40,9 @@
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate>
                         <Button Content="停止"
-                                Command="{Binding ViewModel.CmdStopTask, ElementName='Taskwin' }"
-                                CommandParameter="{Binding SelectedItem,ElementName='datagrid'}" />
+                                Command="{Binding ViewModel.CmdStopTask, ElementName='Taskwin'}"
+                                CommandParameter="{Binding SelectedItem, ElementName='datagrid'}"
+                                />
                     </DataTemplate>
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>

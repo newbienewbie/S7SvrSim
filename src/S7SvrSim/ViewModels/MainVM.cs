@@ -1,51 +1,70 @@
-﻿using ReactiveUI;
+﻿using ReactiveUI.Fody.Helpers;
 using S7Server.Simulator.ViewModels;
+using S7SvrSim.Services;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
-using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 
 namespace S7Svr.Simulator.ViewModels
 {
     public class MainVM : ReactiveObject
     {
         private readonly IS7ServerService _server;
+        private readonly ProjectManager projectManager;
 
         public ConfigSnap7ServerVM ConfigVM { get; }
         public MsgLoggerVM LoggerVM { get; }
         public ConfigPyEngineVM ConfigPyEngineVM { get; }
         public RunningSnap7ServerVM RunningVM { get; }
         public OperationVM OperationVM { get; }
+        public SignalWatchVM SignalWatchVM { get; }
 
-        public MainVM(IS7ServerService server)
+        [Reactive]
+        public bool NeedSave { get; set; }
+
+        [Reactive]
+        public int UndoCount { get; set; }
+
+        [Reactive]
+        public int RedoCount { get; set; }
+
+        public MainVM(IS7ServerService server, ProjectManager projectManager)
         {
             this._server = server;
+            this.projectManager = projectManager;
 
             this.LoggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>();
             this.ConfigPyEngineVM = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
             this.RunningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             this.OperationVM = Locator.Current.GetRequiredService<OperationVM>();
             this.ConfigVM = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
+            this.SignalWatchVM = Locator.Current.GetRequiredService<SignalWatchVM>();
 
+            var watchRunningStatus = this.WhenAnyValue(vm => vm.RunningVM.RunningStatus);
+            this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl);
+            this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl);
 
-            var watchRunningStatus = this.WhenAnyValue(x => x.RunningVM.RunningStatus);
-            this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl, watchRunningStatus.Select(i => !i));
-            this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl, watchRunningStatus);
+            UndoRedoManager.UndoRedoChanged += () =>
+            {
+                UndoCount = UndoRedoManager.UndoCount;
+                RedoCount = UndoRedoManager.RedoCount;
+            };
         }
 
-
         #region 启停服务器
-
         /// <summary>
         /// 启动服务器
         /// </summary>
         public ReactiveCommand<Unit, Unit> CmdStartServer { get; }
         private async Task CmdStartServer_Impl()
         {
+            if (RunningVM.RunningStatus)
+            {
+                return;
+            }
             if (this.ConfigVM.AreaConfigs.Count == 0)
             {
                 MessageBox.Show("当前未指定DB配置！");
@@ -64,15 +83,18 @@ namespace S7Svr.Simulator.ViewModels
         /// <summary>
         /// 停止服务器
         /// </summary>
-        public ReactiveCommand<Unit,Unit> CmdStopServer { get; }
+        public ReactiveCommand<Unit, Unit> CmdStopServer { get; }
         private async Task CmdStopServer_Impl()
         {
+            if (!RunningVM.RunningStatus)
+            {
+                return;
+            }
             this.RunningVM.IpAddress = string.Empty;
             this.RunningVM.AreaConfigs.Clear();
             await this._server.StopServerAsync();
             this.RunningVM.RunningStatus = false;
         }
         #endregion
-
     }
 }

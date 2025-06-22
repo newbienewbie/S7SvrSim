@@ -3,18 +3,13 @@ using Microsoft.Extensions.DependencyInjection;
 using S7Server.Simulator.ViewModels;
 using S7Svr.Simulator.MessageHandlers;
 using S7Svr.Simulator.ViewModels;
-using S7Svr.Simulator;
 using S7SvrSim.Services;
-using S7SvrSim.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Splat;
-using S7SvrSim.ViewModels.Rw;
-using S7SvrSim.UserControls.Rws;
 using S7SvrSim.UserControls;
+using S7SvrSim.UserControls.Rws;
+using S7SvrSim.ViewModels;
+using S7SvrSim.ViewModels.Rw;
+using Splat;
+using System;
 
 namespace S7SvrSim
 {
@@ -27,6 +22,7 @@ namespace S7SvrSim
             services.AddSingleton<IS7ServerService, S7ServerService>();
             services.AddSingleton<IS7DataBlockService, S7DataBlockService>();
             services.AddSingleton<IS7MBService, S7MBService>();
+            services.AddSingleton<ProjectManager>();
 
             return services;
         }
@@ -52,9 +48,10 @@ namespace S7SvrSim
             Locator.CurrentMutable.RegisterLazySingletonEx<RwRealVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwLRealVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwStringVM>(sp);
-           
+
             Locator.CurrentMutable.RegisterLazySingletonEx<ScriptTaskWindowVM>(sp);
-       
+            Locator.CurrentMutable.RegisterLazySingletonEx<SignalWatchVM>(sp);
+
 
             Locator.CurrentMutable.Register<IViewFor<RwBitVM>, BitOpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwByteVM>, ByteOpsView>();
@@ -66,7 +63,7 @@ namespace S7SvrSim
             Locator.CurrentMutable.Register<IViewFor<RwStringVM>, StringOpsView>();
             //Locator.CurrentMutable.Register<IViewFor<ScriptTaskWindowVM>, ScriptTaskWindow>();
 
-            
+
 
         }
     }

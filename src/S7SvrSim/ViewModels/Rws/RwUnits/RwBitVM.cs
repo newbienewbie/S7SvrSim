@@ -1,19 +1,15 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using MediatR;
+using ReactiveUI.Fody.Helpers;
 using ReactiveUI.Validation.Abstractions;
 using ReactiveUI.Validation.Contexts;
-using ReactiveUI.Validation.Extensions;
 using S7Svr.Simulator.ViewModels;
-using System;
 using System.Reactive.Linq;
-using System.Windows;
 
 namespace S7SvrSim.ViewModels.Rw;
 
 public class RwBitVM : RwVMBase<bool>, IValidatableViewModel
 {
-
-
-    public RwBitVM(IS7DataBlockService s7ServerService) :base(s7ServerService)
+    public RwBitVM(IS7DataBlockService s7ServerService, IMediator mediator) : base(s7ServerService, mediator)
     {
         var watchTargetBitPos = this.WhenAnyValue(x => x.TargetBitPos)
             .Select(p => p >= 0 && p <= 7);
@@ -26,12 +22,12 @@ public class RwBitVM : RwVMBase<bool>, IValidatableViewModel
     [Reactive]
     public byte TargetBitPos { get; set; } = 0;
 
-   
+
     public IValidationContext ValidationContext => new ValidationContext();
 
     protected override void CmdWrite_Impl()
     {
-         this._s7ServerService.WriteBit(this.RwVM.TargetDBNumber, this.RwVM.TargetPos, this.TargetBitPos, this.ToBeWritten);
+        this._s7ServerService.WriteBit(this.RwVM.TargetDBNumber, this.RwVM.TargetPos, this.TargetBitPos, this.ToBeWritten);
     }
 
     protected override bool CmdRead_Impl()

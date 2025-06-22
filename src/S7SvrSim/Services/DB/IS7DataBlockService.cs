@@ -27,5 +27,8 @@ namespace S7Svr.Simulator.ViewModels
 
         string ReadString(int dbNumber, int offset);
         void WriteString(int dbNumber, int offset, int maxlen, string str);
+
+        int ReadInt(int dbNumber, int pos);
+        void WriteInt(int dbNumber, int pos, int value);
     }
 }
