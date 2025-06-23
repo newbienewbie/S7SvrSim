@@ -64,6 +64,7 @@
                               Icon="{md:PackIcon Kind=ContentSaveOutline}"
                               Command="ApplicationCommands.Save"
                               />
+                    <Separator />
                     <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
                               Icon="{md:PackIcon Kind=Redo}"
                               />

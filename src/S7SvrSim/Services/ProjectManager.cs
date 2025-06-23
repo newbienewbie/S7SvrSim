@@ -80,7 +80,7 @@ namespace S7SvrSim.Services
 
             pyConfigModel.PyEngineSearchPaths.AddRange(project.SearchPaths);
 
-            signalWatchModel.SetScanSpan(project.ScanSpan ?? 50);
+            signalWatchModel.SetScanSpan(project.ScanSpan);
 
             signalWatchModel.Signals.AddRange(project.Signals.Select(signalCfg =>
             {
