@@ -1,4 +1,4 @@
-﻿using S7Svr.Simulator.ViewModels;
+﻿using S7SvrSim.Services;
 using System.ComponentModel;
 
 namespace S7SvrSim.S7Signal
@@ -23,21 +23,32 @@ namespace S7SvrSim.S7Signal
             }
         }
 
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadBit(Address.DbIndex, Address.Index, Address.Offset);
+            Value = block.ReadBit(Address.Index, Address.Offset);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public void Refresh(byte flags)
+        {
+            if (Address == null)
+            {
+                Value = null;
+                return;
+            }
+
+            Value = (flags & (1 << Address.Offset)) != 0;
+        }
+
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is bool boolValue)
             {
-                db.WriteBit(Address.DbIndex, Address.Index, Address.Offset, boolValue);
+                block.WriteBit(Address.Index, Address.Offset, boolValue);
                 Value = boolValue;
             }
         }
@@ -47,27 +58,27 @@ namespace S7SvrSim.S7Signal
     [SignalVaueType(typeof(byte))]
     public class Byte : SignalBase
     {
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadByte(Address.DbIndex, Address.Index);
+            Value = block.ReadByte(Address.Index);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is byte byteValue)
             {
-                db.WriteByte(Address.DbIndex, Address.Index, byteValue);
+                block.WriteByte(Address.Index, byteValue);
                 Value = byteValue;
             }
             else if (value is string stringValue)
             {
                 byte val = byte.Parse(stringValue);
-                db.WriteByte(Address.DbIndex, Address.Index, val);
+                block.WriteByte(Address.Index, val);
                 Value = val;
             }
         }
@@ -77,21 +88,21 @@ namespace S7SvrSim.S7Signal
     [SignalVaueType(typeof(short))]
     public class Int : SignalBase
     {
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadShort(Address.DbIndex, Address.Index);
+            Value = block.ReadShort(Address.Index);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is short intValue)
             {
-                db.WriteShort(Address.DbIndex, Address.Index, intValue);
+                block.WriteShort(Address.Index, intValue);
                 Value = intValue;
             }
         }
@@ -101,21 +112,21 @@ namespace S7SvrSim.S7Signal
     [SignalVaueType(typeof(int))]
     public class DInt : SignalBase
     {
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadInt(Address.DbIndex, Address.Index);
+            Value = block.ReadInt(Address.Index);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is int dintValue)
             {
-                db.WriteInt(Address.DbIndex, Address.Index, dintValue);
+                block.WriteInt(Address.Index, dintValue);
                 Value = dintValue;
             }
         }
@@ -125,21 +136,21 @@ namespace S7SvrSim.S7Signal
     [SignalVaueType(typeof(uint))]
     public class UDInt : SignalBase
     {
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadUInt32(Address.DbIndex, Address.Index);
+            Value = block.ReadUInt32(Address.Index);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is uint udintValue)
             {
-                db.WriteUInt32(Address.DbIndex, Address.Index, udintValue);
+                block.WriteUInt32(Address.Index, udintValue);
                 Value = udintValue;
             }
         }
@@ -149,21 +160,21 @@ namespace S7SvrSim.S7Signal
     [SignalVaueType(typeof(ulong))]
     public class ULong : SignalBase
     {
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadULong(Address.DbIndex, Address.Index);
+            Value = block.ReadULong(Address.Index);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is ulong ulongValue)
             {
-                db.WriteULong(Address.DbIndex, Address.Index, ulongValue);
+                block.WriteULong(Address.Index, ulongValue);
                 Value = ulongValue;
             }
         }
@@ -173,21 +184,21 @@ namespace S7SvrSim.S7Signal
     [SignalVaueType(typeof(float))]
     public class Real : SignalBase
     {
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadReal(Address.DbIndex, Address.Index);
+            Value = block.ReadReal(Address.Index);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is float realValue)
             {
-                db.WriteReal(Address.DbIndex, Address.Index, realValue);
+                block.WriteReal(Address.Index, realValue);
                 Value = realValue;
             }
         }
@@ -197,21 +208,21 @@ namespace S7SvrSim.S7Signal
     [SignalVaueType(typeof(double))]
     public class LReal : SignalBase
     {
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadLReal(Address.DbIndex, Address.Index);
+            Value = block.ReadLReal(Address.Index);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is double lrealValue)
             {
-                db.WriteLReal(Address.DbIndex, Address.Index, lrealValue);
+                block.WriteLReal(Address.Index, lrealValue);
                 Value = lrealValue;
             }
         }
@@ -243,25 +254,26 @@ namespace S7SvrSim.S7Signal
             }
         }
 
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
             if (Address == null)
             {
                 Value = null;
                 return;
             }
-            Value = db.ReadString(Address.DbIndex, Address.Index);
+            Value = block.ReadString(Address.Index);
         }
 
-        public override void SetValue(IS7DataBlockService db, object value)
+        public override void SetValue(IS7Block block, object value)
         {
             if (value is string stringValue)
             {
-                db.WriteString(Address.DbIndex, Address.Index, Length, stringValue);
+                block.WriteString(Address.Index, Length, stringValue);
                 Value = stringValue;
             }
         }
     }
+
     /// <summary>
     /// 地址占用
     /// </summary>
@@ -278,7 +290,7 @@ namespace S7SvrSim.S7Signal
             };
         }
 
-        public override void Refresh(IS7DataBlockService db)
+        public override void Refresh(IS7Block block)
         {
 
         }

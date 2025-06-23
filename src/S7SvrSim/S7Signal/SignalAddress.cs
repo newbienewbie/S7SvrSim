@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S7Svr.Simulator.ViewModels;
+using System;
 
 namespace S7SvrSim.S7Signal
 {
@@ -8,8 +9,10 @@ namespace S7SvrSim.S7Signal
         {
 
         }
+
         public SignalAddress(int dbIndex, int index, byte offset)
         {
+            AreaKind = AreaKind.DB;
             DbIndex = dbIndex;
             Index = index;
             Offset = offset;
@@ -25,7 +28,16 @@ namespace S7SvrSim.S7Signal
             var splits = address.Split('.');
             if (splits.Length >= 1)
             {
-                DbIndex = string.IsNullOrWhiteSpace(splits[0]) ? 0 : int.Parse(splits[0]);
+                var dbStr = splits[0];
+                if (dbStr.ToUpper() == "MB")
+                {
+                    AreaKind = AreaKind.MB;
+                }
+                else
+                {
+                    AreaKind = AreaKind.DB;
+                    DbIndex = string.IsNullOrWhiteSpace(dbStr) ? 0 : (dbStr.StartsWith("DB", StringComparison.OrdinalIgnoreCase) ? int.Parse(dbStr.Substring(2)) : int.Parse(dbStr));
+                }
             }
             if (splits.Length >= 2)
             {
@@ -43,37 +55,35 @@ namespace S7SvrSim.S7Signal
             {
                 return;
             }
+            AreaKind = other.AreaKind;
             DbIndex = other.DbIndex;
             Index = other.Index;
             Offset = other.Offset;
             HideOffset = other.HideOffset;
         }
-
+        public AreaKind AreaKind { get; set; }
         public int DbIndex { get; set; }
         public int Index { get; set; }
         public byte Offset { get; set; }
         public bool HideOffset { get; set; } = true;
 
+        /// <summary>
+        /// 和 <see cref="SignalAddress.SignalAddress(string)"/> 的区别在于，该方法会区别比特位
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
         public static SignalAddress Parse(string address)
         {
-            var signalAddress = new SignalAddress();
             if (string.IsNullOrEmpty(address))
             {
-                return signalAddress;
+                return new SignalAddress();
             }
 
             var splits = address.Split('.');
-            if (splits.Length >= 1)
-            {
-                signalAddress.DbIndex = string.IsNullOrWhiteSpace(splits[0]) ? 0 : int.Parse(splits[0]);
-            }
-            if (splits.Length >= 2)
-            {
-                signalAddress.Index = string.IsNullOrWhiteSpace(splits[1]) ? 0 : int.Parse(splits[1]);
-            }
+            var signalAddress = new SignalAddress(address);
+
             if (splits.Length >= 3)
             {
-                signalAddress.Offset = string.IsNullOrWhiteSpace(splits[2]) ? (byte)0 : byte.Parse(splits[2]);
                 signalAddress.HideOffset = false;
             }
 
@@ -84,18 +94,18 @@ namespace S7SvrSim.S7Signal
         {
             if (HideOffset)
             {
-                return $"{DbIndex}.{Index}";
+                return $"{(AreaKind == AreaKind.DB ? $"DB{DbIndex}" : "MB")}.{Index}";
             }
             else
             {
-                return $"{DbIndex}.{Index}.{Offset}";
+                return $"{(AreaKind == AreaKind.DB ? $"DB{DbIndex}" : "MB")}.{Index}.{Offset}";
             }
         }
 
         public override bool Equals(object obj)
         {
             return obj is SignalAddress address &&
-                   DbIndex == address.DbIndex &&
+                   (AreaKind == address.AreaKind && (AreaKind == AreaKind.MB || DbIndex == address.DbIndex)) &&
                    Index == address.Index &&
                    Offset == address.Offset &&
                    HideOffset == address.HideOffset;
@@ -103,7 +113,7 @@ namespace S7SvrSim.S7Signal
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(DbIndex, Index, Offset, HideOffset);
+            return HashCode.Combine(AreaKind, DbIndex, Index, Offset, HideOffset);
         }
 
         public int CompareTo(SignalAddress other)
@@ -113,9 +123,17 @@ namespace S7SvrSim.S7Signal
                 return 1;
             }
 
-            if (DbIndex != other.DbIndex)
+            if (AreaKind != other.AreaKind)
             {
-                return DbIndex - other.DbIndex;
+                return AreaKind == AreaKind.DB ? -1 : 1;
+            }
+
+            if (AreaKind == AreaKind.DB)
+            {
+                if (DbIndex != other.DbIndex)
+                {
+                    return DbIndex - other.DbIndex;
+                }
             }
 
             if (Index != other.Index)
@@ -142,7 +160,7 @@ namespace S7SvrSim.S7Signal
             {
                 return address1 is null && address2 is null;
             }
-            return address1.DbIndex == address2.DbIndex && address1.Index == address2.Index && address1.Offset == address2.Offset;
+            return (address1.AreaKind == address2.AreaKind && (address1.AreaKind == AreaKind.MB || address1.DbIndex == address2.DbIndex)) && address1.Index == address2.Index && address1.Offset == address2.Offset;
         }
 
         public static bool operator !=(SignalAddress address1, SignalAddress address2)

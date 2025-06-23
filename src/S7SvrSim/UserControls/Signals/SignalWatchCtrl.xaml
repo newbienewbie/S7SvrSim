@@ -72,7 +72,7 @@
                               Command="{Binding UpdateAddressFromFirstCommand}"
                               />
                     <MenuItem Header="从选择项开始"
-                              Command="{Binding UpdateAddressFromFirtSelectedCommand}"
+                              Command="{Binding UpdateAddressFromFirstSelectedCommand}"
                               />
                     <MenuItem Header="仅选择项"
                               Command="{Binding UpdateAddressFromSelectedItemsCommand}"

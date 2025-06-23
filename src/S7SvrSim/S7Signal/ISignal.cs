@@ -1,5 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using S7Svr.Simulator.ViewModels;
+using S7SvrSim.Services;
 using System;
 using System.Collections.Generic;
 
@@ -56,6 +56,9 @@ namespace S7SvrSim.S7Signal
             }
         }
 
+        public abstract void Refresh(IS7Block block);
+        public virtual void SetValue(IS7Block block, object value) { }
+
         public override bool Equals(object obj)
         {
             return obj is SignalBase @base &&
@@ -69,9 +72,6 @@ namespace S7SvrSim.S7Signal
         {
             return HashCode.Combine(Name, Address, Remark);
         }
-
-        public abstract void Refresh(IS7DataBlockService db);
-        public virtual void SetValue(IS7DataBlockService db, object value) { }
 
         public static bool operator ==(SignalBase lhs, SignalBase rhs)
         {

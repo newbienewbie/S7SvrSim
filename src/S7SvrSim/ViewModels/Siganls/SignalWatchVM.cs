@@ -25,8 +25,8 @@ namespace S7SvrSim.ViewModels
     public partial class SignalWatchVM : ViewModelBase
     {
         #region DI
-        private readonly IS7DataBlockService db;
         private readonly IMediator mediator;
+        private readonly IS7BlockFactory blockFactory;
         #endregion
 
         public DataGrid Grid { get; set; }
@@ -64,10 +64,10 @@ namespace S7SvrSim.ViewModels
 
         public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;
 
-        public SignalWatchVM(IS7DataBlockService db, IMediator mediator)
+        public SignalWatchVM(IMediator mediator, IS7BlockFactory blockFactory)
         {
-            this.db = db;
             this.mediator = mediator;
+            this.blockFactory = blockFactory;
 
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.PropertyChanged += RunningModel_PropertyChanged;
@@ -542,7 +542,7 @@ namespace S7SvrSim.ViewModels
         }
 
         [RelayCommand]
-        private void UpdateAddressFromFirtSelected()
+        private void UpdateAddressFromFirstSelected()
         {
             if (Grid.SelectedItems.Count == 0)
             {
@@ -690,20 +690,7 @@ namespace S7SvrSim.ViewModels
         {
             while (!token.IsCancellationRequested)
             {
-                Signals.Each(s =>
-                {
-                    if (s.Value is SignalBase bs)
-                    {
-                        try
-                        {
-                            bs.Refresh(db);
-                        }
-                        catch (Exception e) when (e is ArgumentException || e is IndexOutOfRangeException)
-                        {
-
-                        }
-                    }
-                });
+                Signals.Select(s => s.Value).RefreshValue(blockFactory);
                 await Task.Delay(TimeSpan.FromMilliseconds(ScanSpan >= 0 ? ScanSpan : 50), token);
             }
         }
