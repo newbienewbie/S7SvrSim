@@ -2,7 +2,7 @@
 
 namespace S7SvrSim.S7Signal
 {
-    public class SignalAddress
+    public class SignalAddress : IComparable<SignalAddress>
     {
         public SignalAddress()
         {
@@ -104,6 +104,36 @@ namespace S7SvrSim.S7Signal
         public override int GetHashCode()
         {
             return HashCode.Combine(DbIndex, Index, Offset, HideOffset);
+        }
+
+        public int CompareTo(SignalAddress other)
+        {
+            if (other == null)
+            {
+                return 1;
+            }
+
+            if (DbIndex != other.DbIndex)
+            {
+                return DbIndex - other.DbIndex;
+            }
+
+            if (Index != other.Index)
+            {
+                return Index - other.Index;
+            }
+
+            if (HideOffset && !other.HideOffset)
+            {
+                return 1;
+            }
+
+            if (!HideOffset && !other.HideOffset)
+            {
+                return Offset - other.Offset;
+            }
+
+            return 0;
         }
 
         public static bool operator ==(SignalAddress address1, SignalAddress address2)

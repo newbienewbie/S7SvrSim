@@ -234,6 +234,11 @@ namespace S7SvrSim.ViewModels
                 return false;
             }
             var query = Signals.Select((signal, index) => (Signal: signal, Index: index)).IntersectBy(DragSignals, s => s.Signal).Select(s => s.Index).OrderBy(i => i);
+            if (!query.Any())
+            {
+                return false;
+            }
+
             var preIndex = query.First();
             var skipQuery = query.Skip(1);
             return !skipQuery.Any() || skipQuery.All(i =>
@@ -310,6 +315,49 @@ namespace S7SvrSim.ViewModels
                     AfterDragEvent?.Invoke(moved);
                 };
             }
+            UndoRedoManager.Run(command);
+        }
+
+        private SignalSortBy? lastSignalSoryBy;
+
+        [RelayCommand]
+        private void OrderBy(SignalSortBy sortBy)
+        {
+            ICommand command;
+            switch (sortBy)
+            {
+                case SignalSortBy.Name:
+                    command = lastSignalSoryBy == SignalSortBy.Name ? ListChangedCommand.OrderByDescending(Signals, s => s.Value.Name) : ListChangedCommand.OrderBy(Signals, s => s.Value.Name);
+                    break;
+                case SignalSortBy.Address:
+                    command = lastSignalSoryBy == SignalSortBy.Address ? ListChangedCommand.OrderByDescending(Signals, s => s.Value.Address) : ListChangedCommand.OrderBy(Signals, s => s.Value.Address);
+                    break;
+                case SignalSortBy.Type:
+                    command = lastSignalSoryBy == SignalSortBy.Type ? ListChangedCommand.OrderByDescending(Signals, s => s.Other.Name) : ListChangedCommand.OrderBy(Signals, s => s.Other.Name);
+                    break;
+                default:
+                    return;
+            }
+            RegistCommandEventHandle(command);
+            var lastSignalSoryByCp = lastSignalSoryBy;
+            command.AfterExecute += (_, _) =>
+            {
+                switch (lastSignalSoryBy)
+                {
+                    case SignalSortBy.Name:
+                    case SignalSortBy.Address:
+                    case SignalSortBy.Type:
+                        lastSignalSoryBy = null;
+                        break;
+                    case null:
+                        lastSignalSoryBy = sortBy;
+                        break;
+                }
+            };
+            command.AfterUndo += (_, _) =>
+            {
+                lastSignalSoryBy = lastSignalSoryByCp;
+            };
             UndoRedoManager.Run(command);
         }
         #endregion

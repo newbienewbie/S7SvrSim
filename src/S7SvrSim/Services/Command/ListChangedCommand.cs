@@ -35,6 +35,8 @@ namespace S7SvrSim.Services.Command
         public static ListChangedCommand<T> Clear(IList<T> list) => new ListChangedCommand<T>(list, -1, ChangedType.Clear, null, null);
         public static ListChangedCommand<T> Replace(IList<T> list, IEnumerable<(T OldItem, T NewItem)> pairs) => new ListChangedCommand<T>(list, -1, ChangedType.Replace, pairs.IntersectBy(list, p => p.OldItem).Where(item => item.OldItem != null && item.NewItem != null).Select(p => p.NewItem).ToList(), pairs.Select(p => p.OldItem).ToList());
         public static ListChangedCommand<T> Move(IList<T> list, T before, IEnumerable<T> moved) => new ListChangedCommand<T>(list, -1, ChangedType.Move, before == null ? null : [before], moved);
+        public static ListChangedCommand<T> OrderBy<TKey>(IList<T> list, Func<T, TKey> keySelector) => new ListChangedCommand<T>(list, -1, ChangedType.Order, list.OrderBy(keySelector), list);
+        public static ListChangedCommand<T> OrderByDescending<TKey>(IList<T> list, Func<T, TKey> keySelector) => new ListChangedCommand<T>(list, -1, ChangedType.Order, list.OrderByDescending(keySelector), list);
 
         public event EventHandler AfterUndo;
         public event EventHandler AfterExecute;
@@ -144,6 +146,18 @@ namespace S7SvrSim.Services.Command
             }
         }
 
+        private void Order()
+        {
+            list.Clear();
+            list.AddRange(newItems.Select(item => item.Item));
+        }
+
+        private void OrderBack()
+        {
+            list.Clear();
+            list.AddRange(oldItems.Select(item => item.Item));
+        }
+
         public virtual void Execute()
         {
             switch (changedType)
@@ -162,6 +176,9 @@ namespace S7SvrSim.Services.Command
                     break;
                 case ChangedType.Move:
                     Move();
+                    break;
+                case ChangedType.Order:
+                    Order();
                     break;
                 default:
                     break;
@@ -189,6 +206,9 @@ namespace S7SvrSim.Services.Command
                 case ChangedType.Move:
                     MoveBack();
                     break;
+                case ChangedType.Order:
+                    OrderBack();
+                    break;
                 default:
                     break;
             }
@@ -204,5 +224,7 @@ namespace S7SvrSim.Services.Command
         public static ListChangedCommand<T> Clear<T>(IList<T> list) where T : class => ListChangedCommand<T>.Clear(list);
         public static ListChangedCommand<T> Replace<T>(IList<T> list, IEnumerable<(T OldItem, T NewItem)> pairs) where T : class => ListChangedCommand<T>.Replace(list, pairs);
         public static ListChangedCommand<T> Move<T>(IList<T> list, T before, IEnumerable<T> moved) where T : class => ListChangedCommand<T>.Move(list, before, moved);
+        public static ListChangedCommand<T> OrderBy<T, TKey>(IList<T> list, Func<T, TKey> keySelector) where T : class => ListChangedCommand<T>.OrderBy(list, keySelector);
+        public static ListChangedCommand<T> OrderByDescending<T, TKey>(IList<T> list, Func<T, TKey> keySelector) where T : class => ListChangedCommand<T>.OrderByDescending(list, keySelector);
     }
 }
