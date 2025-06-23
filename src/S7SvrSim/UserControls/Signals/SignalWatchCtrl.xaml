@@ -90,11 +90,11 @@
                         <Separator />
                         <MenuItem Header="禁止地址存在奇数"
                                   IsCheckable="True"
-                                  IsChecked="{Binding ForbidIndexHasOddNumber, Mode=TwoWay}"
+                                  IsChecked="{Binding UpdateAddressOptions.ForbidIndexHasOddNumber, Mode=TwoWay}"
                                   />
                         <MenuItem Header="允许 Bool 地址存在奇数"
                                   IsCheckable="True"
-                                  IsChecked="{Binding AllowBoolIndexHasOddNumber, Mode=TwoWay}"
+                                  IsChecked="{Binding UpdateAddressOptions.AllowBoolIndexHasOddNumber, Mode=TwoWay}"
                                   ToolTip="如果禁止地址存在奇数，该项启用后可以允许 Bool 类型的地址存在奇数"
                                   />
                         <Separator />
