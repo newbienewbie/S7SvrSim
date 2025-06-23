@@ -10,6 +10,13 @@ namespace S7SvrSim.S7Signal
 
         }
 
+        public SignalAddress(int index, byte offset)
+        {
+            AreaKind = AreaKind.MB;
+            Index = index;
+            Offset = offset;
+        }
+
         public SignalAddress(int dbIndex, int index, byte offset)
         {
             AreaKind = AreaKind.DB;

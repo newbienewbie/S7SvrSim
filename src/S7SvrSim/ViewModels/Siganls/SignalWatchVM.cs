@@ -453,7 +453,8 @@ namespace S7SvrSim.ViewModels
 
                     var newAddress = new SignalAddress(dbIndex, index, offset)
                     {
-                        HideOffset = usedItem.IndexSize != 0 || signal.Value is Holding
+                        HideOffset = usedItem.IndexSize != 0 || signal.Value is Holding,
+                        AreaKind = preAddress.AreaKind
                     };
 
                     if (newAddress != signal.Value.Address)
