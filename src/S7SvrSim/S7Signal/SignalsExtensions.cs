@@ -59,7 +59,7 @@ namespace S7SvrSim.S7Signal
                         else
                         {
                             signal.Refresh(block);
-                            preValue = signal.Value;
+                            preValue = signal;
                         }
                         preSignal = signal;
                     }
@@ -115,13 +115,13 @@ namespace S7SvrSim.S7Signal
                     int index;
                     byte offset = 0;
 
-                    if (signal.Value is Holding)
+                    if (signal is Holding)
                     {
                         index = preAddress.Index + preUsedItem.IndexSize;
                     }
                     else
                     {
-                        if (preUsedItem.IndexSize == 0 && usedItem.IndexSize == 0 && preSignal.Value is Bool && signal.Value is Bool)
+                        if (preUsedItem.IndexSize == 0 && usedItem.IndexSize == 0 && preSignal is Bool && signal is Bool)
                         {
                             if (preAddress.Offset >= 7)
                             {
@@ -139,7 +139,7 @@ namespace S7SvrSim.S7Signal
                             index = preAddress.Index + (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize);
                         }
 
-                        if (index % 2 == 1 && (signal.Value is not Bool || !options.AllowBoolIndexHasOddNumber) && options.ForbidIndexHasOddNumber)
+                        if (index % 2 == 1 && (signal is not Bool || !options.AllowBoolIndexHasOddNumber) && options.ForbidIndexHasOddNumber)
                         {
                             index += 1;
                         }
@@ -147,7 +147,7 @@ namespace S7SvrSim.S7Signal
 
                     var newAddress = new SignalAddress(dbIndex, index, offset)
                     {
-                        HideOffset = usedItem.IndexSize != 0 || signal.Value is Holding,
+                        HideOffset = usedItem.IndexSize != 0 || signal is Holding,
                         AreaKind = preAddress.AreaKind
                     };
 
