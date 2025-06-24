@@ -86,12 +86,8 @@ namespace S7SvrSim.Services
             {
                 var signalType = signalWatchModel.SignalTypes.First(ty => ty.Name == signalCfg.Type);
                 var signal = (SignalBase)Activator.CreateInstance(signalType);
-                signal.Name = signalCfg.Name;
-                signal.FormatAddress = signalCfg.FormatAddress;
-                if (signal is S7Signal.SignalWithLengthBase strSignal && signalCfg.Length != null)
-                {
-                    strSignal.Length = signalCfg.Length.Value;
-                }
+                signal.CopyFromSignalItem(signalCfg);
+
                 return new SignalEditObj(signalType)
                 {
                     Value = signal
@@ -131,7 +127,7 @@ namespace S7SvrSim.Services
                 }).ToList(),
                 SearchPaths = pyConfigModel.PyEngineSearchPaths.ToList(),
                 IpAddress = configS7Model.IpAddress,
-                Signals = signalWatchModel.Signals.Select(signal => new SignalItem(signal)).ToList(),
+                Signals = signalWatchModel.Signals.Select(signal => signal.Value.ToSignalItem()).ToList(),
                 ScanSpan = signalWatchModel.ScanSpan,
             };
         }

@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using S7SvrSim.Project;
 using S7SvrSim.Services;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,24 @@ namespace S7SvrSim.S7Signal
         public abstract void Refresh(IS7Block block);
         public virtual void SetValue(IS7Block block, object value) { }
 
+        public virtual void CopyFromSignalItem(SignalItem signal)
+        {
+            Name = signal.Name;
+            FormatAddress = signal.FormatAddress;
+            Remark = signal.Remark;
+        }
+
+        public virtual SignalItem ToSignalItem()
+        {
+            return new SignalItem()
+            {
+                Name = Name,
+                FormatAddress = FormatAddress,
+                Remark = Remark,
+                Type = GetType().Name
+            };
+        }
+
         public override bool Equals(object obj)
         {
             return obj is SignalBase @base &&
@@ -95,6 +114,23 @@ namespace S7SvrSim.S7Signal
     {
         [ObservableProperty]
         private int length;
+
+        public override void CopyFromSignalItem(SignalItem signal)
+        {
+            base.CopyFromSignalItem(signal);
+
+            if (signal.Length != null)
+            {
+                Length = signal.Length.Value;
+            }
+        }
+
+        public override SignalItem ToSignalItem()
+        {
+            var item = base.ToSignalItem();
+            item.Length = Length;
+            return item;
+        }
 
         public override bool Equals(object obj)
         {

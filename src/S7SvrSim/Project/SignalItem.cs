@@ -52,34 +52,5 @@ namespace S7SvrSim.Project
         }
 
         public string Remark { get; set; }
-
-        public SignalItem()
-        {
-
-        }
-
-        public SignalItem(SignalBase signal)
-        {
-            Name = signal.Name;
-            FormatAddress = signal.FormatAddress;
-            Type = signal.GetType().Name;
-            Remark = signal.Remark;
-            if (signal is S7Signal.SignalWithLengthBase str)
-            {
-                Length = str.Length;
-            }
-        }
-
-        public SignalItem(SignalEditObj signal)
-        {
-            Name = signal.Value.Name;
-            FormatAddress = signal.Value.FormatAddress;
-            Type = signal.Other.Name;
-            Remark = signal.Value.Remark;
-            if (signal.Value is S7Signal.SignalWithLengthBase str)
-            {
-                Length = str.Length;
-            }
-        }
     }
 }
