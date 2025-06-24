@@ -139,7 +139,7 @@ namespace S7SvrSim.S7Signal
                             index = preAddress.Index + (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize);
                         }
 
-                        if (index % 2 == 1 && (signal is not Bool || !options.AllowBoolIndexHasOddNumber) && options.ForbidIndexHasOddNumber)
+                        if (index % 2 == 1 && (signal is not Bool || !options.AllowBoolIndexHasOddNumber) && (signal is not Byte || !options.AllowByteIndexHAsOddNumber) && options.ForbidIndexHasOddNumber)
                         {
                             index += 1;
                         }

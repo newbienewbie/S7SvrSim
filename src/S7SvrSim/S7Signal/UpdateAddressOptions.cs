@@ -8,5 +8,7 @@ namespace S7SvrSim.S7Signal
         private bool forbidIndexHasOddNumber = true;
         [ObservableProperty]
         private bool allowBoolIndexHasOddNumber = true;
+        [ObservableProperty]
+        private bool allowByteIndexHAsOddNumber = true;
     }
 }

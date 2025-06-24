@@ -97,6 +97,11 @@
                                   IsChecked="{Binding UpdateAddressOptions.AllowBoolIndexHasOddNumber, Mode=TwoWay}"
                                   ToolTip="如果禁止地址存在奇数，该项启用后可以允许 Bool 类型的地址存在奇数"
                                   />
+                        <MenuItem Header="允许 Byte 地址存在奇数"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding UpdateAddressOptions.AllowByteIndexHAsOddNumber, Mode=TwoWay}"
+                                  ToolTip="如果禁止地址存在奇数，该项启用后可以允许 Byte 类型的地址存在奇数"
+                                  />
                         <Separator />
                         <MenuItem Header="String 按十进位地址占用计算"
                                   IsCheckable="True"
