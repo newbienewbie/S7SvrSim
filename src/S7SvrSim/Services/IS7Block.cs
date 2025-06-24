@@ -11,6 +11,9 @@
         short ReadShort(int pos);
         void WriteShort(int pos, short value);
 
+        ushort ReadUShort(int pos);
+        void WriteUShort(int pos, ushort value);
+
         uint ReadUInt32(int pos);
         void WriteUInt32(int pos, uint value);
 

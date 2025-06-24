@@ -58,6 +58,11 @@ namespace S7SvrSim.Services.DB
             return db.ReadULong(dbIndex, pos);
         }
 
+        public ushort ReadUShort(int pos)
+        {
+            return db.ReadUShort(dbIndex, pos);
+        }
+
         public void WriteBit(int offset, byte bit, bool flag)
         {
             db.WriteBit(dbIndex, offset, bit, flag);
@@ -101,6 +106,11 @@ namespace S7SvrSim.Services.DB
         public void WriteULong(int pos, ulong value)
         {
             db.WriteULong(dbIndex, pos, value);
+        }
+
+        public void WriteUShort(int pos, ushort value)
+        {
+            db.WriteUShort(dbIndex, pos, value);
         }
     }
 }

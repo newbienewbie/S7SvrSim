@@ -2,7 +2,6 @@
 using S7SvrSim.Project;
 using S7SvrSim.Services;
 using System;
-using System.Collections.Generic;
 
 namespace S7SvrSim.S7Signal
 {
@@ -80,11 +79,7 @@ namespace S7SvrSim.S7Signal
 
         public override bool Equals(object obj)
         {
-            return obj is SignalBase @base &&
-                   EqualityComparer<object>.Default.Equals(Value, @base.Value) &&
-                   Name == @base.Name &&
-                   EqualityComparer<SignalAddress>.Default.Equals(Address, @base.Address) &&
-                   Remark == @base.Remark;
+            return base.Equals(obj);
         }
 
         public override int GetHashCode()
@@ -134,9 +129,7 @@ namespace S7SvrSim.S7Signal
 
         public override bool Equals(object obj)
         {
-            return obj is SignalWithLengthBase @string &&
-                   base.Equals(obj) &&
-                   Length == @string.Length;
+            return base.Equals(obj);
         }
 
         public override int GetHashCode()

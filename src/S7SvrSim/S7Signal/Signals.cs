@@ -132,6 +132,30 @@ namespace S7SvrSim.S7Signal
         }
     }
 
+    [AddressUsed(IndexSize = 2)]
+    [SignalVaueType(typeof(ushort))]
+    public class UInt : SignalBase
+    {
+        public override void Refresh(IS7Block block)
+        {
+            if (Address == null)
+            {
+                Value = null;
+                return;
+            }
+            Value = block.ReadUShort(Address.Index);
+        }
+
+        public override void SetValue(IS7Block block, object value)
+        {
+            if (value is ushort ushortValue)
+            {
+                block.WriteUShort(Address.Index, ushortValue);
+                Value = ushortValue;
+            }
+        }
+    }
+
     [AddressUsed(IndexSize = 4)]
     [SignalVaueType(typeof(uint))]
     public class UDInt : SignalBase

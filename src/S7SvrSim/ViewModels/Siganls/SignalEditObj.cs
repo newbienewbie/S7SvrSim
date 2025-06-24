@@ -38,7 +38,7 @@ namespace S7SvrSim.ViewModels
             }
 
             newVal.FormatAddress = (string)Value?.FormatAddress?.Clone();
-
+            newVal.Remark = Value?.Remark;
             Value = newVal;
         }
 

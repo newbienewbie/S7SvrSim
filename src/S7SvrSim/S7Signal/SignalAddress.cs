@@ -111,11 +111,7 @@ namespace S7SvrSim.S7Signal
 
         public override bool Equals(object obj)
         {
-            return obj is SignalAddress address &&
-                   (AreaKind == address.AreaKind && (AreaKind == AreaKind.MB || DbIndex == address.DbIndex)) &&
-                   Index == address.Index &&
-                   Offset == address.Offset &&
-                   HideOffset == address.HideOffset;
+            return base.Equals(obj);
         }
 
         public override int GetHashCode()

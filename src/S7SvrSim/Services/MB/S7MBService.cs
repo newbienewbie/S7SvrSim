@@ -1,7 +1,6 @@
 ﻿using FutureTech.Snap7;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using S7Svr.Simulator.Messages;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
@@ -186,6 +185,23 @@ namespace S7Svr.Simulator.ViewModels
             var buffer = GetBuffer();
 
             S7.SetDIntAt(buffer, pos, value);
+        }
+        #endregion
+
+        #region ushort
+        public ushort ReadUShort(int pos)
+        {
+            var buffer = GetBuffer();
+
+            var val = S7.GetUIntAt(buffer, pos);
+            return val;
+        }
+
+        public void WriteUShort(int pos, ushort value)
+        {
+            var buffer = GetBuffer();
+
+            S7.SetUIntAt(buffer, pos, value);
         }
         #endregion
     }
