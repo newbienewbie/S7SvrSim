@@ -23,7 +23,7 @@ namespace S7SvrSim.Services.DB
             return db.ReadByte(dbIndex, pos);
         }
 
-        public int ReadInt(int pos)
+        public int ReadDInt(int pos)
         {
             return db.ReadInt(dbIndex, pos);
         }
@@ -73,7 +73,7 @@ namespace S7SvrSim.Services.DB
             db.WriteByte(dbIndex, pos, value);
         }
 
-        public void WriteInt(int pos, int value)
+        public void WriteDInt(int pos, int value)
         {
             db.WriteInt(dbIndex, pos, value);
         }

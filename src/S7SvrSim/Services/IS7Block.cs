@@ -28,7 +28,7 @@
 
         string ReadString(int offset);
         void WriteString(int offset, int maxlen, string str);
-        int ReadInt(int pos);
-        void WriteInt(int pos, int value);
+        int ReadDInt(int pos);
+        void WriteDInt(int pos, int value);
     }
 }

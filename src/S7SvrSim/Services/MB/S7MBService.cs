@@ -171,16 +171,16 @@ namespace S7Svr.Simulator.ViewModels
         }
         #endregion
 
-        #region Int
-        public int ReadInt(int pos)
+        #region DInt
+        public int ReadDInt(int pos)
         {
             var buffer = GetBuffer();
 
-            var val = S7.GetIntAt(buffer, pos);
+            var val = S7.GetDIntAt(buffer, pos);
             return val;
         }
 
-        public void WriteInt(int pos, int value)
+        public void WriteDInt(int pos, int value)
         {
             var buffer = GetBuffer();
 
