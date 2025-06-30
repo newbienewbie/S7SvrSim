@@ -86,6 +86,16 @@
                               Icon="{md:PackIcon Kind=Stop}"
                               />
                 </MenuItem>
+                <MenuItem Header="Python">
+                    <MenuItem Command="{Binding OperationVM.RwTargetVM.CmdRunScript}"
+                              Header="导入脚本"
+                              Icon="{md:PackIcon Kind=LanguagePython}"
+                              />
+                    <MenuItem Command="{Binding OperationVM.RwTargetVM.CmdTaskList}"
+                              Header="运行列表"
+                              Icon="{md:PackIcon Kind=ViewList}"
+                              />
+                </MenuItem>
             </Menu>
             <ToolBarTray>
                 <ToolBarTray.Resources>
@@ -139,6 +149,18 @@
                                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                 />
                     </md:Badged>
+                </ToolBar>
+                <ToolBar>
+                    <Button Content="{md:PackIcon Kind=LanguagePython}"
+                            ToolTip="导入 Python 脚本"
+                            Padding="{StaticResource ButtonPadding}"
+                            Command="{Binding OperationVM.RwTargetVM.CmdRunScript}"
+                            />
+                    <Button Content="{md:PackIcon Kind=ViewList}"
+                            ToolTip="正在运行的 Python 任务"
+                            Padding="{StaticResource ButtonPadding}"
+                            Command="{Binding OperationVM.RwTargetVM.CmdTaskList}"
+                            />
                 </ToolBar>
             </ToolBarTray>
         </StackPanel>
