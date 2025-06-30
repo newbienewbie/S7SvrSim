@@ -97,6 +97,11 @@ namespace S7SvrSim.S7Signal
             return signalAddress;
         }
 
+        public bool IsValid()
+        {
+            return DbIndex >= 0 && Index >= 0 && (HideOffset || Offset >= 0);
+        }
+
         public override string ToString()
         {
             if (HideOffset)

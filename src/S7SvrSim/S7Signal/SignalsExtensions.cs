@@ -40,6 +40,12 @@ namespace S7SvrSim.S7Signal
                 SignalBase preSignal = null;
                 foreach (var signal in blockSignals.OrderBy(s => s.Address))
                 {
+                    if (signal.Address.DbIndex < 0 || signal.Address.Index < 0 || (!signal.Address.HideOffset && signal.Address.Offset < 0))
+                    {
+                        signal.Value = null;
+                        continue;
+                    }
+
                     var block = signal.Address.AreaKind == S7Svr.Simulator.ViewModels.AreaKind.DB ? blockFactory.GetDataBlockService(signal.Address.DbIndex) : blockFactory.GetMemoryBlockService();
                     try
                     {

@@ -66,7 +66,7 @@ namespace S7SvrSim.ViewModels
             {
                 return;
             }
-            if (SelectedSignal != null && SelectedSignal.Value.Address != null)
+            if (SelectedSignal != null && SelectedSignal.Value.Address != null && SelectedSignal.Value.Address.IsValid())
             {
                 var block = SelectedSignal.Value.Address.AreaKind == AreaKind.DB ? blockFactory.GetDataBlockService(SelectedSignal.Value.Address.DbIndex) : blockFactory.GetMemoryBlockService();
                 SelectedSignal.Value.SetValue(block, Value);
