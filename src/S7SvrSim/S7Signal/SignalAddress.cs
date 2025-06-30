@@ -3,7 +3,7 @@ using System;
 
 namespace S7SvrSim.S7Signal
 {
-    public class SignalAddress : IComparable<SignalAddress>
+    public class SignalAddress : IComparable<SignalAddress>, IEquatable<SignalAddress>
     {
         public SignalAddress()
         {
@@ -160,6 +160,11 @@ namespace S7SvrSim.S7Signal
             }
 
             return 0;
+        }
+
+        public bool Equals(SignalAddress other)
+        {
+            return this == other;
         }
 
         public static bool operator ==(SignalAddress address1, SignalAddress address2)

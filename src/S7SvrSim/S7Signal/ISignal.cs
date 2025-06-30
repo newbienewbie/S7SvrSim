@@ -25,7 +25,7 @@ namespace S7SvrSim.S7Signal
         string Remark { get; set; }
     }
 
-    public abstract partial class SignalBase : ObservableObject, ISignal
+    public abstract partial class SignalBase : ObservableObject, ISignal, IEquatable<SignalBase>
     {
         [ObservableProperty]
         private object value;
@@ -85,6 +85,11 @@ namespace S7SvrSim.S7Signal
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, Address, Remark);
+        }
+
+        public virtual bool Equals(SignalBase other)
+        {
+            return this == other;
         }
 
         public static bool operator ==(SignalBase lhs, SignalBase rhs)
