@@ -1,7 +1,6 @@
 ﻿using FutureTech.Snap7;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using S7Svr.Simulator.Messages;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
@@ -25,14 +24,16 @@ namespace S7Svr.Simulator.ViewModels
             this._logger = logger;
         }
 
+        private RunningServerItem GetConfig(int dbNumber)
+        {
+            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
+            return config ?? throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
+        }
+
         #region Byte
         public byte ReadByte(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
 
             var buffer = config.Bytes;
 
@@ -43,11 +44,8 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteByte(int dbNumber, int pos, byte value)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
 
             S7.SetByteAt(buffer, pos, value);
@@ -57,11 +55,7 @@ namespace S7Svr.Simulator.ViewModels
         #region Short
         public short ReadShort(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
 
             var buffer = config.Bytes;
 
@@ -72,11 +66,8 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteShort(int dbNumber, int pos, short value)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
 
             S7.SetIntAt(buffer, pos, value);
@@ -86,11 +77,7 @@ namespace S7Svr.Simulator.ViewModels
         #region Bit
         public bool ReadBit(int dbNumber, int offset, byte bit)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
 
             var buffer = config.Bytes;
 
@@ -101,11 +88,8 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteBit(int dbNumber, int offset, byte bit, bool flag)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
 
             S7.SetBitAt(ref buffer, offset, bit, flag);
@@ -115,22 +99,16 @@ namespace S7Svr.Simulator.ViewModels
         #region String
         public void WriteString(int dbNumber, int offset, int maxlen, string str)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
             S7.SetStringAt(buffer, offset, maxlen, str);
         }
 
         public string ReadString(int dbNumber, int offset)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
             var str = S7.GetStringAt(buffer, offset);
             return str;
@@ -140,22 +118,16 @@ namespace S7Svr.Simulator.ViewModels
         #region Real
         public void WriteReal(int dbNumber, int pos, float real)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
             S7.SetRealAt(buffer, pos, real);
         }
 
         public float ReadReal(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
             var real = S7.GetRealAt(buffer, pos);
             return real;
@@ -166,22 +138,16 @@ namespace S7Svr.Simulator.ViewModels
         #region LReal
         public void WriteLReal(int dbNumber, int pos, double real)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
             S7.SetLRealAt(buffer, pos, real);
         }
 
         public double ReadLReal(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
             var real = S7.GetLRealAt(buffer, pos);
             return real;
@@ -218,14 +184,31 @@ namespace S7Svr.Simulator.ViewModels
         }
         #endregion
 
+        #region ushort
+        public ushort ReadUShort(int dbNumber, int pos)
+        {
+            var config = GetConfig(dbNumber);
+
+            var buffer = config.Bytes;
+
+            var val = S7.GetUIntAt(buffer, pos);
+            return val;
+        }
+
+        public void WriteUShort(int dbNumber, int pos, ushort value)
+        {
+            var config = GetConfig(dbNumber);
+
+            var buffer = config.Bytes;
+
+            S7.SetUIntAt(buffer, pos, value);
+        }
+        #endregion
+
         #region uint32
         public uint ReadUInt32(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
 
             var buffer = config.Bytes;
 
@@ -235,11 +218,8 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteUInt32(int dbNumber, int pos, uint value)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
 
             S7.SetUDIntAt(buffer, pos, value);
@@ -249,11 +229,7 @@ namespace S7Svr.Simulator.ViewModels
         #region int32(DInt)
         public int ReadInt(int dbNumber, int pos)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
 
             var buffer = config.Bytes;
 
@@ -263,15 +239,14 @@ namespace S7Svr.Simulator.ViewModels
 
         public void WriteInt(int dbNumber, int pos, int value)
         {
-            var config = _runningVM.RunningsItems.Where(i => i.AreaKind == AreaKind.DB && i.BlockNumber == dbNumber).FirstOrDefault();
-            if (config == null)
-            {
-                throw new ArgumentException($"DBNumber={dbNumber} 不存在！", nameof(dbNumber));
-            }
+            var config = GetConfig(dbNumber);
+
             var buffer = config.Bytes;
 
             S7.SetDIntAt(buffer, pos, value);
         }
+
+
         #endregion
     }
 }

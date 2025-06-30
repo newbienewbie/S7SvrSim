@@ -7,5 +7,6 @@
         Replace,
         Clear,
         Move,
+        Order,
     }
 }

@@ -1,9 +1,9 @@
 ﻿using FutureTech.Snap7;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using S7Svr.Simulator.Messages;
 using S7SvrSim.ViewModels;
 using Splat;
+using System;
 using System.Linq;
 
 namespace S7Svr.Simulator.ViewModels
@@ -30,8 +30,7 @@ namespace S7Svr.Simulator.ViewModels
             var config = _runningVM.RunningsItems.FirstOrDefault(i => i.AreaKind == AreaKind.MB);
             if (config == null)
             {
-                this._mediator.Publish(new MessageNotification { Message = $"AreaKind.MB 不存在！" });
-                return default;
+                throw new InvalidOperationException($"AreaKind.MB 不存在！");
             }
             var buffer = config.Bytes;
             return buffer;
@@ -63,7 +62,7 @@ namespace S7Svr.Simulator.ViewModels
         }
 
 
-        public void WriteShort( int pos, short value)
+        public void WriteShort(int pos, short value)
         {
             var buffer = GetBuffer();
 
@@ -156,7 +155,7 @@ namespace S7Svr.Simulator.ViewModels
         #endregion
 
         #region uint32
-        public uint ReadUInt32( int pos)
+        public uint ReadUInt32(int pos)
         {
             var buffer = GetBuffer();
 
@@ -164,11 +163,45 @@ namespace S7Svr.Simulator.ViewModels
             return val;
         }
 
-        public void WriteUInt32( int pos, uint value)
+        public void WriteUInt32(int pos, uint value)
         {
             var buffer = GetBuffer();
 
             S7.SetUDIntAt(buffer, pos, value);
+        }
+        #endregion
+
+        #region Int
+        public int ReadInt(int pos)
+        {
+            var buffer = GetBuffer();
+
+            var val = S7.GetIntAt(buffer, pos);
+            return val;
+        }
+
+        public void WriteInt(int pos, int value)
+        {
+            var buffer = GetBuffer();
+
+            S7.SetDIntAt(buffer, pos, value);
+        }
+        #endregion
+
+        #region ushort
+        public ushort ReadUShort(int pos)
+        {
+            var buffer = GetBuffer();
+
+            var val = S7.GetUIntAt(buffer, pos);
+            return val;
+        }
+
+        public void WriteUShort(int pos, ushort value)
+        {
+            var buffer = GetBuffer();
+
+            S7.SetUIntAt(buffer, pos, value);
         }
         #endregion
     }

@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using S7Svr.Simulator.ViewModels;
+using S7SvrSim.Project;
+using S7SvrSim.Services;
 using System;
-using System.Collections.Generic;
 
 namespace S7SvrSim.S7Signal
 {
@@ -56,22 +56,36 @@ namespace S7SvrSim.S7Signal
             }
         }
 
+        public abstract void Refresh(IS7Block block);
+        public virtual void SetValue(IS7Block block, object value) { }
+
+        public virtual void CopyFromSignalItem(SignalItem signal)
+        {
+            Name = signal.Name;
+            FormatAddress = signal.FormatAddress;
+            Remark = signal.Remark;
+        }
+
+        public virtual SignalItem ToSignalItem()
+        {
+            return new SignalItem()
+            {
+                Name = Name,
+                FormatAddress = FormatAddress,
+                Remark = Remark,
+                Type = GetType().Name
+            };
+        }
+
         public override bool Equals(object obj)
         {
-            return obj is SignalBase @base &&
-                   EqualityComparer<object>.Default.Equals(Value, @base.Value) &&
-                   Name == @base.Name &&
-                   EqualityComparer<SignalAddress>.Default.Equals(Address, @base.Address) &&
-                   Remark == @base.Remark;
+            return base.Equals(obj);
         }
 
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, Address, Remark);
         }
-
-        public abstract void Refresh(IS7DataBlockService db);
-        public virtual void SetValue(IS7DataBlockService db, object value) { }
 
         public static bool operator ==(SignalBase lhs, SignalBase rhs)
         {
@@ -96,11 +110,26 @@ namespace S7SvrSim.S7Signal
         [ObservableProperty]
         private int length;
 
+        public override void CopyFromSignalItem(SignalItem signal)
+        {
+            base.CopyFromSignalItem(signal);
+
+            if (signal.Length != null)
+            {
+                Length = signal.Length.Value;
+            }
+        }
+
+        public override SignalItem ToSignalItem()
+        {
+            var item = base.ToSignalItem();
+            item.Length = Length;
+            return item;
+        }
+
         public override bool Equals(object obj)
         {
-            return obj is SignalWithLengthBase @string &&
-                   base.Equals(obj) &&
-                   Length == @string.Length;
+            return base.Equals(obj);
         }
 
         public override int GetHashCode()

@@ -42,6 +42,22 @@
                             </Style>
                         </MenuItem.ItemContainerStyle>
                     </MenuItem>
+                    <MenuItem Header="插入信号"
+                              ItemsSource="{Binding SignalTypes}"
+                              Visibility="{Binding IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
+                              ToolTip="在当前选择的信号前插入新的信号"
+                              >
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem"
+                                   BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
+                                   >
+                                <Setter Property="Header" Value="{Binding Name}" />
+                                <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.InsertSignalCommand}" />
+                                <Setter Property="CommandParameter" Value="{Binding .}" />
+                                <Setter Property="ToolTip" Value="{Binding ., Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
                     <MenuItem Header="删除选择的信号"
                               Command="{Binding RemoveSelectedSignalsCommand}"
                               />
@@ -56,7 +72,7 @@
                               Command="{Binding UpdateAddressFromFirstCommand}"
                               />
                     <MenuItem Header="从选择项开始"
-                              Command="{Binding UpdateAddressFromFirtSelectedCommand}"
+                              Command="{Binding UpdateAddressFromFirstSelectedCommand}"
                               />
                     <MenuItem Header="仅选择项"
                               Command="{Binding UpdateAddressFromSelectedItemsCommand}"
@@ -74,12 +90,17 @@
                         <Separator />
                         <MenuItem Header="禁止地址存在奇数"
                                   IsCheckable="True"
-                                  IsChecked="{Binding ForbidIndexHasOddNumber, Mode=TwoWay}"
+                                  IsChecked="{Binding UpdateAddressOptions.ForbidIndexHasOddNumber, Mode=TwoWay}"
                                   />
                         <MenuItem Header="允许 Bool 地址存在奇数"
                                   IsCheckable="True"
-                                  IsChecked="{Binding AllowBoolIndexHasOddNumber, Mode=TwoWay}"
+                                  IsChecked="{Binding UpdateAddressOptions.AllowBoolIndexHasOddNumber, Mode=TwoWay}"
                                   ToolTip="如果禁止地址存在奇数，该项启用后可以允许 Bool 类型的地址存在奇数"
+                                  />
+                        <MenuItem Header="允许 Byte 地址存在奇数"
+                                  IsCheckable="True"
+                                  IsChecked="{Binding UpdateAddressOptions.AllowByteIndexHAsOddNumber, Mode=TwoWay}"
+                                  ToolTip="如果禁止地址存在奇数，该项启用后可以允许 Byte 类型的地址存在奇数"
                                   />
                         <Separator />
                         <MenuItem Header="String 按十进位地址占用计算"
@@ -87,6 +108,29 @@
                                   IsChecked="{Binding StringUseTenCeiling}"
                                   ToolTip="启用该项，String类型的占用会按10的整数倍进行计算"
                                   />
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="排序">
+                    <MenuItem Header="根据地址"
+                              Command="{Binding OrderByCommand}"
+                              >
+                        <MenuItem.CommandParameter>
+                            <vm:SignalSortBy>Address</vm:SignalSortBy>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="根据信号名"
+                              Command="{Binding OrderByCommand}"
+                              >
+                        <MenuItem.CommandParameter>
+                            <vm:SignalSortBy>Name</vm:SignalSortBy>
+                        </MenuItem.CommandParameter>
+                    </MenuItem>
+                    <MenuItem Header="根据信号类型"
+                              Command="{Binding OrderByCommand}"
+                              >
+                        <MenuItem.CommandParameter>
+                            <vm:SignalSortBy>Type</vm:SignalSortBy>
+                        </MenuItem.CommandParameter>
                     </MenuItem>
                 </MenuItem>
             </Menu>
@@ -119,9 +163,24 @@
                 <ContextMenu StaysOpen="True"
                              Closed="SignalGridContextMenu_Closed"
                              >
+                    <MenuItem Header="新建信号"
+                              ItemsSource="{Binding SignalTypes}"
+                              >
+                        <MenuItem.ItemContainerStyle>
+                            <Style TargetType="MenuItem"
+                                   BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
+                                   >
+                                <Setter Property="Header" Value="{Binding Name}" />
+                                <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.NewSignalCommand}" />
+                                <Setter Property="CommandParameter" Value="{Binding .}" />
+                                <Setter Property="ToolTip" Value="{Binding ., Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
+                            </Style>
+                        </MenuItem.ItemContainerStyle>
+                    </MenuItem>
                     <MenuItem Header="插入信号"
                               ItemsSource="{Binding SignalTypes}"
                               Visibility="{Binding IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
+                              ToolTip="在当前选择的信号前插入新的信号"
                               >
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="MenuItem"

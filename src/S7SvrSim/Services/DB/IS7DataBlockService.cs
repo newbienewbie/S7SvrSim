@@ -13,6 +13,9 @@ namespace S7Svr.Simulator.ViewModels
         short ReadShort(int dbNumber, int pos);
         void WriteShort(int dbNumber, int pos, short value);
 
+        ushort ReadUShort(int dbNumber, int pos);
+        void WriteUShort(int dbNumber, int pos, ushort value);
+
         uint ReadUInt32(int dbNumber, int pos);
         void WriteUInt32(int dbNumber, int pos, uint value);
 
