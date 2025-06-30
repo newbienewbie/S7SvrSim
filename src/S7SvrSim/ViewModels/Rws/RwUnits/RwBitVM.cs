@@ -14,8 +14,8 @@ public class RwBitVM : RwVMBase<bool>, IValidatableViewModel
         var watchTargetBitPos = this.WhenAnyValue(x => x.TargetBitPos)
             .Select(p => p >= 0 && p <= 7);
 
-        this.CmdRead = ReactiveCommand.Create(this.CmdRead_Impl, watchTargetBitPos);
-        this.CmdWrite = ReactiveCommand.Create(this.CmdWrite_Impl, watchTargetBitPos);
+        this.CmdRead = ReactiveCommand.Create(base.CmdRead_Base, watchTargetBitPos);
+        this.CmdWrite = ReactiveCommand.Create(this.CmdWrite_Base, watchTargetBitPos);
     }
 
 

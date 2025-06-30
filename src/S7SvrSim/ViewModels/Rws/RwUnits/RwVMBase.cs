@@ -26,27 +26,27 @@ public abstract class RwVMBase<TValue> : ReactiveObject
         this.CmdRead = ReactiveCommand.Create(CmdRead_Base);
     }
 
-    private void CmdWrite_Base()
+    protected void CmdWrite_Base()
     {
         try
         {
             CmdWrite_Impl();
         }
-        catch (ArgumentException argEx)
+        catch (Exception ex)
         {
-            this.mediator.Publish(new MessageNotification { Message = argEx.Message });
+            this.mediator.Publish(new MessageNotification { Message = ex.Message });
         }
     }
 
-    private TValue CmdRead_Base()
+    protected TValue CmdRead_Base()
     {
         try
         {
             return CmdRead_Impl();
         }
-        catch (ArgumentException argEx)
+        catch (Exception ex)
         {
-            this.mediator.Publish(new MessageNotification { Message = argEx.Message });
+            this.mediator.Publish(new MessageNotification { Message = ex.Message });
             if (typeof(TValue) == typeof(string))
             {
                 return (TValue)(object)string.Empty;
