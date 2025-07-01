@@ -24,6 +24,7 @@ namespace S7SvrSim
             services.AddSingleton<IS7MBService, S7MBService>();
             services.AddSingleton<ProjectManager>();
             services.AddSingleton<IS7BlockFactory, S7BlockFactory>();
+            services.AddSingleton<SignalsHelper>();
 
             return services;
         }

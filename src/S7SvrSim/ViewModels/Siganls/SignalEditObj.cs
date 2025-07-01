@@ -1,32 +1,121 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
 using System;
-using System.ComponentModel;
-using SignalWithType = S7SvrSim.Shared.ObjectWith<S7SvrSim.S7Signal.SignalBase, System.Type>;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace S7SvrSim.ViewModels
 {
-    public partial class SignalEditObj : ObservableObject, IEditableObject
+    public partial class SignalEditObj : ObservableObject
     {
-        private SignalWithType _bakup;
+        private readonly SignalsHelper signalHelper;
+        private bool isInit = false;
 
         [ObservableProperty]
-        private Type other;
+        [NotifyPropertyChangedFor(nameof(SignaleType))]
+        public Type other;
 
         [ObservableProperty]
         private SignalBase value;
 
+        public string SignaleType
+        {
+            get => (Other.IsSubclassOf(typeof(SignalWithLengthBase)) && Value is SignalWithLengthBase lengthSignal) ? $"{Other.Name}[{lengthSignal?.Length}]" : Other.Name;
+            set
+            {
+                if (!UndoRedoManager.IsInUndoRedo)
+                {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        return;
+                    }
+
+                    if (SignaleType.Equals(value, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return;
+                    }
+
+                    var tyStr = value.Split('[')[0];
+                    var len = GetLength(value);
+
+                    var typeQuery = signalHelper.SignalTypes.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
+                    if (typeQuery.Any())
+                    {
+                        UndoRedoManager.StartTransaction();
+                        Other = typeQuery.First();
+                        if (Value is SignalWithLengthBase lengthValue)
+                        {
+                            lengthValue.Length = len;
+                        }
+                        UndoRedoManager.EndTransaction();
+                    }
+                }
+
+                OnPropertyChanged();
+            }
+        }
+
+        private int GetLength(string value)
+        {
+            var leftBaket = value.IndexOf('[');
+            var rightBaket = value.IndexOf(']');
+
+            if (leftBaket != -1 && rightBaket != -1)
+            {
+                if (int.TryParse(value[(leftBaket + 1)..rightBaket], out var res))
+                {
+                    return res;
+                }
+            }
+            return default;
+        }
+
         public SignalEditObj(Type type)
         {
             Other = type;
+
+            signalHelper = ((App)App.Current).ServiceProvider.GetRequiredService<SignalsHelper>();
+
+            isInit = true;
+        }
+
+        partial void OnValueChanged(SignalBase value)
+        {
+            Value.NameChanged += OnNameChanged;
+            Value.RemarkChanged += OnRemarkChanged;
+            Value.FormatAddressChanged += OnFormtAddressChanged;
+            if (Value is SignalWithLengthBase lengthValue)
+            {
+                lengthValue.LengthChanged += OnSignalLengthChanged;
+                lengthValue.NotifyLengthChanged();
+            }
+        }
+
+        void ReleaseBind()
+        {
+            Value.NameChanged -= OnNameChanged;
+            Value.RemarkChanged -= OnRemarkChanged;
+            Value.FormatAddressChanged -= OnFormtAddressChanged;
+            if (Value is SignalWithLengthBase lengthValue)
+            {
+                lengthValue.LengthChanged -= OnSignalLengthChanged;
+                lengthValue.NotifyLengthChanged();
+            }
         }
 
         partial void OnOtherChanged(Type value)
         {
+            if (UndoRedoManager.IsInUndoRedo)
+            {
+                return;
+            }
+
             var newVal = (SignalBase)Activator.CreateInstance(value);
+            var preValue = CloneValue();
 
             if (Value != null)
             {
@@ -39,12 +128,79 @@ namespace S7SvrSim.ViewModels
 
             newVal.FormatAddress = (string)Value?.FormatAddress?.Clone();
             newVal.Remark = Value?.Remark;
-            Value = newVal;
+
+            this.value = newVal;
+            OnPropertyChanged(nameof(Value));
+            OnValueChanged(Value);
+
+            if (isInit)
+            {
+                var command = new ValueChangedCommand<SignalEditObj>(signal =>
+                {
+                    Other = signal.Other;
+                    ReleaseBind();
+                    this.value = signal.Value;
+                    OnPropertyChanged(nameof(Value));
+                    OnPropertyChanged(nameof(SignaleType));
+                }, new SignalEditObj(preValue.GetType()) { Value = preValue }, CloneCurrent());
+                command.AfterExecute += CommandEventHandle;
+                command.AfterUndo += CommandEventHandle;
+                UndoRedoManager.Regist(command);
+            }
+        }
+
+        private void OnSignalLengthChanged(int oldValue, int newValue)
+        {
+            RegistValueChangedCommand(val =>
+            {
+                if (Value is SignalWithLengthBase lengthSignal)
+                {
+                    lengthSignal.Length = val;
+                    OnPropertyChanged(nameof(SignaleType));
+                }
+            }, oldValue, newValue);
+            
+        }
+
+        private void OnFormtAddressChanged(string oldValue, string newValue)
+        {
+            RegistValueChangedCommand(val => Value.FormatAddress = val, oldValue, newValue);
+        }
+
+        private void OnRemarkChanged(string oldValue, string newValue)
+        {
+            RegistValueChangedCommand(val => Value.Remark = val, oldValue, newValue);
+        }
+
+        private void OnNameChanged(string oldValue, string newValue)
+        {
+            RegistValueChangedCommand(val => Value.Name = val, oldValue, newValue);
+        }
+
+        private void RegistValueChangedCommand<T>(Action<T> update, T oldValue, T newValue)
+        {
+            if (UndoRedoManager.IsInUndoRedo || EqualityComparer<T>.Default.Equals(oldValue, newValue))
+            {
+                return;
+            }
+
+            var command = new ValueChangedCommand<T>(val =>
+            {
+                update?.Invoke(val);
+            }, oldValue, newValue);
+            command.AfterExecute += CommandEventHandle;
+            command.AfterUndo += CommandEventHandle;
+            UndoRedoManager.Regist(command);
         }
 
         private SignalBase CloneValue()
         {
-            var value = (SignalBase)Activator.CreateInstance(Other);
+            if (Value == null)
+            {
+                return null;
+            }
+
+            var value = (SignalBase)Activator.CreateInstance(Value.GetType());
             value.Value = Value.Value;
             value.Address = Value.Address ?? null;
             value.Name = Value.Name;
@@ -58,65 +214,18 @@ namespace S7SvrSim.ViewModels
             return value;
         }
 
-        private SignalWithType CloneCurrent()
+        private SignalEditObj CloneCurrent()
         {
-            return new SignalWithType()
+            return new SignalEditObj(Other)
             {
                 Other = Other,
                 Value = CloneValue()
             };
         }
 
-        public void BeginEdit()
-        {
-            _bakup = CloneCurrent();
-        }
-
-        public void CancelEdit()
-        {
-            Other = _bakup.Other;
-            Value = _bakup.Value;
-        }
-
         private void CommandEventHandle(object _object, EventArgs _args)
         {
             ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
-        }
-
-        private bool IsChanged()
-        {
-            if (_bakup == null)
-            {
-                return false;
-            }
-
-            return Other != _bakup.Other
-                || Value != _bakup.Value
-                || (Value is S7Signal.SignalWithLengthBase valLen && _bakup.Value is S7Signal.SignalWithLengthBase bakLen && valLen != bakLen);
-        }
-
-        public void EndEdit()
-        {
-            if (IsChanged())
-            {
-                var command = new ValueChangedCommand<SignalWithType>(signal =>
-                {
-                    Other = signal.Other;
-                    Value = signal.Value;
-                }, _bakup, CloneCurrent());
-                command.AfterExecute += CommandEventHandle;
-                command.AfterUndo += CommandEventHandle;
-                UndoRedoManager.Regist(command);
-            }
-            _bakup = default;
-        }
-
-        public static implicit operator SignalEditObj(SignalWithType signal)
-        {
-            return new SignalEditObj(signal.Other)
-            {
-                Value = signal.Value
-            };
         }
     }
 }

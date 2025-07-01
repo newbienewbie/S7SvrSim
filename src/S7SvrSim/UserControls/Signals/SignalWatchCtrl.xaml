@@ -23,6 +23,18 @@
                          Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}, Path=DataContext}"
                          />
         <ucs:DescriptionConverter x:Key="DescriptionConverter" />
+        <shared:IsTypeToBooleanConverter x:Key="IsTypeToBooleanConverter" />
+        <Style TargetType="Border"
+               x:Key="SepectorBorder"
+               >
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="{StaticResource {x:Static SystemColors.ActiveBorderColorKey}}" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Margin" Value="5 3" />
+            <Setter Property="CornerRadius" Value="1" />
+        </Style>
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
@@ -148,7 +160,7 @@
             </StackPanel>
 
         </StackPanel>
-        <DataGrid ItemsSource="{Binding Signals}"
+        <DataGrid ItemsSource="{Binding Signals, UpdateSourceTrigger=PropertyChanged}"
                   AutoGenerateColumns="False"
                   CanUserDeleteRows="False"
                   CanUserAddRows="False"
@@ -266,36 +278,42 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Name"
-                                    Binding="{Binding Value.Name}"
+                                    Binding="{Binding Value.Name, UpdateSourceTrigger=LostFocus}"
                                     EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                     />
-                <md:DataGridComboBoxColumn Header="Type"
-                                           ItemsSource="{Binding Data.SignalTypes, Source={StaticResource DataContextProxy}}"
-                                           DisplayMemberPath="Name"
-                                           SelectedItemBinding="{Binding Other}"
-                                           />
+                <DataGridTemplateColumn Header="Type">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox ItemsSource="{Binding Data.SignalTypes, Source={StaticResource DataContextProxy}}"
+                                      SelectedValuePath="Name"
+                                      DisplayMemberPath="Name"
+                                      Text="{Binding SignaleType, UpdateSourceTrigger=Explicit}"
+                                      LostFocus="ComboBox_LostFocus"
+                                      IsEditable="True"
+                                      />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Address"
                                     EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                     >
                     <DataGridTextColumn.Binding>
-                        <Binding Path="Value.FormatAddress">
+                        <Binding Path="Value.FormatAddress"
+                                 UpdateSourceTrigger="LostFocus"
+                                 >
                             <Binding.ValidationRules>
                                 <lu:EventValidation ValidateEvent="EventValidation_ValidateEvent" />
                             </Binding.ValidationRules>
                         </Binding>
                     </DataGridTextColumn.Binding>
                 </DataGridTextColumn>
-                <local:DataGridMaxLenTextColumn Header="Length"
-                                                Binding="{Binding Value.Length}"
-                                                EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
-                                                />
                 <DataGridTextColumn Header="Value"
                                     Binding="{Binding Value.Value}"
                                     IsReadOnly="True"
                                     Width="160"
                                     />
                 <DataGridTextColumn Header="Remark"
-                                    Binding="{Binding Value.Remark}"
+                                    Binding="{Binding Value.Remark, UpdateSourceTrigger=LostFocus}"
                                     EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}"
                                     />
             </DataGrid.Columns>

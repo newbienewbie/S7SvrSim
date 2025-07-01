@@ -119,14 +119,14 @@ namespace S7SvrSim.S7Signal
                 Value = null;
                 return;
             }
-            Value = block.ReadInt(Address.Index);
+            Value = block.ReadDInt(Address.Index);
         }
 
         public override void SetValue(IS7Block block, object value)
         {
             if (value is int dintValue)
             {
-                block.WriteInt(Address.Index, dintValue);
+                block.WriteDInt(Address.Index, dintValue);
                 Value = dintValue;
             }
         }

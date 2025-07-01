@@ -27,6 +27,8 @@ namespace S7SvrSim.S7Signal
 
     public abstract partial class SignalBase : ObservableObject, ISignal, IEquatable<SignalBase>
     {
+        public delegate void PropertyChangedHandle<T>(T oldValue, T newValue);
+
         [ObservableProperty]
         private object value;
 
@@ -40,11 +42,19 @@ namespace S7SvrSim.S7Signal
         [ObservableProperty]
         private string remark;
 
+        public event PropertyChangedHandle<string> FormatAddressChanged;
         public virtual string FormatAddress
         {
             get => Address?.ToString();
             set
             {
+                if (Address?.ToString() == value)
+                {
+                    return;
+                }
+
+                var oldAddress = Address?.ToString();
+
                 if (string.IsNullOrEmpty(value))
                 {
                     Address = null;
@@ -53,6 +63,9 @@ namespace S7SvrSim.S7Signal
                 {
                     Address = new SignalAddress(value);
                 }
+                OnPropertyChanged();
+                FormatAddressChanged?.Invoke(oldAddress, Address?.ToString());
+
             }
         }
 
@@ -64,6 +77,18 @@ namespace S7SvrSim.S7Signal
             Name = signal.Name;
             FormatAddress = signal.FormatAddress;
             Remark = signal.Remark;
+        }
+
+        public event PropertyChangedHandle<string> NameChanged;
+        partial void OnNameChanged(string oldValue, string newValue)
+        {
+            NameChanged?.Invoke(oldValue, newValue);
+        }
+
+        public event PropertyChangedHandle<string> RemarkChanged;
+        partial void OnRemarkChanged(string oldValue, string newValue)
+        {
+            RemarkChanged?.Invoke(oldValue, newValue);
         }
 
         public virtual SignalItem ToSignalItem()
@@ -114,6 +139,17 @@ namespace S7SvrSim.S7Signal
     {
         [ObservableProperty]
         private int length;
+
+        public event PropertyChangedHandle<int> LengthChanged;
+        partial void OnLengthChanged(int oldValue, int newValue)
+        {
+            LengthChanged?.Invoke(oldValue, newValue);
+        }
+
+        public void NotifyLengthChanged()
+        {
+            OnPropertyChanged(nameof(Length));
+        }
 
         public override void CopyFromSignalItem(SignalItem signal)
         {

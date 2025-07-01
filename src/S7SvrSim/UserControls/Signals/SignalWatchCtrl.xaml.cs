@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 
 namespace S7SvrSim.UserControls
@@ -158,26 +159,14 @@ namespace S7SvrSim.UserControls
         {
             ViewModel.IsDragSignals = false;
         }
-    }
 
-    public class DataGridMaxLenTextColumn : DataGridTextColumn
-    {
-        protected override FrameworkElement GenerateEditingElement(DataGridCell cell, object dataItem)
+        private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (dataItem is SignalEditObj editObj && editObj.Value is SignalWithLengthBase)
+            if (sender is ComboBox box)
             {
-                return base.GenerateEditingElement(cell, dataItem);
+                var binding = BindingOperations.GetBindingExpression(box, ComboBox.TextProperty);
+                binding?.UpdateSource();
             }
-            return null;
-        }
-
-        protected override FrameworkElement GenerateElement(DataGridCell cell, object dataItem)
-        {
-            if (dataItem is SignalEditObj editObj && editObj.Value is SignalWithLengthBase)
-            {
-                return base.GenerateElement(cell, dataItem);
-            }
-            return null;
         }
     }
 }

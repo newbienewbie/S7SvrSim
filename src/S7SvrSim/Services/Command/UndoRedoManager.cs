@@ -22,7 +22,7 @@ namespace S7SvrSim.Services
         {
 
         }
-
+        public static bool IsInUndoRedo { get; private set; } = false;
         public static int MaxOfCommands { get; set; } = 100;
         private static List<ICommand> UndoCommands { get; } = [];
         public static int UndoCount => UndoCommands.Count;
@@ -94,12 +94,13 @@ namespace S7SvrSim.Services
             {
                 return;
             }
-
+            IsInUndoRedo = true;
             var command = UndoCommands.Last();
             command.Undo();
             UndoCommands.Remove(command);
             AddCommand(RedoCommands, command, false);
             UndoRedoChanged?.Invoke();
+            IsInUndoRedo = false;
         }
 
         public static void Redo()
@@ -109,11 +110,13 @@ namespace S7SvrSim.Services
                 return;
             }
 
+            IsInUndoRedo = true;
             var command = RedoCommands.Last();
             command.Execute();
             RedoCommands.Remove(command);
             AddCommand(UndoCommands, command, false);
             UndoRedoChanged?.Invoke();
+            IsInUndoRedo = false;
         }
 
         public static void Regist(ICommand command)

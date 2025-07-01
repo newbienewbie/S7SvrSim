@@ -60,7 +60,7 @@ namespace S7SvrSim.ViewModels
 
         public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;
 
-        public SignalWatchVM(IMediator mediator, IS7BlockFactory blockFactory)
+        public SignalWatchVM(IMediator mediator, IS7BlockFactory blockFactory, SignalsHelper helper)
         {
             this.mediator = mediator;
             this.blockFactory = blockFactory;
@@ -68,7 +68,7 @@ namespace S7SvrSim.ViewModels
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.PropertyChanged += RunningModel_PropertyChanged;
 
-            SignalTypes = [.. typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase)))];
+            SignalTypes = helper.SignalTypes;
             DragSignals.CollectionChanged += (_, _) =>
             {
                 OnPropertyChanged(nameof(DragSignalsIsOne));
