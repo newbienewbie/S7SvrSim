@@ -56,11 +56,20 @@
                               />
                 </MenuItem>
                 <MenuItem Header="服务">
-                    <MenuItem Command="commands:AppCommands.StartServer"
+                    <MenuItem x:Name="menuStartServer"
                               Icon="{md:PackIcon Kind=Play}"
+                              Header="开启 S7 服务"
+                              InputGestureText="F5"
                               />
-                    <MenuItem Command="commands:AppCommands.StopServer"
+                    <MenuItem x:Name="menuStopServer"
                               Icon="{md:PackIcon Kind=Stop}"
+                              Header="停止 S7 服务"
+                              InputGestureText="Shift+F5"
+                              />
+                    <MenuItem x:Name="menuRestartServer"
+                              Icon="{md:PackIcon Kind=Refresh}"
+                              Header="重启 S7 服务"
+                              InputGestureText="Ctrl+F5"
                               />
                 </MenuItem>
                 <MenuItem Header="Python">
@@ -79,17 +88,22 @@
                     <Thickness x:Key="ButtonPadding">10</Thickness>
                 </ToolBarTray.Resources>
                 <ToolBar>
-                    <Button Command="commands:AppCommands.StartServer"
+                    <Button x:Name="btnStartServer"
                             Content="{md:PackIcon Kind=Play}"
                             Padding="{StaticResource ButtonPadding}"
-                            shared:RoutedCommandTooltip.Enabled="True"
+                            ToolTip="启动S7(F5)"
                             Foreground="Green"
                             />
-                    <Button Command="commands:AppCommands.StopServer"
+                    <Button x:Name="btnStopServer"
                             Content="{md:PackIcon Kind=Stop}"
                             Padding="{StaticResource ButtonPadding}"
-                            shared:RoutedCommandTooltip.Enabled="True"
+                            ToolTip="停止S7(Shift+F5)"
                             Foreground="MediumVioletRed"
+                            />
+                    <Button x:Name="btnRestartServer"
+                            Content="{md:PackIcon Kind=Refresh}"
+                            Padding="{StaticResource ButtonPadding}"
+                            ToolTip="重启S7(Ctrl+F5)"
                             />
                 </ToolBar>
                 <ToolBar>
@@ -183,7 +197,6 @@
                                   CanUserAddRows="False"
                                   CanUserDeleteRows="False"
                                   InitializingNewItem="AreaConfigGrid_InitializingNewItem"
-                                  IsEnabled="{Binding RunningVM.RunningStatus, Converter={StaticResource InvertBooleanConverter}}"
                                   >
                             <DataGrid.Columns>
                                 <DataGridTemplateColumn Header="删除">

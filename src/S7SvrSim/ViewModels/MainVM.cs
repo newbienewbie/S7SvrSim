@@ -53,8 +53,9 @@ namespace S7Svr.Simulator.ViewModels
             this.SignalWatchVM = Locator.Current.GetRequiredService<SignalWatchVM>();
 
             var watchRunningStatus = this.WhenAnyValue(vm => vm.RunningVM.RunningStatus);
-            this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl);
-            this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl);
+            this.CmdStartServer = ReactiveCommand.CreateFromTask(CmdStartServer_Impl, watchRunningStatus.Select(r => !r));
+            this.CmdStopServer = ReactiveCommand.CreateFromTask(CmdStopServer_Impl, watchRunningStatus);
+            this.CmdRestartServer = ReactiveCommand.CreateFromTask(CmdRestartServer_Impl, watchRunningStatus);
 
             UndoRedoManager.UndoRedoChanged += () =>
             {
@@ -103,6 +104,16 @@ namespace S7Svr.Simulator.ViewModels
             this.RunningVM.AreaConfigs.Clear();
             await this._server.StopServerAsync();
             this.RunningVM.RunningStatus = false;
+        }
+
+        /// <summary>
+        /// 停止服务器
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CmdRestartServer { get; }
+        private async Task CmdRestartServer_Impl()
+        {
+            await CmdStopServer_Impl();
+            await CmdStartServer_Impl();
         }
         #endregion
 

@@ -29,8 +29,12 @@ namespace S7Svr.Simulator
                 this.OneWayBind(ViewModel, vm => vm.NeedSave, w => w.Title, GetTitle).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.UndoCount, win => win.undoBadged.Badge).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.RedoCount, win => win.redoBadged.Badge).DisposeWith(d);
-                this.CommandBindings.Add(new CommandBinding(AppCommands.StartServer, (_, _) => ViewModel.CmdStartServer.Execute(), (_, e) => e.CanExecute = !ViewModel.RunningVM.RunningStatus));
-                this.CommandBindings.Add(new CommandBinding(AppCommands.StopServer, (_, _) => ViewModel.CmdStopServer.Execute(), (_, e) => e.CanExecute = ViewModel.RunningVM.RunningStatus));
+                this.BindCommand(ViewModel, vm => vm.CmdStartServer, win => win.menuStartServer);
+                this.BindCommand(ViewModel, vm => vm.CmdStartServer, win => win.btnStartServer);
+                this.BindCommand(ViewModel, vm => vm.CmdStopServer, win => win.menuStopServer);
+                this.BindCommand(ViewModel, vm => vm.CmdStopServer, win => win.btnStopServer);
+                this.BindCommand(ViewModel, vm => vm.CmdRestartServer, win => win.menuRestartServer);
+                this.BindCommand(ViewModel, vm => vm.CmdRestartServer, win => win.btnRestartServer);
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.New, (_, _) => ViewModel.NewProject(), NotRunningStatus_CanExecute));
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Open, (_, _) => ViewModel.LoadProject(), NotRunningStatus_CanExecute));
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Save, (_, _) => ViewModel.SaveProject(), CanExecuteTrue));
@@ -38,6 +42,9 @@ namespace S7Svr.Simulator
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Undo, (_, _) => UndoRedoManager.Undo(), Undo_CanExecute));
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Redo, (_, _) => UndoRedoManager.Redo(), Redo_CanExecute));
                 this.CommandBindings.Add(new CommandBinding(AppCommands.OpenFolder, (_, _) => ViewModel.OpenProjectFolder(), CanExecuteTrue));
+                this.InputBindings.Add(new KeyBinding(ViewModel.CmdStartServer, new KeyGesture(Key.F5)));
+                this.InputBindings.Add(new KeyBinding(ViewModel.CmdStopServer, new KeyGesture(Key.F5, ModifierKeys.Shift)));
+                this.InputBindings.Add(new KeyBinding(ViewModel.CmdRestartServer, new KeyGesture(Key.F5, ModifierKeys.Control)));
             });
 
             UndoRedoManager.UndoRedoChanged += () =>
@@ -92,7 +99,7 @@ namespace S7Svr.Simulator
             if (ViewModel?.RunningVM != null)
             {
                 var keyboardFocus = Keyboard.FocusedElement;
-                e.CanExecute = UndoRedoManager.UndoCount > 0 && !ViewModel.RunningVM.RunningStatus && (keyboardFocus is not TextBoxBase || (keyboardFocus is TextBoxBase textBox && textBox.IsReadOnly));
+                e.CanExecute = UndoRedoManager.UndoCount > 0 && (keyboardFocus is not TextBoxBase || (keyboardFocus is TextBoxBase textBox && textBox.IsReadOnly));
                 e.Handled = true;
             }
         }
@@ -102,7 +109,7 @@ namespace S7Svr.Simulator
             if (ViewModel?.RunningVM != null)
             {
                 var keyboardFocus = Keyboard.FocusedElement;
-                e.CanExecute = UndoRedoManager.RedoCount > 0 && !ViewModel.RunningVM.RunningStatus && (keyboardFocus is not TextBoxBase || (keyboardFocus is TextBoxBase textBox && textBox.IsReadOnly));
+                e.CanExecute = UndoRedoManager.RedoCount > 0  && (keyboardFocus is not TextBoxBase || (keyboardFocus is TextBoxBase textBox && textBox.IsReadOnly));
                 e.Handled = true;
             }
         }

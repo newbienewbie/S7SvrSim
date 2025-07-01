@@ -66,7 +66,7 @@ namespace S7SvrSim.ViewModels
             this.blockFactory = blockFactory;
 
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
-            runningModel.PropertyChanged += RunningModel_PropertyChanged;
+            runningModel.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
 
             SignalTypes = helper.SignalTypes;
             DragSignals.CollectionChanged += (_, _) =>
@@ -507,18 +507,15 @@ namespace S7SvrSim.ViewModels
         CancellationTokenSource watchCancelSource;
         Task watchTask;
         public bool IsInWatch => watchTask != null && watchCancelSource != null && !watchCancelSource.IsCancellationRequested;
-        private void RunningModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void RunningStatusChanged(bool runningStatus)
         {
-            if (sender is RunningSnap7ServerVM runningModel && e.PropertyName == nameof(RunningSnap7ServerVM.RunningStatus))
+            if (runningStatus)
             {
-                if (runningModel.RunningStatus)
-                {
-                    StartWatch();
-                }
-                else
-                {
-                    EndWatch();
-                }
+                StartWatch();
+            }
+            else
+            {
+                EndWatch();
             }
         }
 
