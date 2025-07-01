@@ -4,11 +4,8 @@ using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
-using S7SvrSim.Shared;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Forms;
@@ -17,7 +14,7 @@ namespace S7SvrSim.ViewModels
 {
     public class ConfigPyEngineVM : ReactiveObject
     {
-        private readonly static string[] DefaultPath = [".", Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "lib"), Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "DLLs"), Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "predefined")];
+
         private readonly PyScriptRunner _pyRunner;
 
         public ConfigPyEngineVM(PyScriptRunner pyRunner)
@@ -27,16 +24,7 @@ namespace S7SvrSim.ViewModels
 
             if (searchpathes != null)
             {
-                if (!DefaultPath.Except(searchpathes).Any())
-                {
-                    this.PyEngineSearchPaths.Add("$DEFAULT");
-                    this.PyEngineSearchPaths.AddRange(searchpathes.Except(DefaultPath));
-
-                }
-                else
-                {
-                    this.PyEngineSearchPaths.AddRange(searchpathes);
-                }
+                this.PyEngineSearchPaths.AddRange(searchpathes);
             }
 
             this.CmdSelectModulePath = ReactiveCommand.Create(() =>
@@ -67,7 +55,7 @@ namespace S7SvrSim.ViewModels
 
         internal void SetSearchPaths(ScriptEngine engine)
         {
-            engine.SetSearchPaths(ActualSearchPaths.ToArray());
+            engine.SetSearchPaths(PyEngineSearchPaths);
         }
 
         private void CommandEventHandle(object _object, EventArgs _args)
@@ -83,14 +71,6 @@ namespace S7SvrSim.ViewModels
         }
 
         public ObservableCollection<string> PyEngineSearchPaths { get; } = new ObservableCollection<string>();
-        private IEnumerable<string> ActualSearchPaths => PyEngineSearchPaths.Select(s =>
-        {
-            if (s == "$DEFAULT")
-            {
-                return DefaultPath;
-            }
-            return [s];
-        }).Merge();
 
         #region 选择路径
         [Reactive]
@@ -107,7 +87,7 @@ namespace S7SvrSim.ViewModels
         public ReactiveCommand<Unit, Unit> CmdSubmitSelectPath { get; }
         private void CmdSubmitSelectPath_Impl()
         {
-            if (ActualSearchPaths.Contains(this.SelectedModulePath))
+            if (PyEngineSearchPaths.Contains(this.SelectedModulePath))
             {
                 MessageBox.Show($"当前所选择的路径已经在检索路径中！无需重复添加");
                 return;

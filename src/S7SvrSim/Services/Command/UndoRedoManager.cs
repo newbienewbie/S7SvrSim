@@ -142,6 +142,7 @@ namespace S7SvrSim.Services
         {
             UndoCommands.Clear();
             RedoCommands.Clear();
+            UndoRedoChanged?.Invoke();
         }
 
         public static T GetLastUndoCommands<T>()

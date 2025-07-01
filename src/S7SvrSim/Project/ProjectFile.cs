@@ -11,6 +11,9 @@ namespace S7SvrSim.Project
     [XmlRoot("Project")]
     public class ProjectFile
     {
+        public const string DEFAULT_PATH_KEY = "$DEFAULT";
+        public readonly static string[] DefaultPaths = [".", Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "lib"), Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "DLLs"), Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "predefined")];
+
         [XmlAttribute]
         public string IpAddress { get; set; }
 
@@ -36,7 +39,7 @@ namespace S7SvrSim.Project
         public void DefaultInit()
         {
             IpAddress = "127.0.0.1";
-            SearchPaths.Add("$DEFAULT");
+            SearchPaths.Add(DEFAULT_PATH_KEY);
             ScriptItems.Add(new ScriptItem()
             {
                 Path = "Scripts\\",

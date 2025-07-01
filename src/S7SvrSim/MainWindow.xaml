@@ -23,32 +23,6 @@
                                      Type="{x:Type viewmodels:AreaConfigVM}"
                                      />
     </Window.Resources>
-    <Window.CommandBindings>
-        <CommandBinding Command="ApplicationCommands.New"
-                        Executed="CommandBinding_Executed"
-                        CanExecute="NotRunningStatus_CanExecute"
-                        />
-        <CommandBinding Command="ApplicationCommands.Open"
-                        Executed="CommandBinding_Executed"
-                        CanExecute="NotRunningStatus_CanExecute"
-                        />
-        <CommandBinding Command="ApplicationCommands.Save"
-                        Executed="CommandBinding_Executed"
-                        CanExecute="CanExecuteTrue"
-                        />
-        <CommandBinding Command="ApplicationCommands.Undo"
-                        Executed="CommandBinding_Executed"
-                        CanExecute="Undo_CanExecute"
-                        />
-        <CommandBinding Command="ApplicationCommands.Redo"
-                        Executed="CommandBinding_Executed"
-                        CanExecute="Redo_CanExecute"
-                        />
-        <CommandBinding Command="{x:Static commands:AppCommands.OpenFolder}"
-                        Executed="CommandBinding_Executed"
-                        CanExecute="CanExecuteTrue"
-                        />
-    </Window.CommandBindings>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
             <Menu>
@@ -63,6 +37,9 @@
                     <MenuItem Header="保存"
                               Icon="{md:PackIcon Kind=ContentSaveOutline}"
                               Command="ApplicationCommands.Save"
+                              />
+                    <MenuItem Header="另存为"
+                              Command="ApplicationCommands.SaveAs"
                               />
                     <Separator />
                     <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
@@ -133,7 +110,7 @@
                             />
                 </ToolBar>
                 <ToolBar ClipToBounds="False">
-                    <md:Badged Badge="{Binding UndoCount}">
+                    <md:Badged x:Name="undoBadged">
                         <Button Command="ApplicationCommands.Undo"
                                 Content="{md:PackIcon Kind=UndoVariant}"
                                 Padding="{StaticResource ButtonPadding}"
@@ -141,7 +118,7 @@
                                 Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                 />
                     </md:Badged>
-                    <md:Badged Badge="{Binding RedoCount}">
+                    <md:Badged x:Name="redoBadged">
                         <Button Command="ApplicationCommands.Redo"
                                 Content="{md:PackIcon Kind=RedoVariant}"
                                 Padding="{StaticResource ButtonPadding}"

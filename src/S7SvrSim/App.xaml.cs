@@ -3,9 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using S7SvrSim;
-using S7SvrSim.Services;
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -75,16 +73,6 @@ namespace S7Svr.Simulator
             {
                 MessageBox.Show(ex.Message);
                 this.Shutdown();
-            }
-
-            if (e.Args != null && e.Args.Length > 0)
-            {
-                var filePath = e.Args[0];
-                if (File.Exists(filePath))
-                {
-                    var projectManager = ServiceProvider.GetRequiredService<ProjectManager>();
-                    projectManager.Load(filePath);
-                }
             }
         }
 
