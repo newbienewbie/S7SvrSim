@@ -51,7 +51,7 @@ namespace S7SvrSim.S7Signal
                     {
                         if (signal is Bool boolSignal)
                         {
-                            if (preSignal is Bool && preSignal.Address.Index == signal.Address.Index)
+                            if (preSignal is Bool && preSignal.Address.DbIndex == signal.Address.DbIndex && preSignal.Address.Index == signal.Address.Index)
                             {
                                 preValue ??= block.ReadByte(signal.Address.Index);
                             }
@@ -71,7 +71,7 @@ namespace S7SvrSim.S7Signal
                     }
                     catch (Exception e) when (e is ArgumentException || e is IndexOutOfRangeException || e is InvalidOperationException)
                     {
-
+                        signal.Value = null;
                     }
                 }
             }

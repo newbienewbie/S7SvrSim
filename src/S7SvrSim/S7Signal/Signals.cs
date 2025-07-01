@@ -12,6 +12,13 @@ namespace S7SvrSim.S7Signal
             get => base.FormatAddress;
             set
             {
+                if (Address?.ToString() == value)
+                {
+                    return;
+                }
+
+                var oldAddress = Address?.ToString();
+
                 if (string.IsNullOrEmpty(value))
                 {
                     Address = null;
@@ -20,6 +27,8 @@ namespace S7SvrSim.S7Signal
                 {
                     Address = new SignalAddress(value) { HideOffset = false };
                 }
+                OnPropertyChanged();
+                InvokeFormatAddressEvent(oldAddress, Address?.ToString());
             }
         }
 

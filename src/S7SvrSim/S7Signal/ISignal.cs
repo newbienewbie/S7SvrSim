@@ -43,6 +43,10 @@ namespace S7SvrSim.S7Signal
         private string remark;
 
         public event PropertyChangedHandle<string> FormatAddressChanged;
+        protected void InvokeFormatAddressEvent(string oldAddress, string newAddress)
+        {
+            FormatAddressChanged?.Invoke(oldAddress, newAddress);
+        }
         public virtual string FormatAddress
         {
             get => Address?.ToString();
@@ -64,8 +68,7 @@ namespace S7SvrSim.S7Signal
                     Address = new SignalAddress(value);
                 }
                 OnPropertyChanged();
-                FormatAddressChanged?.Invoke(oldAddress, Address?.ToString());
-
+                InvokeFormatAddressEvent(oldAddress, Address?.ToString());
             }
         }
 
