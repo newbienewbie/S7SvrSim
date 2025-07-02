@@ -2,7 +2,7 @@
 
 namespace S7SvrSim.Services.Command
 {
-    internal class ValueChangedCommand<T> : ICommand
+    internal class ValueChangedCommand<T> : IHistoryCommand
     {
         private readonly Action<T> set;
         private readonly T oldValue;

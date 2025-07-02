@@ -64,7 +64,7 @@ namespace S7SvrSim.ViewModels
             ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(3);
         }
 
-        private void CommandEventRegist(ICommand command)
+        private void CommandEventRegist(IHistoryCommand command)
         {
             command.AfterExecute += CommandEventHandle;
             command.AfterUndo += CommandEventHandle;

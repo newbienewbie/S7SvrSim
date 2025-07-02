@@ -83,7 +83,7 @@ namespace S7SvrSim.ViewModels
             ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
         }
 
-        private void RegistCommandEventHandle(ICommand command)
+        private void RegistCommandEventHandle(IHistoryCommand command)
         {
             command.AfterExecute += CommandEventHandle;
             command.AfterUndo += CommandEventHandle;
@@ -318,7 +318,7 @@ namespace S7SvrSim.ViewModels
         [RelayCommand]
         private void OrderBy(SignalSortBy sortBy)
         {
-            ICommand command;
+            IHistoryCommand command;
             switch (sortBy)
             {
                 case SignalSortBy.Name:

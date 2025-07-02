@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace S7SvrSim.Services.Command
 {
-    internal class ListChangedCommand<T> : ICommand
+    internal class ListChangedCommand<T> : IHistoryCommand
         where T : class
     {
         protected class ListItem

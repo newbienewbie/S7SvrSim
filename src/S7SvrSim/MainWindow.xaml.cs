@@ -26,31 +26,20 @@ namespace S7Svr.Simulator
             {
                 this.ViewModel = Locator.Current.GetRequiredService<MainVM>();
                 this.DataContext = this.ViewModel;
-                this.OneWayBind(ViewModel, vm => vm.NeedSave, w => w.Title, GetTitle).DisposeWith(d);
-                this.Bind(ViewModel, vm => vm.UndoCount, win => win.undoBadged.Badge).DisposeWith(d);
-                this.Bind(ViewModel, vm => vm.RedoCount, win => win.redoBadged.Badge).DisposeWith(d);
-                this.BindCommand(ViewModel, vm => vm.CmdStartServer, win => win.menuStartServer);
-                this.BindCommand(ViewModel, vm => vm.CmdStartServer, win => win.btnStartServer);
-                this.BindCommand(ViewModel, vm => vm.CmdStopServer, win => win.menuStopServer);
-                this.BindCommand(ViewModel, vm => vm.CmdStopServer, win => win.btnStopServer);
-                this.BindCommand(ViewModel, vm => vm.CmdRestartServer, win => win.menuRestartServer);
-                this.BindCommand(ViewModel, vm => vm.CmdRestartServer, win => win.btnRestartServer);
-                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.New, (_, _) => ViewModel.NewProject(), NotRunningStatus_CanExecute));
-                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Open, (_, _) => ViewModel.LoadProject(), NotRunningStatus_CanExecute));
-                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Save, (_, _) => ViewModel.SaveProject(), CanExecuteTrue));
-                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.SaveAs, (_, _) => ViewModel.SaveProjectAs(), CanExecuteTrue));
-                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Undo, (_, _) => UndoRedoManager.Undo(), Undo_CanExecute));
-                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Redo, (_, _) => UndoRedoManager.Redo(), Redo_CanExecute));
-                this.CommandBindings.Add(new CommandBinding(AppCommands.OpenFolder, (_, _) => ViewModel.OpenProjectFolder(), CanExecuteTrue));
+                this.OneWayBind(ViewModel, vm => vm.ProjectVM.NeedSave, w => w.Title, GetTitle).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.ProjectVM.UndoCount, win => win.undoBadged.Badge).DisposeWith(d);
+                this.Bind(ViewModel, vm => vm.ProjectVM.RedoCount, win => win.redoBadged.Badge).DisposeWith(d);
+                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.New, (_, _) => ViewModel.ProjectVM.NewProject(), NotRunningStatus_CanExecute));
+                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Open, (_, _) => ViewModel.ProjectVM.LoadProject(), NotRunningStatus_CanExecute));
+                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Save, (_, _) => ViewModel.ProjectVM.SaveProject(), CanExecuteTrue));
+                this.CommandBindings.Add(new CommandBinding(ApplicationCommands.SaveAs, (_, _) => ViewModel.ProjectVM.SaveProjectAs(), CanExecuteTrue));
+                this.CommandBindings.Add(new CommandBinding(AppCommands.OpenFolder, (_, _) => ViewModel.ProjectVM.OpenProjectFolder(), CanExecuteTrue));
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdStartServer, new KeyGesture(Key.F5)));
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdStopServer, new KeyGesture(Key.F5, ModifierKeys.Shift)));
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdRestartServer, new KeyGesture(Key.F5, ModifierKeys.Control)));
+                this.InputBindings.Add(new KeyBinding(ViewModel.ProjectVM.UndoCommand, new KeyGesture(Key.Z, ModifierKeys.Control)));
+                this.InputBindings.Add(new KeyBinding(ViewModel.ProjectVM.RedoCommand, new KeyGesture(Key.Y, ModifierKeys.Control)));
             });
-
-            UndoRedoManager.UndoRedoChanged += () =>
-            {
-                ViewModel.NeedSave = true;
-            };
         }
 
         #region
@@ -71,11 +60,11 @@ namespace S7Svr.Simulator
         {
             if (needSave)
             {
-                return $"* {ViewModel.ProjectTitle} - Siemens PLC 通讯模拟器";
+                return $"* {ViewModel.ProjectVM.ProjectTitle} - Siemens PLC 通讯模拟器";
             }
             else
             {
-                return $"{ViewModel.ProjectTitle} - Siemens PLC 通讯模拟器";
+                return $"{ViewModel.ProjectVM.ProjectTitle} - Siemens PLC 通讯模拟器";
             }
         }
 
@@ -94,26 +83,6 @@ namespace S7Svr.Simulator
             e.Handled = true;
         }
 
-        private void Undo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (ViewModel?.RunningVM != null)
-            {
-                var keyboardFocus = Keyboard.FocusedElement;
-                e.CanExecute = UndoRedoManager.UndoCount > 0 && (keyboardFocus is not TextBoxBase || (keyboardFocus is TextBoxBase textBox && textBox.IsReadOnly));
-                e.Handled = true;
-            }
-        }
-
-        private void Redo_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (ViewModel?.RunningVM != null)
-            {
-                var keyboardFocus = Keyboard.FocusedElement;
-                e.CanExecute = UndoRedoManager.RedoCount > 0  && (keyboardFocus is not TextBoxBase || (keyboardFocus is TextBoxBase textBox && textBox.IsReadOnly));
-                e.Handled = true;
-            }
-        }
-
         private void AreaConfigGrid_InitializingNewItem(object sender, InitializingNewItemEventArgs e)
         {
             if (e.NewItem is AreaConfigVM areaConfigVM)
@@ -126,7 +95,7 @@ namespace S7Svr.Simulator
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            if (ViewModel.NotifyIfSave() == MessageBoxResult.Cancel)
+            if (ViewModel.ProjectVM.NotifyIfSave() == MessageBoxResult.Cancel)
             {
                 e.Cancel = true;
             }

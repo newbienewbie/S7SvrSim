@@ -41,6 +41,7 @@ namespace S7SvrSim
             Locator.CurrentMutable.RegisterLazySingletonEx<RunningSnap7ServerVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwTargetVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<OperationVM>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<ProjectVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<MainVM>(sp);
 
             Locator.CurrentMutable.RegisterLazySingletonEx<RwBitVM>(sp);

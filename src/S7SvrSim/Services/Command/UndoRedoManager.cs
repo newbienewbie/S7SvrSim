@@ -24,9 +24,9 @@ namespace S7SvrSim.Services
         }
         public static bool IsInUndoRedo { get; private set; } = false;
         public static int MaxOfCommands { get; set; } = 100;
-        private static List<ICommand> UndoCommands { get; } = [];
+        private static List<IHistoryCommand> UndoCommands { get; } = [];
         public static int UndoCount => UndoCommands.Count;
-        private static List<ICommand> RedoCommands { get; } = [];
+        private static List<IHistoryCommand> RedoCommands { get; } = [];
         public static int RedoCount => RedoCommands.Count;
 
         public delegate void UndoRedoChangedEvent();
@@ -47,7 +47,7 @@ namespace S7SvrSim.Services
             TransactionCommand = new TransactionCommand();
         }
 
-        public static IEnumerable<ICommand> CancelTransaction()
+        public static IEnumerable<IHistoryCommand> CancelTransaction()
         {
             if (TransactionCommand != null && TransactionCommand.Any())
             {
@@ -60,7 +60,7 @@ namespace S7SvrSim.Services
             return resCmd;
         }
 
-        public static ICommand EndTransaction()
+        public static IHistoryCommand EndTransaction()
         {
             if (TransactionCommand != null && TransactionCommand.Any())
             {
@@ -73,7 +73,7 @@ namespace S7SvrSim.Services
             return resCmd;
         }
 
-        private static void AddCommand(List<ICommand> target, ICommand command, bool clearRedo = true)
+        private static void AddCommand(List<IHistoryCommand> target, IHistoryCommand command, bool clearRedo = true)
         {
             if (target.Count >= 100)
             {
@@ -119,7 +119,7 @@ namespace S7SvrSim.Services
             IsInUndoRedo = false;
         }
 
-        public static void Regist(ICommand command)
+        public static void Regist(IHistoryCommand command)
         {
             if (TransactionCommand != null)
             {
@@ -132,7 +132,7 @@ namespace S7SvrSim.Services
             }
         }
 
-        public static void Run(ICommand command)
+        public static void Run(IHistoryCommand command)
         {
             command.Execute();
             Regist(command);
@@ -146,25 +146,25 @@ namespace S7SvrSim.Services
         }
 
         public static T GetLastUndoCommands<T>()
-            where T : ICommand
+            where T : IHistoryCommand
         {
             return UndoCommands.Where(c => c is T).Cast<T>().LastOrDefault();
         }
 
         public static T GetLastRedoCommands<T>()
-            where T : ICommand
+            where T : IHistoryCommand
         {
             return RedoCommands.Where(c => c is T).Cast<T>().LastOrDefault();
         }
 
         public static T[] GetUndoCommands<T>()
-            where T : ICommand
+            where T : IHistoryCommand
         {
             return UndoCommands.Where(c => c is T).Cast<T>().ToArray();
         }
 
         public static T[] GetRedoCommands<T>()
-            where T : ICommand
+            where T : IHistoryCommand
         {
             return RedoCommands.Where(c => c is T).Cast<T>().ToArray();
         }

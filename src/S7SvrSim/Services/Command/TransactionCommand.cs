@@ -5,26 +5,26 @@ using System.Linq;
 
 namespace S7SvrSim.Services.Command
 {
-    internal class TransactionCommand : ICommand, IEnumerable<ICommand>
+    internal class TransactionCommand : IHistoryCommand, IEnumerable<IHistoryCommand>
     {
-        private readonly IList<ICommand> _commands;
+        private readonly IList<IHistoryCommand> _commands;
 
         public event EventHandler AfterUndo;
         public event EventHandler AfterExecute;
 
         public TransactionCommand()
         {
-            _commands = new List<ICommand>();
+            _commands = new List<IHistoryCommand>();
         }
 
-        public void Regist(ICommand command)
+        public void Regist(IHistoryCommand command)
         {
             _commands.Add(command);
         }
 
         public void Execute()
         {
-            foreach (ICommand command in _commands)
+            foreach (IHistoryCommand command in _commands)
             {
                 command.Execute();
             }
@@ -33,14 +33,14 @@ namespace S7SvrSim.Services.Command
 
         public void Undo()
         {
-            foreach (ICommand command in _commands.Reverse())
+            foreach (IHistoryCommand command in _commands.Reverse())
             {
                 command.Undo();
             }
             AfterUndo?.Invoke(this, EventArgs.Empty);
         }
 
-        public IEnumerator<ICommand> GetEnumerator()
+        public IEnumerator<IHistoryCommand> GetEnumerator()
         {
             return _commands.GetEnumerator();
         }

@@ -23,247 +23,259 @@
                                      Type="{x:Type viewmodels:AreaConfigVM}"
                                      />
     </Window.Resources>
-    <DockPanel>
-        <StackPanel DockPanel.Dock="Top">
-            <Menu>
-                <MenuItem Header="文件">
-                    <MenuItem Command="ApplicationCommands.New"
-                              Icon="{md:PackIcon Kind=FileOutline}"
-                              />
-                    <MenuItem Header="打开"
-                              Icon="{md:PackIcon Kind=FolderOpenOutline}"
-                              Command="ApplicationCommands.Open"
-                              />
-                    <MenuItem Header="保存"
-                              Icon="{md:PackIcon Kind=ContentSaveOutline}"
-                              Command="ApplicationCommands.Save"
-                              />
-                    <MenuItem Header="另存为"
-                              Command="ApplicationCommands.SaveAs"
-                              />
+    <md:DialogHost>
+        <md:DialogHost.DialogContent>
+            <StackPanel>
+                <TextBox md:TextFieldAssist.SuffixText=".s7proj" />
+            </StackPanel>
+        </md:DialogHost.DialogContent>
+        <DockPanel>
+            <StackPanel DockPanel.Dock="Top">
+                <Menu>
+                    <MenuItem Header="文件">
+                        <MenuItem Command="ApplicationCommands.New"
+                                  Icon="{md:PackIcon Kind=FileOutline}"
+                                  />
+                        <MenuItem Header="打开"
+                                  Icon="{md:PackIcon Kind=FolderOpenOutline}"
+                                  Command="ApplicationCommands.Open"
+                                  />
+                        <MenuItem Header="保存"
+                                  Icon="{md:PackIcon Kind=ContentSaveOutline}"
+                                  Command="ApplicationCommands.Save"
+                                  />
+                        <MenuItem Header="另存为"
+                                  Command="ApplicationCommands.SaveAs"
+                                  />
+                        <Separator />
+                        <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
+                                  Icon="{md:PackIcon Kind=Redo}"
+                                  />
+                    </MenuItem>
                     <Separator />
-                    <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
-                              Icon="{md:PackIcon Kind=Redo}"
-                              />
-                </MenuItem>
-                <Separator />
-                <MenuItem Header="编辑">
-                    <MenuItem Command="ApplicationCommands.Undo"
-                              Icon="{md:PackIcon Kind=UndoVariant}"
-                              />
-                    <MenuItem Command="ApplicationCommands.Redo"
-                              Icon="{md:PackIcon Kind=RedoVariant}"
-                              />
-                </MenuItem>
-                <MenuItem Header="服务">
-                    <MenuItem x:Name="menuStartServer"
-                              Icon="{md:PackIcon Kind=Play}"
-                              Header="开启 S7 服务"
-                              InputGestureText="F5"
-                              />
-                    <MenuItem x:Name="menuStopServer"
-                              Icon="{md:PackIcon Kind=Stop}"
-                              Header="停止 S7 服务"
-                              InputGestureText="Shift+F5"
-                              />
-                    <MenuItem x:Name="menuRestartServer"
-                              Icon="{md:PackIcon Kind=Refresh}"
-                              Header="重启 S7 服务"
-                              InputGestureText="Ctrl+F5"
-                              />
-                </MenuItem>
-                <MenuItem Header="Python">
-                    <MenuItem Command="{Binding OperationVM.RwTargetVM.CmdRunScript}"
-                              Header="导入脚本"
-                              Icon="{md:PackIcon Kind=LanguagePython}"
-                              />
-                    <MenuItem Command="{Binding OperationVM.RwTargetVM.CmdTaskList}"
-                              Header="运行列表"
-                              Icon="{md:PackIcon Kind=ViewList}"
-                              />
-                </MenuItem>
-            </Menu>
-            <ToolBarTray>
-                <ToolBarTray.Resources>
-                    <Thickness x:Key="ButtonPadding">10</Thickness>
-                </ToolBarTray.Resources>
-                <ToolBar>
-                    <Button x:Name="btnStartServer"
-                            Content="{md:PackIcon Kind=Play}"
-                            Padding="{StaticResource ButtonPadding}"
-                            ToolTip="启动S7(F5)"
-                            Foreground="Green"
-                            />
-                    <Button x:Name="btnStopServer"
-                            Content="{md:PackIcon Kind=Stop}"
-                            Padding="{StaticResource ButtonPadding}"
-                            ToolTip="停止S7(Shift+F5)"
-                            Foreground="MediumVioletRed"
-                            />
-                    <Button x:Name="btnRestartServer"
-                            Content="{md:PackIcon Kind=Refresh}"
-                            Padding="{StaticResource ButtonPadding}"
-                            ToolTip="重启S7(Ctrl+F5)"
-                            />
-                </ToolBar>
-                <ToolBar>
-                    <Button Command="ApplicationCommands.New"
-                            Content="{md:PackIcon Kind=FileOutline}"
-                            Padding="{StaticResource ButtonPadding}"
-                            shared:RoutedCommandTooltip.Enabled="True"
-                            />
-                    <Button Command="ApplicationCommands.Open"
-                            Content="{md:PackIcon Kind=FolderOpenOutline}"
-                            Padding="{StaticResource ButtonPadding}"
-                            shared:RoutedCommandTooltip.Enabled="True"
-                            />
-                    <Button Command="ApplicationCommands.Save"
-                            Content="{md:PackIcon Kind=ContentSaveOutline}"
-                            Padding="{StaticResource ButtonPadding}"
-                            shared:RoutedCommandTooltip.Enabled="True"
-                            />
-                </ToolBar>
-                <ToolBar ClipToBounds="False">
-                    <md:Badged x:Name="undoBadged">
-                        <Button Command="ApplicationCommands.Undo"
-                                Content="{md:PackIcon Kind=UndoVariant}"
+                    <MenuItem Header="编辑">
+                        <MenuItem Command="{Binding ProjectVM.UndoCommand}"
+                                  Icon="{md:PackIcon Kind=UndoVariant}"
+                                  Header="撤回"
+                                  InputGestureText="Ctrl+Z"
+                                  />
+                        <MenuItem Command="{Binding ProjectVM.RedoCommand}"
+                                  Icon="{md:PackIcon Kind=RedoVariant}"
+                                  Header="重做"
+                                  InputGestureText="Ctrl+Y"
+                                  />
+                    </MenuItem>
+                    <MenuItem Header="S7服务">
+                        <MenuItem Icon="{md:PackIcon Kind=Play}"
+                                  Header="开启"
+                                  InputGestureText="F5"
+                                  Command="{Binding CmdStartServer}"
+                                  />
+                        <MenuItem Icon="{md:PackIcon Kind=Stop}"
+                                  Header="停止"
+                                  InputGestureText="Shift+F5"
+                                  Command="{Binding CmdStopServer}"
+                                  />
+                        <MenuItem Icon="{md:PackIcon Kind=Refresh}"
+                                  Header="重启"
+                                  InputGestureText="Ctrl+F5"
+                                  Command="{Binding CmdRestartServer}"
+                                  />
+                    </MenuItem>
+                    <MenuItem Header="Python">
+                        <MenuItem Command="{Binding OperationVM.RwTargetVM.CmdRunScript}"
+                                  Header="导入脚本"
+                                  Icon="{md:PackIcon Kind=LanguagePython}"
+                                  />
+                        <MenuItem Command="{Binding OperationVM.RwTargetVM.CmdTaskList}"
+                                  Header="运行列表"
+                                  Icon="{md:PackIcon Kind=ViewList}"
+                                  />
+                    </MenuItem>
+                </Menu>
+                <ToolBarTray>
+                    <ToolBarTray.Resources>
+                        <Thickness x:Key="ButtonPadding">10</Thickness>
+                    </ToolBarTray.Resources>
+                    <ToolBar>
+                        <Button Content="{md:PackIcon Kind=Play}"
+                                Padding="{StaticResource ButtonPadding}"
+                                ToolTip="启动S7(F5)"
+                                Foreground="Green"
+                                Command="{Binding CmdStartServer}"
+                                />
+                        <Button Content="{md:PackIcon Kind=Stop}"
+                                Padding="{StaticResource ButtonPadding}"
+                                ToolTip="停止S7(Shift+F5)"
+                                Foreground="MediumVioletRed"
+                                Command="{Binding CmdStopServer}"
+                                />
+                        <Button Content="{md:PackIcon Kind=Refresh}"
+                                Padding="{StaticResource ButtonPadding}"
+                                ToolTip="重启S7(Ctrl+F5)"
+                                Command="{Binding CmdRestartServer}"
+                                Foreground="SteelBlue"
+                                />
+                    </ToolBar>
+                    <ToolBar>
+                        <Button Command="ApplicationCommands.New"
+                                Content="{md:PackIcon Kind=FileOutline}"
                                 Padding="{StaticResource ButtonPadding}"
                                 shared:RoutedCommandTooltip.Enabled="True"
-                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                 />
-                    </md:Badged>
-                    <md:Badged x:Name="redoBadged">
-                        <Button Command="ApplicationCommands.Redo"
-                                Content="{md:PackIcon Kind=RedoVariant}"
+                        <Button Command="ApplicationCommands.Open"
+                                Content="{md:PackIcon Kind=FolderOpenOutline}"
                                 Padding="{StaticResource ButtonPadding}"
                                 shared:RoutedCommandTooltip.Enabled="True"
-                                Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
                                 />
-                    </md:Badged>
-                </ToolBar>
-                <ToolBar>
-                    <Button Content="{md:PackIcon Kind=LanguagePython}"
-                            ToolTip="导入 Python 脚本"
-                            Padding="{StaticResource ButtonPadding}"
-                            Command="{Binding OperationVM.RwTargetVM.CmdRunScript}"
-                            />
-                    <Button Content="{md:PackIcon Kind=ViewList}"
-                            ToolTip="正在运行的 Python 任务"
-                            Padding="{StaticResource ButtonPadding}"
-                            Command="{Binding OperationVM.RwTargetVM.CmdTaskList}"
-                            />
-                </ToolBar>
-            </ToolBarTray>
-        </StackPanel>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="200" />
-            </Grid.RowDefinitions>
-            <TabControl TabStripPlacement="Left"
-                        x:Name="tabControl"
-                        >
-                <TabControl.Resources>
-                    <Style TargetType="TabItem"
-                           BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}"
-                           />
-                </TabControl.Resources>
-                <TabItem Header="配置">
-                    <DockPanel>
-                        <StackPanel DockPanel.Dock="Top">
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="IP Address: "
-                                       HorizontalAlignment="Left"
-                                       VerticalAlignment="Center"
-                                       DockPanel.Dock="Left"
-                                       />
-                                <TextBox Text="{Binding ConfigVM.IpAddress}"
-                                         Width="160"
-                                         VerticalAlignment="Center"
-                                         />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="0 10"
-                                        >
-                                <Button Command="{Binding ConfigVM.CmdAddArea}"
-                                        Style="{StaticResource MaterialDesignOutlinedButton}"
-                                        >
-                                    添加
-                                </Button>
-                            </StackPanel>
-                        </StackPanel>
-                        <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}"
-                                  CanUserAddRows="False"
-                                  CanUserDeleteRows="False"
-                                  InitializingNewItem="AreaConfigGrid_InitializingNewItem"
-                                  >
-                            <DataGrid.Columns>
-                                <DataGridTemplateColumn Header="删除">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Button IsTabStop="False"
-                                                    CommandParameter="{Binding .}"
-                                                    Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid, Mode=FindAncestor}, Path=DataContext.ConfigVM.CmdRemoveArea}"
-                                                    Visibility="{Binding ., Converter={StaticResource IsAreaConfigVM}}"
-                                                    Content="{md:PackIcon Kind=Delete}"
-                                                    Style="{StaticResource MaterialDesignFlatButton}"
-                                                    Padding="0"
-                                                    Height="24"
-                                                    Width="24"
-                                                    />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </DockPanel>
-                </TabItem>
-                <TabItem Header="命令">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-
-                        <Label Content="IpAddress"
-                               Margin="0 4 0 4"
-                               Grid.Row="0"
-                               Grid.Column="0"
+                        <Button Command="ApplicationCommands.Save"
+                                Content="{md:PackIcon Kind=ContentSaveOutline}"
+                                Padding="{StaticResource ButtonPadding}"
+                                shared:RoutedCommandTooltip.Enabled="True"
+                                />
+                    </ToolBar>
+                    <ToolBar ClipToBounds="False">
+                        <md:Badged x:Name="undoBadged">
+                            <Button Content="{md:PackIcon Kind=UndoVariant}"
+                                    Command="{Binding ProjectVM.UndoCommand}"
+                                    Padding="{StaticResource ButtonPadding}"
+                                    shared:RoutedCommandTooltip.Enabled="True"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    />
+                        </md:Badged>
+                        <md:Badged x:Name="redoBadged">
+                            <Button Content="{md:PackIcon Kind=RedoVariant}"
+                                    Command="{Binding ProjectVM.RedoCommand}"
+                                    Padding="{StaticResource ButtonPadding}"
+                                    shared:RoutedCommandTooltip.Enabled="True"
+                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
+                                    />
+                        </md:Badged>
+                    </ToolBar>
+                    <ToolBar>
+                        <Button Content="{md:PackIcon Kind=LanguagePython}"
+                                ToolTip="导入 Python 脚本"
+                                Padding="{StaticResource ButtonPadding}"
+                                Command="{Binding OperationVM.RwTargetVM.CmdRunScript}"
+                                />
+                        <Button Content="{md:PackIcon Kind=ViewList}"
+                                ToolTip="正在运行的 Python 任务"
+                                Padding="{StaticResource ButtonPadding}"
+                                Command="{Binding OperationVM.RwTargetVM.CmdTaskList}"
+                                />
+                    </ToolBar>
+                </ToolBarTray>
+            </StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="200" />
+                </Grid.RowDefinitions>
+                <TabControl TabStripPlacement="Left"
+                            x:Name="tabControl"
+                            >
+                    <TabControl.Resources>
+                        <Style TargetType="TabItem"
+                               BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}"
                                />
-                        <TextBlock Text="{Binding ConfigVM.IpAddress}"
+                    </TabControl.Resources>
+                    <TabItem Header="配置">
+                        <DockPanel>
+                            <StackPanel DockPanel.Dock="Top">
+                                <StackPanel Orientation="Horizontal">
+                                    <Label Content="IP Address: "
+                                           HorizontalAlignment="Left"
+                                           VerticalAlignment="Center"
+                                           DockPanel.Dock="Left"
+                                           />
+                                    <TextBox Text="{Binding ConfigVM.IpAddress}"
+                                             Width="160"
+                                             VerticalAlignment="Center"
+                                             />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0 10"
+                                            >
+                                    <Button Command="{Binding ConfigVM.CmdAddArea}"
+                                            Style="{StaticResource MaterialDesignOutlinedButton}"
+                                            >
+                                        添加
+                                    </Button>
+                                </StackPanel>
+                            </StackPanel>
+                            <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False"
+                                      InitializingNewItem="AreaConfigGrid_InitializingNewItem"
+                                      >
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn Header="删除">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button IsTabStop="False"
+                                                        CommandParameter="{Binding .}"
+                                                        Command="{Binding RelativeSource={RelativeSource AncestorType=DataGrid, Mode=FindAncestor}, Path=DataContext.ConfigVM.CmdRemoveArea}"
+                                                        Visibility="{Binding ., Converter={StaticResource IsAreaConfigVM}}"
+                                                        Content="{md:PackIcon Kind=Delete}"
+                                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                                        Padding="0"
+                                                        Height="24"
+                                                        Width="24"
+                                                        />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </DockPanel>
+                    </TabItem>
+                    <TabItem Header="命令">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+
+                            <Label Content="IpAddress"
                                    Margin="0 4 0 4"
                                    Grid.Row="0"
-                                   Grid.Column="1"
+                                   Grid.Column="0"
                                    />
+                            <TextBlock Text="{Binding ConfigVM.IpAddress}"
+                                       Margin="0 4 0 4"
+                                       Grid.Row="0"
+                                       Grid.Column="1"
+                                       />
 
-                        <uc:OperationsCtrl DataContext="{Binding OperationVM}"
-                                           Grid.Row="1"
-                                           Grid.Column="0"
-                                           Grid.ColumnSpan="2"
-                                           />
-                    </Grid>
-                </TabItem>
-                <TabItem Header="监看">
-                    <usercontrols:SignalWatchCtrl DataContext="{Binding SignalWatchVM}" />
-                </TabItem>
-                <TabItem Header="脚本">
-                    <scripting:ConfigPyEngineView />
-                </TabItem>
-            </TabControl>
-            <GridSplitter Grid.Row="1"
-                          Height="3"
-                          HorizontalAlignment="Stretch"
-                          />
-            <usercontrols:MsgLoggerCtrl DataContext="{Binding LoggerVM}"
-                                        Grid.Row="2"
-                                        />
-        </Grid>
-    </DockPanel>
+                            <uc:OperationsCtrl DataContext="{Binding OperationVM}"
+                                               Grid.Row="1"
+                                               Grid.Column="0"
+                                               Grid.ColumnSpan="2"
+                                               />
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="监看">
+                        <usercontrols:SignalWatchCtrl DataContext="{Binding SignalWatchVM}" />
+                    </TabItem>
+                    <TabItem Header="脚本">
+                        <scripting:ConfigPyEngineView />
+                    </TabItem>
+                </TabControl>
+                <GridSplitter Grid.Row="1"
+                              Height="3"
+                              HorizontalAlignment="Stretch"
+                              />
+                <usercontrols:MsgLoggerCtrl DataContext="{Binding LoggerVM}"
+                                            Grid.Row="2"
+                                            />
+            </Grid>
+        </DockPanel>
+    </md:DialogHost>
 </Window>

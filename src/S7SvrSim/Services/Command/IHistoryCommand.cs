@@ -2,7 +2,7 @@
 
 namespace S7SvrSim.Services
 {
-    public interface ICommand
+    public interface IHistoryCommand
     {
         event EventHandler AfterUndo;
         event EventHandler AfterExecute;
