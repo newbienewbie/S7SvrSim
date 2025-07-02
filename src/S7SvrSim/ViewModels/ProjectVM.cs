@@ -1,10 +1,12 @@
-﻿using Microsoft.Win32;
+﻿using IronPython.Runtime.Operations;
+using Microsoft.Win32;
 using ReactiveUI.Fody.Helpers;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Input;
@@ -27,7 +29,7 @@ namespace S7SvrSim.ViewModels
 
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
-
+        public ICommand RenameCommand { get; }
         public string ProjectTitle => Path.GetFileName(currentProject.Path);
 
         public ProjectVM(IProjectFactory projectFactory)
@@ -43,8 +45,9 @@ namespace S7SvrSim.ViewModels
                 NeedSave = true;
             };
 
-            UndoCommand = ReactiveCommand.Create(() => UndoRedoManager.Undo(), this.WhenAnyValue(vm => vm.UndoCount).Select(c => c > 0));
-            RedoCommand = ReactiveCommand.Create(() => UndoRedoManager.Redo(), this.WhenAnyValue(vm => vm.RedoCount).Select(c => c > 0));
+            UndoCommand = ReactiveCommand.Create(UndoRedoManager.Undo, this.WhenAnyValue(vm => vm.UndoCount).Select(c => c > 0));
+            RedoCommand = ReactiveCommand.Create(UndoRedoManager.Redo, this.WhenAnyValue(vm => vm.RedoCount).Select(c => c > 0));
+            RenameCommand = ReactiveCommand.Create<string>(RenameProject);
         }
 
         private void CallbackNeedSave()
@@ -157,6 +160,25 @@ namespace S7SvrSim.ViewModels
 
             currentProject.SaveAs(saveFileDialog.FileName);
             currentProject = projectFactory.GetProject(saveFileDialog.FileName);
+
+            CallbackNeedSave();
+        }
+        private static readonly char[] InvalidCharsForPath = ['\\', '/', ':', '*', '?', '"', '<', '>', '|'];
+        public void RenameProject(string newName)
+        {
+            if (string.IsNullOrEmpty(newName))
+            {
+                return;
+            }
+
+            if (!newName.EndsWith(".s7proj"))
+            {
+                newName = $"{newName}.s7proj";
+            }
+
+            newName = new string(newName.Select(c => InvalidCharsForPath.Contains(c) ? ' ' : c).ToArray());
+
+            currentProject.Move(Path.Combine(Path.GetDirectoryName(currentProject.Path), newName));
 
             CallbackNeedSave();
         }

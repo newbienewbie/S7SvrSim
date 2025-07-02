@@ -12,6 +12,7 @@
         xmlns:scripting="clr-namespace:S7SvrSim.UserControls.Scripting"
         xmlns:shared="clr-namespace:S7SvrSim.Shared"
         xmlns:commands="clr-namespace:S7SvrSim.Commands"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainVM}"
         Title="Siemens PLC 通讯模拟器"
@@ -23,10 +24,42 @@
                                      Type="{x:Type viewmodels:AreaConfigVM}"
                                      />
     </Window.Resources>
-    <md:DialogHost>
+    <md:DialogHost CloseOnClickAway="True"
+                   DialogOpened="DialogHost_DialogOpened"
+                   >
         <md:DialogHost.DialogContent>
-            <StackPanel>
-                <TextBox md:TextFieldAssist.SuffixText=".s7proj" />
+            <StackPanel Margin="16">
+                <TextBlock Text="Rename" />
+                <TextBox md:TextFieldAssist.SuffixText=".s7proj"
+                         VerticalAlignment="Center"
+                         Width="120"
+                         x:Name="renameProjectTextBox"
+                         FontSize="12"
+                         />
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="{md:PackIcon Kind=Check}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Command="{x:Static md:DialogHost.CloseDialogCommand}"
+                            IsDefault="True"
+                            Margin="0 8 8 0"
+                            >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <i:EventTrigger.Actions>
+                                    <i:InvokeCommandAction Command="{Binding ProjectVM.RenameCommand}"
+                                                           CommandParameter="{Binding Text, ElementName=renameProjectTextBox}"
+                                                           />
+                                </i:EventTrigger.Actions>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                    <Button Content="{md:PackIcon Kind=Close}"
+                            Style="{StaticResource MaterialDesignFlatButton}"
+                            Command="{x:Static md:DialogHost.CloseDialogCommand}"
+                            Margin="0 8 8 0"
+                            IsCancel="True"
+                            />
+                </StackPanel>
             </StackPanel>
         </md:DialogHost.DialogContent>
         <DockPanel>
@@ -48,6 +81,10 @@
                                   Command="ApplicationCommands.SaveAs"
                                   />
                         <Separator />
+                        <MenuItem Header="项目重命名"
+                                  Command="{x:Static md:DialogHost.OpenDialogCommand}"
+                                  Icon="{md:PackIcon Kind=FormTextbox}"
+                                  />
                         <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
                                   Icon="{md:PackIcon Kind=Redo}"
                                   />

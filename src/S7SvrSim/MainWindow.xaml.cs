@@ -6,9 +6,9 @@ using S7SvrSim.Services.Command;
 using Splat;
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 
 namespace S7Svr.Simulator
@@ -109,6 +109,11 @@ namespace S7Svr.Simulator
             {
                 tabControl.SelectedIndex = index;
             }
+        }
+
+        private void DialogHost_DialogOpened(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
+        {
+            renameProjectTextBox.Text = Path.GetFileNameWithoutExtension(ViewModel.ProjectVM.ProjectTitle);
         }
     }
 }

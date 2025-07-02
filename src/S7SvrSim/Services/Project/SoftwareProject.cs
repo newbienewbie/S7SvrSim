@@ -19,7 +19,7 @@ namespace S7SvrSim.Services.Project
         private readonly SignalWatchVM signalWatchModel;
 
         public ProjectFile ProjectFile { get; private set; }
-        public string Path { get; }
+        public string Path { get; private set; }
 
         public SoftwareProject(string path)
         {
@@ -63,6 +63,19 @@ namespace S7SvrSim.Services.Project
 
             ProjectFile = ProjectFile.Load(Path) ?? throw new NullReferenceException("反序列化文件内容结果为空");
             SetSoftware();
+        }
+
+        public void Move(string newPath)
+        {
+            if (string.IsNullOrEmpty(newPath)) throw new ArgumentNullException(nameof(newPath));
+
+            Save();
+
+            if (newPath.Equals(Path, StringComparison.OrdinalIgnoreCase)) return;
+
+            var oldPath = Path;
+            File.Move(oldPath, newPath, true);
+            Path = newPath;
         }
 
         /// <summary>

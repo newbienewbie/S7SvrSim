@@ -13,6 +13,7 @@ namespace S7SvrSim.Services.Project
         void Save();
         void SaveAs(string path);
         void Load();
+        void Move(string newPath);
         void SetSoftware();
     }
 }
