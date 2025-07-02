@@ -177,6 +177,7 @@
                              >
                     <MenuItem Header="新建信号"
                               ItemsSource="{Binding SignalTypes}"
+                              Visibility="{Binding IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
                               >
                         <MenuItem.ItemContainerStyle>
                             <Style TargetType="MenuItem"

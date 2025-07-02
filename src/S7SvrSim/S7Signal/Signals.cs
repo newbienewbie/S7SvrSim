@@ -261,26 +261,25 @@ namespace S7SvrSim.S7Signal
         }
     }
 
-    [AddressUsed(CalcMethod = nameof(AddressUse))]
     [SignalVaueType(typeof(string))]
     public partial class String : SignalWithLengthBase
     {
         public static bool UseTenCeiling = false;
 
-        public AddressUsedItem AddressUse()
+        public AddressUsed AddressUse()
         {
             if (UseTenCeiling)
             {
                 var remain = (Length + 2) % 10;
                 var number = (Length + 2) - remain;
-                return new AddressUsedItem()
+                return new AddressUsed()
                 {
                     IndexSize = (number < 0 ? 0 : number) + (remain != 0 ? 10 : 0),
                 };
             }
             else
             {
-                return new AddressUsedItem()
+                return new AddressUsed()
                 {
                     IndexSize = Length + 2,
                 };
@@ -310,14 +309,12 @@ namespace S7SvrSim.S7Signal
     /// <summary>
     /// 地址占用
     /// </summary>
-    [AddressUsed(CalcMethod = nameof(AddressUse))]
-    [SignalVaueType(typeof(string))]
     [Description("Holding 是一个特殊类型，用于占用对应长度的字节")]
     public class Holding : SignalWithLengthBase
     {
-        public AddressUsedItem AddressUse()
+        public AddressUsed AddressUse()
         {
-            return new AddressUsedItem()
+            return new AddressUsed()
             {
                 IndexSize = Length
             };

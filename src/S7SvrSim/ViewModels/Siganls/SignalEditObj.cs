@@ -12,7 +12,7 @@ namespace S7SvrSim.ViewModels
 {
     public partial class SignalEditObj : ObservableObject
     {
-        private readonly SignalsHelper signalHelper;
+        private readonly IMemCache<Type[]> signalTypes;
         private bool isInit = false;
 
         [ObservableProperty]
@@ -42,7 +42,7 @@ namespace S7SvrSim.ViewModels
                     var tyStr = value.Split('[')[0];
                     var len = GetLength(value);
 
-                    var typeQuery = signalHelper.SignalTypes.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
+                    var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
                     if (typeQuery.Any())
                     {
                         UndoRedoManager.StartTransaction();
@@ -78,7 +78,7 @@ namespace S7SvrSim.ViewModels
         {
             Other = type;
 
-            signalHelper = ((App)App.Current).ServiceProvider.GetRequiredService<SignalsHelper>();
+            signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<Type[]>>();
 
             isInit = true;
         }
@@ -159,7 +159,7 @@ namespace S7SvrSim.ViewModels
                     OnPropertyChanged(nameof(SignaleType));
                 }
             }, oldValue, newValue);
-            
+
         }
 
         private void OnFormtAddressChanged(string oldValue, string newValue)

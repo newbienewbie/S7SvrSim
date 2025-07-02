@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using S7Server.Simulator.ViewModels;
 using S7Svr.Simulator.MessageHandlers;
 using S7Svr.Simulator.ViewModels;
+using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
 using S7SvrSim.UserControls;
@@ -25,7 +26,10 @@ namespace S7SvrSim
             services.AddSingleton<IS7MBService, S7MBService>();
             services.AddSingleton<IProjectFactory, ProjectFractory>();
             services.AddSingleton<IS7BlockFactory, S7BlockFactory>();
-            services.AddSingleton<SignalsHelper>();
+            services.AddSingleton<IMemCache<Type[]>, SignalTypeCache>();
+            services.AddSingleton<ISignalAddressUesdCollection, SignalAddressUesedCollection>();
+            services.AddAddressUsedCalc();
+            services.AddScoped<SignalsHelper>();
 
             return services;
         }

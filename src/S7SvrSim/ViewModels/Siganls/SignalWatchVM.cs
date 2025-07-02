@@ -26,6 +26,7 @@ namespace S7SvrSim.ViewModels
         #region DI
         private readonly IMediator mediator;
         private readonly IS7BlockFactory blockFactory;
+        private readonly SignalsHelper signalsHelper;
         #endregion
 
         public DataGrid Grid { get; set; }
@@ -60,15 +61,15 @@ namespace S7SvrSim.ViewModels
 
         public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;
 
-        public SignalWatchVM(IMediator mediator, IS7BlockFactory blockFactory, SignalsHelper helper)
+        public SignalWatchVM(IMediator mediator, IS7BlockFactory blockFactory, IMemCache<Type[]> signalTypes, SignalsHelper signalsHelper)
         {
             this.mediator = mediator;
             this.blockFactory = blockFactory;
-
+            this.signalsHelper = signalsHelper;
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
 
-            SignalTypes = helper.SignalTypes;
+            SignalTypes = signalTypes.Value;
             DragSignals.CollectionChanged += (_, _) =>
             {
                 OnPropertyChanged(nameof(DragSignalsIsOne));
@@ -396,11 +397,11 @@ namespace S7SvrSim.ViewModels
             if (UpdateAddressByDbIndex)
             {
                 var dbSignals = AssembleSignalByAddress(Signals);
-                dbSignals.Each(signals => signals.UpdateAddress(UpdateAddressOptions));
+                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals, UpdateAddressOptions));
             }
             else
             {
-                Signals.Select(s => s.Value).UpdateAddress(UpdateAddressOptions);
+                signalsHelper.UpdateAddress(Signals.Select(s => s.Value), UpdateAddressOptions);
             }
 
             var command = UndoRedoManager.EndTransaction();
@@ -424,11 +425,11 @@ namespace S7SvrSim.ViewModels
             if (UpdateAddressByDbIndex)
             {
                 var dbSignals = AssembleSignalByAddress(signals);
-                dbSignals.Each(signals => signals.UpdateAddress(UpdateAddressOptions));
+                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals, UpdateAddressOptions));
             }
             else
             {
-                signals.Select(s => s.Value).UpdateAddress(UpdateAddressOptions);
+                signalsHelper.UpdateAddress(signals.Select(s => s.Value), UpdateAddressOptions);
             }
 
             var command = UndoRedoManager.EndTransaction();
@@ -438,7 +439,7 @@ namespace S7SvrSim.ViewModels
         [RelayCommand]
         private void UpdateAddressFromSelectedItems()
         {
-            var signals = Grid.SelectedItems.Cast<SignalEditObj>();
+            var signals = Grid.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf);
             if (!signals.Any())
             {
                 return;
@@ -451,11 +452,11 @@ namespace S7SvrSim.ViewModels
             if (UpdateAddressByDbIndex)
             {
                 var dbSignals = AssembleSignalByAddress(signals);
-                dbSignals.Each(signals => signals.UpdateAddress(UpdateAddressOptions));
+                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals, UpdateAddressOptions));
             }
             else
             {
-                signals.Select(s => s.Value).UpdateAddress(UpdateAddressOptions);
+                signalsHelper.UpdateAddress(signals.Select(s => s.Value), UpdateAddressOptions);
             }
 
             var command = UndoRedoManager.EndTransaction();
@@ -553,7 +554,7 @@ namespace S7SvrSim.ViewModels
         {
             while (!token.IsCancellationRequested)
             {
-                Signals.Select(s => s.Value).RefreshValue(blockFactory);
+                signalsHelper.RefreshValue(Signals.Select(s => s.Value));
                 await Task.Delay(TimeSpan.FromMilliseconds(ScanSpan >= 0 ? ScanSpan : 50), token);
             }
         }

@@ -7,16 +7,23 @@ namespace S7SvrSim.S7Signal
     {
         public int IndexSize { get; set; }
         public byte OffsetSize { get; set; }
-        /// <summary>
-        /// <para>如果指定了计算地址大小的方法，则会优先使用该方法</para>
-        /// <para>指定的方法需要返回 <see cref="AddressUsedItem"/> 类型</para>
-        /// </summary>
-        public string CalcMethod { get; set; }
     }
 
-    public class AddressUsedItem
+    public class AddressUsed : IAddressUsed
     {
         public int IndexSize { get; set; }
         public byte OffsetSize { get; set; }
+    }
+
+    public interface IAddressUsed
+    {
+        int IndexSize { get; }
+        byte OffsetSize { get; }
+    }
+
+    public interface IAddressUsedCalc<T>
+        where T : SignalBase
+    {
+        IAddressUsed CalcAddressUsed(T signal);
     }
 }

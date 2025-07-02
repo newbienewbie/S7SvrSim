@@ -1,38 +1,23 @@
 ﻿using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
-using S7SvrSim.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace S7SvrSim.S7Signal
 {
-    public static class SignalsExtensions
+    public class SignalsHelper
     {
-        private class AddressUsed
+        private readonly IS7BlockFactory blockFactory;
+        private readonly ISignalAddressUesdCollection signalAddressUsed;
+
+        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockFactory blockFactory)
         {
-            public AddressUsedAttribute Attribute { get; }
-            public MethodInfo CalcMethod { get; }
-            public AddressUsed(Type ty)
-            {
-                Attribute = ty.GetCustomAttribute<AddressUsedAttribute>();
-                if (Attribute != null && !string.IsNullOrEmpty(Attribute.CalcMethod))
-                {
-                    CalcMethod = ty.GetMethod(Attribute.CalcMethod);
-                }
-            }
+            this.signalAddressUsed = signalAddressUsed;
+            this.blockFactory = blockFactory;
         }
 
-        private static Dictionary<Type, AddressUsed> SignalAddressUsed { get; }
-
-        static SignalsExtensions()
-        {
-            var signalTypes = typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase)));
-            SignalAddressUsed = signalTypes.Select(ty => (Type: ty, Attr: new AddressUsed(ty))).Where(it => it.Attr.Attribute != null).ToDictionary(it => it.Type, it => it.Attr);
-        }
-
-        public static void RefreshValue(this IEnumerable<SignalBase> signals, IS7BlockFactory blockFactory)
+        public void RefreshValue(IEnumerable<SignalBase> signals)
         {
             foreach (var blockSignals in signals.Where(s => s.Address != null).GroupBy(s => s.Address.AreaKind))
             {
@@ -77,7 +62,7 @@ namespace S7SvrSim.S7Signal
             }
         }
 
-        public static void UpdateAddress(this IEnumerable<SignalBase> signals, UpdateAddressOptions options = null)
+        public void UpdateAddress(IEnumerable<SignalBase> signals, UpdateAddressOptions options = null)
         {
             if (signals.Count() <= 1)
             {
@@ -93,13 +78,13 @@ namespace S7SvrSim.S7Signal
                 return;
             }
 
-            AddressUsed preUsed = null;
+            IAddressUsed preUsed = null;
 
             try
             {
-                preUsed = SignalAddressUsed[preSignal.GetType()];
+                preUsed = signalAddressUsed.GetAddressUsed(preSignal);
             }
-            catch (KeyNotFoundException)
+            catch (Exception e) when (e is KeyNotFoundException || e is NotSupportedException)
             {
 
             }
@@ -112,22 +97,19 @@ namespace S7SvrSim.S7Signal
 
             foreach (var signal in signals.Skip(1))
             {
-                if (SignalAddressUsed.TryGetValue(signal.GetType(), out var used))
+                if (signalAddressUsed.TryGetAddressUsed(signal, out var used))
                 {
-                    var preUsedItem = GetAddressUsedItem(preUsed, preSignal);
-                    var usedItem = GetAddressUsedItem(used, signal);
-
                     var dbIndex = preAddress.DbIndex;
                     int index;
                     byte offset = 0;
 
                     if (signal is Holding)
                     {
-                        index = preAddress.Index + preUsedItem.IndexSize;
+                        index = preAddress.Index + preUsed.IndexSize;
                     }
                     else
                     {
-                        if (preUsedItem.IndexSize == 0 && usedItem.IndexSize == 0 && preSignal is Bool && signal is Bool)
+                        if (preUsed.IndexSize == 0 && used.IndexSize == 0 && preSignal is Bool && signal is Bool)
                         {
                             if (preAddress.Offset >= 7)
                             {
@@ -137,12 +119,12 @@ namespace S7SvrSim.S7Signal
                             else
                             {
                                 index = preAddress.Index;
-                                offset = (byte)(preAddress.Offset + preUsedItem.OffsetSize);
+                                offset = (byte)(preAddress.Offset + preUsed.OffsetSize);
                             }
                         }
                         else
                         {
-                            index = preAddress.Index + (preUsedItem.IndexSize == 0 ? 1 : preUsedItem.IndexSize);
+                            index = preAddress.Index + (preUsed.IndexSize == 0 ? 1 : preUsed.IndexSize);
                         }
 
                         if (index % 2 == 1 && (signal is not Bool || !options.AllowBoolIndexHasOddNumber) && (signal is not Byte || !options.AllowByteIndexHAsOddNumber) && options.ForbidIndexHasOddNumber)
@@ -153,7 +135,7 @@ namespace S7SvrSim.S7Signal
 
                     var newAddress = new SignalAddress(dbIndex, index, offset)
                     {
-                        HideOffset = usedItem.IndexSize != 0 || signal is Holding,
+                        HideOffset = used.IndexSize != 0 || signal is Holding,
                         AreaKind = preAddress.AreaKind
                     };
 
@@ -174,22 +156,6 @@ namespace S7SvrSim.S7Signal
                 {
                     break;
                 }
-            }
-        }
-
-        private static AddressUsedItem GetAddressUsedItem(AddressUsed used, SignalBase signal)
-        {
-            if (used.CalcMethod == null)
-            {
-                return new AddressUsedItem()
-                {
-                    IndexSize = used.Attribute.IndexSize,
-                    OffsetSize = used.Attribute.OffsetSize
-                };
-            }
-            else
-            {
-                return (AddressUsedItem)used.CalcMethod.Invoke(signal, []);
             }
         }
     }
