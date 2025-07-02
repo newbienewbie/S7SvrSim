@@ -63,12 +63,10 @@ namespace S7SvrSim.S7Signal
     {
         public static IServiceCollection AddAddressUsedCalc(this IServiceCollection services)
         {
-            var signalTypes = typeof(SignalWatchVM).Assembly
-                .GetTypes()
-                .Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase)))
-                .Select(ty => (Type: ty, Attr: ty.GetCustomAttribute<AddressUsedAttribute>()))
-                .Where(item => item.Attr != null)
-                .Select(item => item.Type);
+            var signalTypes = from ty in typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase)))
+                              let attr = ty.GetCustomAttribute<AddressUsedAttribute>()
+                              where attr != null
+                              select ty;
             var calcType = typeof(IAddressUsedCalc<>);
             var attrCalcType = typeof(AddressUsedAttrCalc<>);
 

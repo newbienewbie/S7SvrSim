@@ -106,7 +106,7 @@ namespace S7SvrSim.ViewModels
         #region Signal Edit
         public void OpenValueSet()
         {
-            if (SelectedEditObj == null || !IsInWatch || SelectedEditObj.Value is Holding)
+            if (SelectedEditObj == null || SelectedEditObj.Value.Address == null || !IsInWatch || SelectedEditObj.Value is Holding)
             {
                 return;
             }

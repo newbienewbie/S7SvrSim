@@ -14,17 +14,15 @@ namespace S7SvrSim.S7Signal
         {
             var calcType = typeof(IAddressUsedCalc<>);
 
-            calcs = signalTypes.Value.Select(ty =>
-            {
-                var calc = serviceProvider.GetRequiredService(calcType.MakeGenericType(ty));
-                return (Type: ty, Calc: calc);
-            })
-                .Where(item => item.Calc != null)
-                .ToDictionary(item => item.Type, item =>
-                {
-                    var method = item.Calc.GetType().GetMethod("CalcAddressUsed");
-                    return new Func<SignalBase, IAddressUsed>((SignalBase signal) => (IAddressUsed)method.Invoke(item.Calc, new object[] { signal }));
-                });
+            calcs = (from ty in signalTypes.Value
+                     let calc = serviceProvider.GetRequiredService(calcType.MakeGenericType(ty))
+                     let method = calc?.GetType().GetMethod("CalcAddressUsed")
+                     where method != null
+                     select new
+                     {
+                         Type = ty,
+                         Method = new Func<SignalBase, IAddressUsed>((SignalBase signal) => (IAddressUsed)method.Invoke(calc, new object[] { signal }))
+                     }).ToDictionary(item => item.Type, item => item.Method);
         }
         public IAddressUsed GetAddressUsed(SignalBase signal)
 

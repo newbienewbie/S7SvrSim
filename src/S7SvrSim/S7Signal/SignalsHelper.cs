@@ -1,5 +1,6 @@
 ﻿using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
+using S7SvrSim.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace S7SvrSim.S7Signal
 
         public void RefreshValue(IEnumerable<SignalBase> signals)
         {
+            signals.Where(s => s.Address == null).Each(s => s.Value = null);
             foreach (var blockSignals in signals.Where(s => s.Address != null).GroupBy(s => s.Address.AreaKind))
             {
                 object preValue = null;
