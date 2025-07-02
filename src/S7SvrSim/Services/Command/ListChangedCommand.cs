@@ -1,5 +1,6 @@
 ﻿using DynamicData;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -148,14 +149,20 @@ namespace S7SvrSim.Services.Command
 
         private void Order()
         {
-            list.Clear();
-            list.AddRange(newItems.Select(item => item.Item));
+            var items = newItems.Select(item => item.Item);
+            ArrayList.Adapter((IList)list).Sort(Comparer<T>.Create((item1, item2) =>
+            {
+                return items.IndexOf(item1) - items.IndexOf(item2);
+            }));
         }
 
         private void OrderBack()
         {
-            list.Clear();
-            list.AddRange(oldItems.Select(item => item.Item));
+            var items = oldItems.Select(item => item.Item);
+            ArrayList.Adapter((IList)list).Sort(Comparer<T>.Create((item1, item2) =>
+            {
+                return items.IndexOf(item1) - items.IndexOf(item2);
+            }));
         }
 
         public virtual void Execute()
