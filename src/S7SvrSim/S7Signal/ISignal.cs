@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using S7SvrSim.Project;
 using S7SvrSim.Services;
+using S7SvrSim.Shared;
 using System;
 
 namespace S7SvrSim.S7Signal
@@ -27,8 +28,6 @@ namespace S7SvrSim.S7Signal
 
     public abstract partial class SignalBase : ObservableObject, ISignal, IEquatable<SignalBase>
     {
-        public delegate void PropertyChangedHandle<T>(T oldValue, T newValue);
-
         [ObservableProperty]
         private object value;
 
@@ -42,7 +41,7 @@ namespace S7SvrSim.S7Signal
         [ObservableProperty]
         private string remark;
 
-        public event PropertyChangedHandle<string> FormatAddressChanged;
+        public event PropertyChanged<string> FormatAddressChanged;
         protected void InvokeFormatAddressEvent(string oldAddress, string newAddress)
         {
             FormatAddressChanged?.Invoke(oldAddress, newAddress);
@@ -82,13 +81,13 @@ namespace S7SvrSim.S7Signal
             Remark = signal.Remark;
         }
 
-        public event PropertyChangedHandle<string> NameChanged;
+        public event PropertyChanged<string> NameChanged;
         partial void OnNameChanged(string oldValue, string newValue)
         {
             NameChanged?.Invoke(oldValue, newValue);
         }
 
-        public event PropertyChangedHandle<string> RemarkChanged;
+        public event PropertyChanged<string> RemarkChanged;
         partial void OnRemarkChanged(string oldValue, string newValue)
         {
             RemarkChanged?.Invoke(oldValue, newValue);
@@ -143,7 +142,7 @@ namespace S7SvrSim.S7Signal
         [ObservableProperty]
         private int length;
 
-        public event PropertyChangedHandle<int> LengthChanged;
+        public event PropertyChanged<int> LengthChanged;
         partial void OnLengthChanged(int oldValue, int newValue)
         {
             LengthChanged?.Invoke(oldValue, newValue);
