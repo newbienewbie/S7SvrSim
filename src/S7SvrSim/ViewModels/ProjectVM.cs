@@ -120,6 +120,11 @@ namespace S7SvrSim.ViewModels
 
         private void OpenProject(string file)
         {
+            if (file == currentProject.Path)
+            {
+                return;
+            }
+
             IProject project;
 
             try
@@ -173,7 +178,7 @@ namespace S7SvrSim.ViewModels
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog()
             {
-                Title = "选择新项目保存路径",
+                Title = "选择另存路径",
                 Filter = $"S7模拟项目|*{ProjectConst.FILE_EXTENSION}",
                 FileName = Path.GetFileName(currentProject.Path),
                 RestoreDirectory = true,
@@ -204,7 +209,14 @@ namespace S7SvrSim.ViewModels
 
             newName = new string(newName.Select(c => InvalidCharsForPath.Contains(c) ? ' ' : c).ToArray());
 
+            var oldFile = RecentFiles.FirstOrDefault(f => f.Path == currentProject.Path);
+            if (oldFile != null)
+            {
+                recentFiles.RemoveFile(oldFile);
+            }
+
             currentProject.Move(Path.Combine(Path.GetDirectoryName(currentProject.Path), newName));
+            recentFiles.AddFile(new RecentFile(currentProject.Path, DateTime.Now));
 
             CallbackNeedSave();
         }
@@ -227,8 +239,8 @@ namespace S7SvrSim.ViewModels
             else
             {
                 OpenProject(file.Path);
+                recentFiles.AddFile(new RecentFile(file.Path, DateTime.Now));
             }
-            recentFiles.AddFile(new RecentFile(file.Path, DateTime.Now));
         }
 
         private void RemoveRecentFile(RecentFile file)
