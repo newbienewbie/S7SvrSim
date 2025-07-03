@@ -1,10 +1,12 @@
 ﻿using DynamicData;
+using DynamicData.Binding;
 using Microsoft.Win32;
 using ReactiveUI.Fody.Helpers;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
 using S7SvrSim.Services.Recent;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -29,8 +31,7 @@ namespace S7SvrSim.ViewModels
         [Reactive]
         public int RedoCount { get; set; }
 
-        [Reactive]
-        public RecentFile[] RecentFiles { get; set; }
+        public ReadOnlyObservableCollection<RecentFile> RecentFiles { get; }
 
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
@@ -58,7 +59,12 @@ namespace S7SvrSim.ViewModels
             OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile);
             RemoveRecentCommand = ReactiveCommand.Create<RecentFile>(RemoveRecentFile);
 
-            recentFiles.Files.Connect().ToCollection().Subscribe(items => RecentFiles = items.ToArray());
+            recentFiles.Files.Connect()
+                .Sort(SortExpressionComparer<RecentFile>.Descending(file => file.OpenTime))
+                .Bind(out var data)
+                .Subscribe();
+
+            RecentFiles = data;
         }
 
         private void CallbackNeedSave()

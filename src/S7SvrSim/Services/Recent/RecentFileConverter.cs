@@ -37,7 +37,7 @@ namespace S7SvrSim.Services.Recent
             var files = root.Elements(Structure.File)
                 .Select(element =>
                 {
-                    var file = element.Attribute(Structure.File).Value;
+                    var file = element.Attribute(Structure.FilePath).Value;
                     var time = element.Attribute(Structure.OpenTime).Value;
                     return new RecentFile(file, DateTime.Parse(time).ToUniversalTime());
                 });

@@ -16,7 +16,6 @@ namespace S7SvrSim.Services.Recent
         {
             Files = _files
                 .Connect()
-                .SortBy(f => f.OpenTime, SortDirection.Descending)
                 .RemoveKey()
                 .AsObservableList();
 
