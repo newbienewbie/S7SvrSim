@@ -30,7 +30,8 @@ namespace S7SvrSim.Services.Settings
             if (File.Exists(Location))
             {
                 var serializer = new XmlSerializer(typeof(List<Option>));
-                if (serializer.Deserialize(File.OpenRead(Location)) is List<Option> options)
+                using var fileStream = File.OpenRead(Location);
+                if (serializer.Deserialize(fileStream) is List<Option> options)
                 {
                     Options = options.ToDictionary(op => op.Key, op => op.Value);
                 }
@@ -58,7 +59,8 @@ namespace S7SvrSim.Services.Settings
             }
 
             var serializer = new XmlSerializer(typeof(List<Option>));
-            serializer.Serialize(File.Create(Location), Options.Select(item => new Option()
+            using var fileStream = File.Create(Location);
+            serializer.Serialize(fileStream, Options.Select(item => new Option()
             {
                 Key = item.Key,
                 Value = item.Value

@@ -79,6 +79,7 @@
                                   />
                         <MenuItem Header="打开最近..."
                                   ItemsSource="{Binding ProjectVM.RecentFiles}"
+                                  IsEnabled="{Binding ProjectVM.CanOpenRecent}"
                                   >
                             <MenuItem.ItemContainerStyle>
                                 <Style TargetType="MenuItem"
@@ -86,9 +87,27 @@
                                        >
                                     <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.ProjectVM.OpenRecentCommand}" />
                                     <Setter Property="CommandParameter" Value="{Binding .}" />
-                                    <Setter Property="Header" Value="{Binding Path}" />
                                 </Style>
                             </MenuItem.ItemContainerStyle>
+                            <MenuItem.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel>
+                                        <Button Content="{md:PackIcon Kind=Close,
+                                                                      Size=24}"
+                                                DockPanel.Dock="Right"
+                                                Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.ProjectVM.RemoveRecentCommand}"
+                                                CommandParameter="{Binding .}"
+                                                Style="{StaticResource MaterialDesignFlatButton}"
+                                                Padding="0"
+                                                Height="24"
+                                                Margin="10 0 0 0"
+                                                />
+                                        <TextBlock Text="{Binding Path}"
+                                                   VerticalAlignment="Center"
+                                                   />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </MenuItem.ItemTemplate>
                         </MenuItem>
                         <MenuItem Header="保存"
                                   Icon="{md:PackIcon Kind=ContentSaveOutline}"

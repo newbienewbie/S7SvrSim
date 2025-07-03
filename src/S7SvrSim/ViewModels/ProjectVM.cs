@@ -33,6 +33,8 @@ namespace S7SvrSim.ViewModels
 
         public ReadOnlyObservableCollection<RecentFile> RecentFiles { get; }
 
+        public bool CanOpenRecent => RecentFiles.Count > 0;
+
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
         public ICommand RenameCommand { get; }
@@ -53,18 +55,18 @@ namespace S7SvrSim.ViewModels
                 NeedSave = true;
             };
 
+            recentFiles.Files.Connect()
+                .Sort(SortExpressionComparer<RecentFile>.Descending(file => file.OpenTime))
+                .Bind(out var data)
+                .Subscribe(files => this.RaisePropertyChanged(nameof(CanOpenRecent)));
+
+            RecentFiles = data;
+
             UndoCommand = ReactiveCommand.Create(UndoRedoManager.Undo, this.WhenAnyValue(vm => vm.UndoCount).Select(c => c > 0));
             RedoCommand = ReactiveCommand.Create(UndoRedoManager.Redo, this.WhenAnyValue(vm => vm.RedoCount).Select(c => c > 0));
             RenameCommand = ReactiveCommand.Create<string>(RenameProject);
             OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile);
             RemoveRecentCommand = ReactiveCommand.Create<RecentFile>(RemoveRecentFile);
-
-            recentFiles.Files.Connect()
-                .Sort(SortExpressionComparer<RecentFile>.Descending(file => file.OpenTime))
-                .Bind(out var data)
-                .Subscribe();
-
-            RecentFiles = data;
         }
 
         private void CallbackNeedSave()
