@@ -6,10 +6,12 @@ using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
+using S7SvrSim.Services.Settings;
 using S7SvrSim.UserControls;
 using S7SvrSim.UserControls.Rws;
 using S7SvrSim.ViewModels;
 using S7SvrSim.ViewModels.Rw;
+using S7SvrSim.ViewModels.Siganls;
 using Splat;
 using System;
 
@@ -30,6 +32,9 @@ namespace S7SvrSim
             services.AddSingleton<ISignalAddressUesdCollection, SignalAddressUesedCollection>();
             services.AddAddressUsedCalc();
             services.AddScoped<SignalsHelper>();
+            services.AddSingleton<ISettingStore, SettingStore>();
+            services.AddSingleton<ISettingFactory, SettingFactory>();
+            services.AddSetting(new UpdateAddressOptionsConveter(), "UpdateAddressOptions");
 
             return services;
         }
@@ -59,7 +64,7 @@ namespace S7SvrSim
 
             Locator.CurrentMutable.RegisterLazySingletonEx<ScriptTaskWindowVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<SignalWatchVM>(sp);
-
+            Locator.CurrentMutable.RegisterLazySingletonEx<UpdateAddressOptionsVM>(sp);
 
             Locator.CurrentMutable.Register<IViewFor<RwBitVM>, BitOpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwByteVM>, ByteOpsView>();

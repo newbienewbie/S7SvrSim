@@ -1,5 +1,6 @@
 ﻿using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
+using S7SvrSim.Services.Settings;
 using S7SvrSim.Shared;
 using System;
 using System.Collections.Generic;
@@ -12,10 +13,20 @@ namespace S7SvrSim.S7Signal
         private readonly IS7BlockFactory blockFactory;
         private readonly ISignalAddressUesdCollection signalAddressUsed;
 
-        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockFactory blockFactory)
+        private bool ForbidIndexHasOddNumber { get; set; }
+        private bool AllowBoolIndexHasOddNumber { get; set; }
+        private bool AllowByteIndexHAsOddNumber { get; set; }
+        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockFactory blockFactory, ISetting<UpdateAddressOptions> setting)
         {
             this.signalAddressUsed = signalAddressUsed;
             this.blockFactory = blockFactory;
+
+            setting.Value.Subscribe(options =>
+            {
+                ForbidIndexHasOddNumber = options.ForbidIndexHasOddNumber;
+                AllowBoolIndexHasOddNumber = options.AllowBoolIndexHasOddNumber;
+                AllowByteIndexHAsOddNumber = options.AllowByteIndexHAsOddNumber;
+            });
         }
 
         public void RefreshValue(IEnumerable<SignalBase> signals)
@@ -64,14 +75,12 @@ namespace S7SvrSim.S7Signal
             }
         }
 
-        public void UpdateAddress(IEnumerable<SignalBase> signals, UpdateAddressOptions options = null)
+        public void UpdateAddress(IEnumerable<SignalBase> signals)
         {
             if (signals.Count() <= 1)
             {
                 return;
             }
-
-            options ??= new UpdateAddressOptions();
 
             var preSignal = signals.First();
             var preAddress = preSignal.Address;
@@ -129,7 +138,7 @@ namespace S7SvrSim.S7Signal
                             index = preAddress.Index + (preUsed.IndexSize == 0 ? 1 : preUsed.IndexSize);
                         }
 
-                        if (index % 2 == 1 && (signal is not Bool || !options.AllowBoolIndexHasOddNumber) && (signal is not Byte || !options.AllowByteIndexHAsOddNumber) && options.ForbidIndexHasOddNumber)
+                        if (index % 2 == 1 && (signal is not Bool || !AllowBoolIndexHasOddNumber) && (signal is not Byte || !AllowByteIndexHAsOddNumber) && ForbidIndexHasOddNumber)
                         {
                             index += 1;
                         }

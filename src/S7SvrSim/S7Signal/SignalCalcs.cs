@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using S7SvrSim.Services.Settings;
 using S7SvrSim.ViewModels;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -25,12 +27,21 @@ namespace S7SvrSim.S7Signal
         }
     }
 
-    public partial class StringCalc : IAddressUsedCalc<String>
+    public class StringCalc : IAddressUsedCalc<String>
     {
+        private bool UseTenCeiling { get; set; }
+
+        public StringCalc(ISetting<UpdateAddressOptions> setting)
+        {
+            setting.Value.Subscribe(options =>
+            {
+                UseTenCeiling = options.StringUseTenCeiling;
+            });
+        }
+
         public IAddressUsed CalcAddressUsed(String signal)
         {
             var length = signal.Length;
-            bool UseTenCeiling = false;
             if (UseTenCeiling)
             {
                 var remain = (length + 2) % 10;

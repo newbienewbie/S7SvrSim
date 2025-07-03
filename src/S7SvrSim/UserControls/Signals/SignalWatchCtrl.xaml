@@ -97,27 +97,27 @@
                     <MenuItem Header="配置项">
                         <MenuItem Header="根据 DB 分配地址"
                                   IsCheckable="True"
-                                  IsChecked="{Binding UpdateAddressByDbIndex, Mode=TwoWay}"
+                                  IsChecked="{Binding UpdateAddressOptionsVM.UpdateAddressByDbIndex, Mode=TwoWay}"
                                   />
                         <Separator />
                         <MenuItem Header="禁止地址存在奇数"
                                   IsCheckable="True"
-                                  IsChecked="{Binding UpdateAddressOptions.ForbidIndexHasOddNumber, Mode=TwoWay}"
+                                  IsChecked="{Binding UpdateAddressOptionsVM.ForbidIndexHasOddNumber, Mode=TwoWay}"
                                   />
                         <MenuItem Header="允许 Bool 地址存在奇数"
                                   IsCheckable="True"
-                                  IsChecked="{Binding UpdateAddressOptions.AllowBoolIndexHasOddNumber, Mode=TwoWay}"
+                                  IsChecked="{Binding UpdateAddressOptionsVM.AllowBoolIndexHasOddNumber, Mode=TwoWay}"
                                   ToolTip="如果禁止地址存在奇数，该项启用后可以允许 Bool 类型的地址存在奇数"
                                   />
                         <MenuItem Header="允许 Byte 地址存在奇数"
                                   IsCheckable="True"
-                                  IsChecked="{Binding UpdateAddressOptions.AllowByteIndexHAsOddNumber, Mode=TwoWay}"
+                                  IsChecked="{Binding UpdateAddressOptionsVM.AllowByteIndexHAsOddNumber, Mode=TwoWay}"
                                   ToolTip="如果禁止地址存在奇数，该项启用后可以允许 Byte 类型的地址存在奇数"
                                   />
                         <Separator />
                         <MenuItem Header="String 按十进位地址占用计算"
                                   IsCheckable="True"
-                                  IsChecked="{Binding StringUseTenCeiling}"
+                                  IsChecked="{Binding UpdateAddressOptionsVM.StringUseTenCeiling, Mode=TwoWay}"
                                   ToolTip="启用该项，String类型的占用会按10的整数倍进行计算"
                                   />
                     </MenuItem>

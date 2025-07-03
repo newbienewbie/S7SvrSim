@@ -9,6 +9,7 @@ using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
 using S7SvrSim.Shared;
 using S7SvrSim.UserControls.Signals;
+using S7SvrSim.ViewModels.Siganls;
 using Splat;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,8 @@ namespace S7SvrSim.ViewModels
         private readonly IMediator mediator;
         private readonly IS7BlockFactory blockFactory;
         private readonly SignalsHelper signalsHelper;
+
+        public UpdateAddressOptionsVM UpdateAddressOptionsVM { get; }
         #endregion
 
         public DataGrid Grid { get; set; }
@@ -46,14 +49,7 @@ namespace S7SvrSim.ViewModels
         [NotifyPropertyChangedFor(nameof(CanMoveBefore))]
         private SignalEditObj dragTargetSignal;
 
-        [Reactive]
-        public UpdateAddressOptions UpdateAddressOptions { get; set; } = new UpdateAddressOptions();
-
-        [Reactive]
-        public bool UpdateAddressByDbIndex { get; set; } = false;
-
-        [Reactive]
-        public bool StringUseTenCeiling { get; set; } = S7Signal.String.UseTenCeiling;
+        private bool UpdateAddressByDbIndex => UpdateAddressOptionsVM.UpdateAddressByDbIndex;
 
         [Reactive]
         public bool IsDragSignals { get; set; }
@@ -66,6 +62,7 @@ namespace S7SvrSim.ViewModels
             this.mediator = mediator;
             this.blockFactory = blockFactory;
             this.signalsHelper = signalsHelper;
+            UpdateAddressOptionsVM = Locator.Current.GetRequiredService<UpdateAddressOptionsVM>();
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
 
@@ -76,7 +73,6 @@ namespace S7SvrSim.ViewModels
                 OnPropertyChanged(nameof(CanMoveAfter));
                 OnPropertyChanged(nameof(CanMoveBefore));
             };
-            this.WhenAnyValue(vm => vm.StringUseTenCeiling).Subscribe(u => S7Signal.String.UseTenCeiling = u);
         }
 
         private void CommandEventHandle(object _object, EventArgs _args)
@@ -394,14 +390,14 @@ namespace S7SvrSim.ViewModels
 
             UndoRedoManager.StartTransaction();
 
-            if (UpdateAddressByDbIndex)
+            if (UpdateAddressOptionsVM.UpdateAddressByDbIndex)
             {
                 var dbSignals = AssembleSignalByAddress(Signals);
-                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals, UpdateAddressOptions));
+                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals));
             }
             else
             {
-                signalsHelper.UpdateAddress(Signals.Select(s => s.Value), UpdateAddressOptions);
+                signalsHelper.UpdateAddress(Signals.Select(s => s.Value));
             }
 
             var command = UndoRedoManager.EndTransaction();
@@ -425,11 +421,11 @@ namespace S7SvrSim.ViewModels
             if (UpdateAddressByDbIndex)
             {
                 var dbSignals = AssembleSignalByAddress(signals);
-                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals, UpdateAddressOptions));
+                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals));
             }
             else
             {
-                signalsHelper.UpdateAddress(signals.Select(s => s.Value), UpdateAddressOptions);
+                signalsHelper.UpdateAddress(signals.Select(s => s.Value));
             }
 
             var command = UndoRedoManager.EndTransaction();
@@ -452,11 +448,11 @@ namespace S7SvrSim.ViewModels
             if (UpdateAddressByDbIndex)
             {
                 var dbSignals = AssembleSignalByAddress(signals);
-                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals, UpdateAddressOptions));
+                dbSignals.Each(signals => signalsHelper.UpdateAddress(signals));
             }
             else
             {
-                signalsHelper.UpdateAddress(signals.Select(s => s.Value), UpdateAddressOptions);
+                signalsHelper.UpdateAddress(signals.Select(s => s.Value));
             }
 
             var command = UndoRedoManager.EndTransaction();
