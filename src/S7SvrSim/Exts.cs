@@ -30,6 +30,7 @@ namespace S7SvrSim
             services.AddSingleton<IProjectFactory, ProjectFractory>();
             services.AddSingleton<IS7BlockFactory, S7BlockFactory>();
             services.AddSingleton<IMemCache<Type[]>, SignalTypeCache>();
+            services.AddSingleton<IMemCache<WatchState>, WatchStateCache>();
             services.AddSingleton<ISignalAddressUesdCollection, SignalAddressUesedCollection>();
             services.AddAddressUsedCalc();
             services.AddScoped<SignalsHelper>();
@@ -66,8 +67,11 @@ namespace S7SvrSim
             Locator.CurrentMutable.RegisterLazySingletonEx<RwStringVM>(sp);
 
             Locator.CurrentMutable.RegisterLazySingletonEx<ScriptTaskWindowVM>(sp);
-            Locator.CurrentMutable.RegisterLazySingletonEx<SignalWatchVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<UpdateAddressOptionsVM>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<SignalsCollection>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<DragSignalsVM>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<SignalWatchVM>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<SignalPageVM>(sp);
 
             Locator.CurrentMutable.Register<IViewFor<RwBitVM>, BitOpsView>();
             Locator.CurrentMutable.Register<IViewFor<RwByteVM>, ByteOpsView>();

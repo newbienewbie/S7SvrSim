@@ -1,13 +1,8 @@
-﻿using Microsoft.Win32;
-using ReactiveUI.Fody.Helpers;
-using S7Server.Simulator.ViewModels;
-using S7SvrSim.Services;
+﻿using S7Server.Simulator.ViewModels;
 using S7SvrSim.Services.Project;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -23,7 +18,7 @@ namespace S7Svr.Simulator.ViewModels
         public ConfigPyEngineVM ConfigPyEngineVM { get; }
         public RunningSnap7ServerVM RunningVM { get; }
         public OperationVM OperationVM { get; }
-        public SignalWatchVM SignalWatchVM { get; }
+        public SignalPageVM SignalPageVM { get; }
         public ProjectVM ProjectVM { get; }
 
         public MainVM(IS7ServerService server, IProjectFactory projectFactory)
@@ -35,7 +30,7 @@ namespace S7Svr.Simulator.ViewModels
             this.RunningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             this.OperationVM = Locator.Current.GetRequiredService<OperationVM>();
             this.ConfigVM = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
-            this.SignalWatchVM = Locator.Current.GetRequiredService<SignalWatchVM>();
+            this.SignalPageVM = Locator.Current.GetRequiredService<SignalPageVM>();
             this.ProjectVM = Locator.Current.GetRequiredService<ProjectVM>();
 
             var watchRunningStatus = this.WhenAnyValue(vm => vm.RunningVM.RunningStatus);

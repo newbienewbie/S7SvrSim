@@ -1,12 +1,20 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace S7SvrSim.Services.Project
 {
     public class ProjectFractory : IProjectFactory
     {
+        private readonly IServiceProvider serviceProvider;
+
+        public ProjectFractory(IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+        }
+
         private IProject GetProjectByPath(string path)
         {
-            return path == null ? new DefaultProject() : new SoftwareProject(path);
+            return path == null ? new DefaultProject(serviceProvider) : new SoftwareProject(path, serviceProvider);
         }
 
         public IProject CreateProject(string path)
@@ -42,11 +50,6 @@ namespace S7SvrSim.Services.Project
             var project = GetProjectByPath(path);
             project.Load();
             return project;
-        }
-
-        public IProject MoveProject(string path, string newPath)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

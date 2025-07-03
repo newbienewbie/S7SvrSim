@@ -13,5 +13,10 @@ namespace S7SvrSim.Services
         }
 
         public Type[] Value { get; }
+
+        public void Write(Type[] value)
+        {
+
+        }
     }
 }

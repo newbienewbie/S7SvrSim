@@ -1,8 +1,10 @@
-﻿using DynamicData;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Scripting.Utils;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Project;
 using S7SvrSim.S7Signal;
 using S7SvrSim.ViewModels;
+using S7SvrSim.ViewModels.Siganls;
 using Splat;
 using System;
 using System.Collections.Generic;
@@ -17,22 +19,29 @@ namespace S7SvrSim.Services.Project
         private readonly ConfigSnap7ServerVM configS7Model;
         private readonly ConfigPyEngineVM pyConfigModel;
         private readonly SignalWatchVM signalWatchModel;
+        private readonly SignalsCollection signalsCollection;
+        private readonly IServiceProvider serviceProvider;
+        private readonly IMemCache<Type[]> signalTypes;
 
         public ProjectFile ProjectFile { get; private set; }
         public string Path { get; private set; }
 
-        public SoftwareProject(string path)
+        public SoftwareProject(string path, IServiceProvider serviceProvider)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
+            this.serviceProvider = serviceProvider;
 
             Path = path;
+
+            signalTypes = serviceProvider.GetRequiredService<IMemCache<Type[]>>();
 
             configS7Model = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
             signalWatchModel = Locator.Current.GetRequiredService<SignalWatchVM>();
+            signalsCollection = Locator.Current.GetRequiredService<SignalsCollection>();
         }
 
         public void New()
@@ -78,6 +87,18 @@ namespace S7SvrSim.Services.Project
             Path = newPath;
         }
 
+        private SignalEditObj ItemToEditObj(SignalItem item)
+        {
+            var signalType = signalTypes.Value.First(ty => ty.Name == item.Type);
+            var signal = (SignalBase)Activator.CreateInstance(signalType);
+            signal.CopyFromSignalItem(item);
+
+            return new SignalEditObj(signalType)
+            {
+                Value = signal
+            };
+        }
+
         /// <summary>
         /// 用文件数据去配置软件数据
         /// </summary>
@@ -86,7 +107,7 @@ namespace S7SvrSim.Services.Project
         {
             configS7Model.AreaConfigs.Clear();
             pyConfigModel.PyEngineSearchPaths.Clear();
-            signalWatchModel.Signals.Clear();
+            signalsCollection.SignalGroups.Clear();
 
             configS7Model.AreaConfigs.AddRange(ProjectFile.AreaConfigs.Select(config => new AreaConfigVM()
             {
@@ -111,17 +132,17 @@ namespace S7SvrSim.Services.Project
 
             signalWatchModel.SetScanSpan(ProjectFile.ScanSpan);
 
-            signalWatchModel.Signals.AddRange(ProjectFile.Signals.Select(signalCfg =>
-            {
-                var signalType = signalWatchModel.SignalTypes.First(ty => ty.Name == signalCfg.Type);
-                var signal = (SignalBase)Activator.CreateInstance(signalType);
-                signal.CopyFromSignalItem(signalCfg);
+            IEnumerable<SignalEditGroup> defaultGroup = null;
 
-                return new SignalEditObj(signalType)
-                {
-                    Value = signal
-                };
-            }));
+            if (ProjectFile.Signals.Count > 0)
+            {
+                defaultGroup = [new SignalEditGroup("default", ProjectFile.Signals.Select(ItemToEditObj))];
+            }
+
+            var groups = ProjectFile.SignalGroups.Select(sg => new SignalEditGroup(sg.Name, sg.SignalItems.Select(ItemToEditObj)));
+
+            signalsCollection.SignalGroups.AddRange(defaultGroup != null ? defaultGroup.Concat(groups) : groups);
+            signalsCollection.GroupName = signalsCollection.SignalGroups.FirstOrDefault()?.Name;
         }
 
         /// <summary>
@@ -147,7 +168,12 @@ namespace S7SvrSim.Services.Project
                 }).ToList(),
                 SearchPaths = searchPaths.ToList(),
                 IpAddress = configS7Model.IpAddress,
-                Signals = signalWatchModel.Signals.Select(signal => signal.Value.ToSignalItem()).ToList(),
+                //Signals = signalsCollection.Signals.Select(signal => signal.Value.ToSignalItem()).ToList(),
+                SignalGroups = signalsCollection.SignalGroups.Select(sg => new SignalGroup()
+                {
+                    Name = sg.Name,
+                    SignalItems = sg.Signals.Select(s => s.Value.ToSignalItem()).ToList()
+                }).ToList(),
                 ScanSpan = signalWatchModel.ScanSpan,
             };
         }

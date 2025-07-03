@@ -7,7 +7,11 @@ namespace S7SvrSim.Services.Project
     {
         protected const string DEFAULT_FILENAME = "unamed";
 
-        public DefaultProject() : base(IOPath.Combine(IOPath.GetDirectoryName(Environment.ProcessPath), DEFAULT_FILENAME, $"{DEFAULT_FILENAME}{ProjectConst.FILE_EXTENSION}"))
+        public DefaultProject(IServiceProvider serviceProvider)
+            : base(IOPath.Combine(IOPath.GetDirectoryName(Environment.ProcessPath)
+                , DEFAULT_FILENAME
+                , $"{DEFAULT_FILENAME}{ProjectConst.FILE_EXTENSION}")
+              , serviceProvider)
         {
         }
     }

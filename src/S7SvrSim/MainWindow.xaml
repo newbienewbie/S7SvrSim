@@ -92,16 +92,21 @@
                             <MenuItem.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel>
-                                        <Button Content="{md:PackIcon Kind=Close,
-                                                                      Size=24}"
-                                                DockPanel.Dock="Right"
+                                        <Button DockPanel.Dock="Right"
                                                 Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.ProjectVM.RemoveRecentCommand}"
                                                 CommandParameter="{Binding .}"
-                                                Style="{StaticResource MaterialDesignFlatButton}"
-                                                Padding="0"
-                                                Height="24"
                                                 Margin="10 0 0 0"
-                                                />
+                                                >
+                                            <Button.Template>
+                                                <ControlTemplate>
+                                                    <md:PackIcon Kind="Close"
+                                                                 Background="Transparent"
+                                                                 Foreground="{DynamicResource MaterialDesignLightForeground}"
+                                                                 VerticalAlignment="Center"
+                                                                 />
+                                                </ControlTemplate>
+                                            </Button.Template>
+                                        </Button>
                                         <TextBlock Text="{Binding Path}"
                                                    VerticalAlignment="Center"
                                                    />
@@ -335,7 +340,7 @@
                         </Grid>
                     </TabItem>
                     <TabItem Header="监看">
-                        <usercontrols:SignalWatchCtrl DataContext="{Binding SignalWatchVM}" />
+                        <usercontrols:SignalWatchCtrl DataContext="{Binding SignalPageVM}" />
                     </TabItem>
                     <TabItem Header="脚本">
                         <scripting:ConfigPyEngineView />

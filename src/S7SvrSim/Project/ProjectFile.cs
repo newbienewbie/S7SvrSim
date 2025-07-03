@@ -36,6 +36,9 @@ namespace S7SvrSim.Project
         [XmlElement("Signal")]
         public List<SignalItem> Signals { get; set; } = new();
 
+        [XmlElement("SignalGroup")]
+        public List<SignalGroup> SignalGroups { get; set; } = new();
+
         public void DefaultInit()
         {
             IpAddress = "127.0.0.1";
@@ -45,6 +48,7 @@ namespace S7SvrSim.Project
                 Path = "Scripts\\",
                 Recursive = true,
             });
+            SignalGroups.Add(new SignalGroup() { Name = "Defalut" });
         }
 
         public void Save(string path)

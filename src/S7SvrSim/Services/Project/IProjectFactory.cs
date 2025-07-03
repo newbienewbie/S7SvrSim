@@ -5,6 +5,5 @@
         IProject GetProject(string path);
         IProject CreateProject(string path);
         IProject GetOrCreateProject(string path);
-        IProject MoveProject(string path, string newPath);
     }
 }

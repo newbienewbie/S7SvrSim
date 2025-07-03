@@ -18,7 +18,7 @@ namespace S7SvrSim.UserControls
     /// <summary>
     /// SignalWatchCtrl.xaml 的交互逻辑
     /// </summary>
-    public partial class SignalWatchCtrl : UserControl, IViewFor<SignalWatchVM>
+    public partial class SignalWatchCtrl : UserControl, IViewFor<SignalPageVM>
     {
         private readonly IMediator mediator;
         public SignalWatchCtrl()
@@ -29,18 +29,18 @@ namespace S7SvrSim.UserControls
 
             this.WhenActivated(d =>
             {
-                ViewModel = Locator.Current.GetRequiredService<SignalWatchVM>();
-                ViewModel.Grid = signalGrid;
-                ViewModel.AfterDragEvent += ViewModel_AfterDragEvent;
+                ViewModel = Locator.Current.GetRequiredService<SignalPageVM>();
+                ViewModel.Signals.Grid = signalGrid;
+                ViewModel.DragSignalsVM.AfterDragEvent += ViewModel_AfterDragEvent;
                 signalGrid.ContextMenu.PlacementTarget = signalGrid;
             });
         }
 
-        public SignalWatchVM ViewModel { get => (SignalWatchVM)GetValue(ViewModelProperty); set => SetValue(ViewModelProperty, value); }
-        object IViewFor.ViewModel { get => ViewModel; set => ViewModel = (SignalWatchVM)value; }
+        public SignalPageVM ViewModel { get; set; }
+        object IViewFor.ViewModel { get => ViewModel; set => ViewModel = (SignalPageVM)value; }
 
-        public static readonly DependencyProperty ViewModelProperty =
-            DependencyProperty.Register("ViewModel", typeof(SignalWatchVM), typeof(SignalWatchCtrl), new PropertyMetadata(null));
+        //public static readonly DependencyProperty ViewModelProperty =
+        //    DependencyProperty.Register("ViewModel", typeof(SignalWatchVM), typeof(SignalWatchCtrl), new PropertyMetadata(null));
 
         private ValidationResult EventValidation_ValidateEvent(object value, System.Globalization.CultureInfo cultureInfo)
         {
@@ -76,7 +76,7 @@ namespace S7SvrSim.UserControls
             var currentCell = signalGrid.CurrentCell;
             if ((string)currentCell.Column?.Header == "Value")
             {
-                ViewModel.OpenValueSet();
+                ViewModel.Signals.OpenValueSet();
             }
         }
 
@@ -87,7 +87,7 @@ namespace S7SvrSim.UserControls
             {
                 signalGrid.SelectedItems.Add(item);
             }
-            ViewModel.IsDragSignals = false;
+            ViewModel.DragSignalsVM.IsDragSignals = false;
             signalGrid.ContextMenu.IsOpen = false;
         }
 
@@ -109,8 +109,8 @@ namespace S7SvrSim.UserControls
                     return;
                 }
 
-                ViewModel.DragTargetSignal = targetItem;
-                ViewModel.IsDragSignals = true;
+                ViewModel.DragSignalsVM.DragTargetSignal = targetItem;
+                ViewModel.DragSignalsVM.IsDragSignals = true;
 
                 signalGrid.ContextMenu.IsOpen = true;
             }
@@ -132,8 +132,8 @@ namespace S7SvrSim.UserControls
                     list.Add(item);
                 }
 
-                ViewModel.DragSignals.Clear();
-                ViewModel.DragSignals.AddRange(list);
+                ViewModel.DragSignalsVM.DragSignals.Clear();
+                ViewModel.DragSignalsVM.DragSignals.AddRange(list);
                 DragDrop.DoDragDrop(icon, list, DragDropEffects.Move);
                 e.Handled = true;
             }
@@ -157,7 +157,7 @@ namespace S7SvrSim.UserControls
 
         private void SignalGridContextMenu_Closed(object sender, RoutedEventArgs e)
         {
-            ViewModel.IsDragSignals = false;
+            ViewModel.DragSignalsVM.IsDragSignals = false;
         }
 
         private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
