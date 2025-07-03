@@ -6,6 +6,7 @@ using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
+using S7SvrSim.Services.Recent;
 using S7SvrSim.Services.Settings;
 using S7SvrSim.UserControls;
 using S7SvrSim.UserControls.Rws;
@@ -35,6 +36,8 @@ namespace S7SvrSim
             services.AddSingleton<ISettingStore, SettingStore>();
             services.AddSingleton<ISettingFactory, SettingFactory>();
             services.AddSetting(new UpdateAddressOptionsConveter(), "UpdateAddressOptions");
+            services.AddSetting(new RecentFileConverter(), "RecentFiles");
+            services.AddSingleton<RecentFilesCollection>();
 
             return services;
         }

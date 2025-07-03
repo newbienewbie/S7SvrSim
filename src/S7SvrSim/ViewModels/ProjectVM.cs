@@ -1,8 +1,9 @@
-﻿using IronPython.Runtime.Operations;
+﻿using DynamicData;
 using Microsoft.Win32;
 using ReactiveUI.Fody.Helpers;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
+using S7SvrSim.Services.Recent;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -16,6 +17,7 @@ namespace S7SvrSim.ViewModels
     public class ProjectVM : ReactiveObject
     {
         private readonly IProjectFactory projectFactory;
+        private readonly RecentFilesCollection recentFiles;
         private IProject currentProject;
 
         [Reactive]
@@ -27,15 +29,20 @@ namespace S7SvrSim.ViewModels
         [Reactive]
         public int RedoCount { get; set; }
 
+        [Reactive]
+        public RecentFile[] RecentFiles { get; set; }
+
         public ICommand UndoCommand { get; }
         public ICommand RedoCommand { get; }
         public ICommand RenameCommand { get; }
+        public ICommand OpenRecentCommand { get; }
+        public ICommand RemoveRecentCommand { get; }
         public string ProjectTitle => Path.GetFileName(currentProject.Path);
 
-        public ProjectVM(IProjectFactory projectFactory)
+        public ProjectVM(IProjectFactory projectFactory, RecentFilesCollection recentFilesVM)
         {
             this.projectFactory = projectFactory;
-
+            this.recentFiles = recentFilesVM;
             currentProject = projectFactory.GetOrCreateProject(null);
 
             UndoRedoManager.UndoRedoChanged += () =>
@@ -48,6 +55,10 @@ namespace S7SvrSim.ViewModels
             UndoCommand = ReactiveCommand.Create(UndoRedoManager.Undo, this.WhenAnyValue(vm => vm.UndoCount).Select(c => c > 0));
             RedoCommand = ReactiveCommand.Create(UndoRedoManager.Redo, this.WhenAnyValue(vm => vm.RedoCount).Select(c => c > 0));
             RenameCommand = ReactiveCommand.Create<string>(RenameProject);
+            OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile);
+            RemoveRecentCommand = ReactiveCommand.Create<RecentFile>(RemoveRecentFile);
+
+            recentFiles.Files.Connect().ToCollection().Subscribe(items => RecentFiles = items.ToArray());
         }
 
         private void CallbackNeedSave()
@@ -99,6 +110,26 @@ namespace S7SvrSim.ViewModels
             UndoRedoManager.Reset();
         }
 
+        private void OpenProject(string file)
+        {
+            IProject project;
+
+            try
+            {
+                project = projectFactory.GetProject(file);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex}", "打开项目文件失败", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            currentProject = project;
+            UndoRedoManager.Reset();
+
+            CallbackNeedSave();
+        }
+
         public void LoadProject()
         {
             if (NotifyIfSave() == MessageBoxResult.Cancel)
@@ -119,22 +150,9 @@ namespace S7SvrSim.ViewModels
                 return;
             }
 
-            IProject project;
+            OpenProject(openFileDialog.FileName);
 
-            try
-            {
-                project = projectFactory.GetProject(openFileDialog.FileName);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"{ex}", "打开项目文件失败", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            currentProject = project;
-            UndoRedoManager.Reset();
-
-            CallbackNeedSave();
+            recentFiles.AddFile(new RecentFile(openFileDialog.FileName, DateTime.Now));
         }
 
         public void SaveProject()
@@ -181,6 +199,33 @@ namespace S7SvrSim.ViewModels
             currentProject.Move(Path.Combine(Path.GetDirectoryName(currentProject.Path), newName));
 
             CallbackNeedSave();
+        }
+
+        private void OpenRecentFile(RecentFile file)
+        {
+            if (NotifyIfSave() == MessageBoxResult.Cancel)
+            {
+                return;
+            }
+
+            if (!File.Exists(file.Path))
+            {
+                if (MessageBox.Show("是否从列表中移除？", "文件不存在", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    recentFiles.RemoveFile(file);
+                    return;
+                }
+            }
+            else
+            {
+                OpenProject(file.Path);
+            }
+            recentFiles.AddFile(new RecentFile(file.Path, DateTime.Now));
+        }
+
+        private void RemoveRecentFile(RecentFile file)
+        {
+            recentFiles.RemoveFile(file);
         }
     }
 }

@@ -13,6 +13,7 @@
         xmlns:shared="clr-namespace:S7SvrSim.Shared"
         xmlns:commands="clr-namespace:S7SvrSim.Commands"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:lu="clr-namespace:Less.Utils.WPF;assembly=Less.Utils.WPF"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewmodels:MainVM}"
         Title="Siemens PLC 通讯模拟器"
@@ -23,6 +24,9 @@
         <shared:IsTypeValueConverter x:Key="IsAreaConfigVM"
                                      Type="{x:Type viewmodels:AreaConfigVM}"
                                      />
+        <lu:BindingProxy x:Key="DataContextProxy"
+                         Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext}"
+                         />
     </Window.Resources>
     <md:DialogHost CloseOnClickAway="True"
                    DialogOpened="DialogHost_DialogOpened"
@@ -73,6 +77,19 @@
                                   Icon="{md:PackIcon Kind=FolderOpenOutline}"
                                   Command="ApplicationCommands.Open"
                                   />
+                        <MenuItem Header="打开最近..."
+                                  ItemsSource="{Binding ProjectVM.RecentFiles}"
+                                  >
+                            <MenuItem.ItemContainerStyle>
+                                <Style TargetType="MenuItem"
+                                       BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
+                                       >
+                                    <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.ProjectVM.OpenRecentCommand}" />
+                                    <Setter Property="CommandParameter" Value="{Binding .}" />
+                                    <Setter Property="Header" Value="{Binding Path}" />
+                                </Style>
+                            </MenuItem.ItemContainerStyle>
+                        </MenuItem>
                         <MenuItem Header="保存"
                                   Icon="{md:PackIcon Kind=ContentSaveOutline}"
                                   Command="ApplicationCommands.Save"

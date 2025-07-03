@@ -19,7 +19,7 @@ namespace S7SvrSim.S7Signal
 
         public string Convert(UpdateAddressOptions value)
         {
-            var root = new XElement(new XElement(Structure.Root));
+            var root = new XElement(Structure.Root);
             root.Add(new XElement(Structure.UpdateAddressByDbIndex, value.UpdateAddressByDbIndex));
             root.Add(new XElement(Structure.ForbidIndexHasOddNumber, value.ForbidIndexHasOddNumber));
             root.Add(new XElement(Structure.AllowBoolIndexHasOddNumber, value.AllowBoolIndexHasOddNumber));
