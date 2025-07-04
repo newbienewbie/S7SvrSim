@@ -16,6 +16,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace S7SvrSim.ViewModels.Siganls
 {
@@ -23,7 +24,6 @@ namespace S7SvrSim.ViewModels.Siganls
     {
         private readonly IMemCache<WatchState> watchState;
         private readonly SignalsHelper signalsHelper;
-
         public DataGrid Grid { get; set; }
 
         [Reactive]
@@ -33,22 +33,57 @@ namespace S7SvrSim.ViewModels.Siganls
 
         public ObservableCollection<SignalEditObj> Signals => SignalGroups.Where(sg => sg.Name == GroupName).FirstOrDefault()?.Signals;
 
+        public bool IsSignalsNotNull => Signals != null;
+
         [ObservableProperty]
         private SignalEditObj selectedEditObj;
 
         public bool UpdateAddressByDbIndex { get; set; }
+
+        [ObservableProperty]
+        private string newGroupName;
+
+        public ICommand NewSignalCommand { get; }
+        public ICommand InsertSignalCommand { get; }
+        public ICommand RemoveSelectedSignalsCommand { get; }
+        public ICommand RemoveSignalCommand { get; }
+        public ICommand ClearSignalsCommand { get; }
+        public ICommand OrderByCommand { get; }
+        public ICommand UpdateAddressFromFirstCommand { get; }
+        public ICommand UpdateAddressFromFirstSelectedCommand { get; }
+        public ICommand UpdateAddressFromSelectedItemsCommand { get; }
+        public ICommand ClearAddressCommand { get; }
 
         public SignalsCollection(IMemCache<WatchState> watchState, ISetting<UpdateAddressOptions> setting, SignalsHelper signalsHelper)
         {
             this.watchState = watchState;
             this.signalsHelper = signalsHelper;
 
-            this.WhenAnyValue(signals => signals.GroupName).Subscribe(_ => OnPropertyChanged(nameof(Signals)));
-
             setting.Value.Subscribe(options =>
             {
                 UpdateAddressByDbIndex = true;
             });
+
+            var watchGroupName = this.WhenAnyValue(vm => vm.GroupName);
+            watchGroupName.Subscribe(_ =>
+            {
+                OnPropertyChanged(nameof(GroupName));
+                OnPropertyChanged(nameof(Signals));
+            });
+
+            var watchCanEditSignal = watchGroupName.Select(name => !string.IsNullOrEmpty(name));
+
+            NewSignalCommand = ReactiveCommand.Create<Type>(NewSignal, watchCanEditSignal);
+            InsertSignalCommand = ReactiveCommand.Create<Type>(InsertSignal, watchCanEditSignal);
+            RemoveSelectedSignalsCommand = ReactiveCommand.Create(RemoveSelectedSignals, watchCanEditSignal);
+            RemoveSignalCommand = ReactiveCommand.Create<SignalEditObj>(RemoveSignal, watchCanEditSignal);
+            ClearSignalsCommand = ReactiveCommand.Create(ClearSignals, watchCanEditSignal);
+            OrderByCommand = ReactiveCommand.Create<SignalSortBy>(OrderBy, watchCanEditSignal);
+
+            UpdateAddressFromFirstCommand = ReactiveCommand.Create(UpdateAddressFromFirst, watchCanEditSignal);
+            UpdateAddressFromFirstSelectedCommand = ReactiveCommand.Create(UpdateAddressFromFirstSelected, watchCanEditSignal);
+            UpdateAddressFromSelectedItemsCommand = ReactiveCommand.Create(UpdateAddressFromSelectedItems, watchCanEditSignal);
+            ClearAddressCommand = ReactiveCommand.Create(ClearAddress, watchCanEditSignal);
         }
 
         private void CommandEventHandle(object _object, EventArgs _args)
@@ -75,6 +110,53 @@ namespace S7SvrSim.ViewModels.Siganls
             }
         }
 
+        [RelayCommand]
+        private void AddGroup()
+        {
+            if (string.IsNullOrEmpty(NewGroupName) || SignalGroups.Any(sg => sg.Name == NewGroupName)) return;
+
+            var newGroupName = NewGroupName;
+            var currentGroupName = GroupName;
+
+            var command = ListChangedCommand.Add(SignalGroups, [new SignalEditGroup(newGroupName, [])]);
+            RegistCommandEventHandle(command);
+            command.AfterExecute += (_, _) => GroupName = newGroupName;
+            command.AfterUndo += (_, _) => GroupName = currentGroupName;
+            UndoRedoManager.Run(command);
+
+            NewGroupName = "";
+        }
+
+        [RelayCommand]
+        private void SwitchGroup(string name)
+        {
+            GroupName = name;
+        }
+
+        [RelayCommand]
+        private void DeleteGroup(SignalEditGroup sg)
+        {
+            if (MessageBox.Show("是否删除？", "请确认", MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
+
+            if (sg == null) return;
+
+            var deleteName = sg.Name;
+
+            var command = ListChangedCommand.Remove(SignalGroups, [sg]);
+            RegistCommandEventHandle(command);
+            command.AfterExecute += (_, _) =>
+            {
+                if (deleteName == GroupName)
+                {
+                    GroupName = SignalGroups.FirstOrDefault()?.Name;
+                }
+            };
+            command.AfterUndo += (_, _) => GroupName = deleteName;
+            UndoRedoManager.Run(command);
+
+
+        }
+        #region Signal Edit
         public void OpenValueSet()
         {
             if (SelectedEditObj == null || SelectedEditObj.Value.Address == null || !watchState.Value.IsInWatch || SelectedEditObj.Value is Holding)
@@ -87,7 +169,6 @@ namespace S7SvrSim.ViewModels.Siganls
             setWindow.ShowDialog();
         }
 
-        [RelayCommand]
         private void NewSignal(Type signalType)
         {
             var newSignal = new SignalEditObj(signalType);
@@ -97,17 +178,15 @@ namespace S7SvrSim.ViewModels.Siganls
             UndoRedoManager.Run(command);
         }
 
-        [RelayCommand]
         private void InsertSignal(Type signalType)
         {
             var newSignal = new SignalEditObj(signalType);
-            var command = ListChangedCommand.Insert(Signals, Grid.SelectedItems.Count == 0 ? -1 : Signals.IndexOf(Grid.SelectedItems.Cast<SignalEditObj>().First()), [newSignal]);
+            var command = ListChangedCommand.Insert(Signals, (Grid.SelectedItems.Count == 0) ? -1 : Signals.IndexOf(Grid.SelectedItems.Cast<SignalEditObj>().First()), [newSignal]);
             RegistCommandEventHandle(command);
             command.AfterExecute += (_, _) => SetGridSelectedItems([newSignal]);
             UndoRedoManager.Run(command);
         }
 
-        [RelayCommand]
         private void RemoveSignal(SignalEditObj signal)
         {
             var command = ListChangedCommand.Remove(Signals, [signal]);
@@ -116,7 +195,6 @@ namespace S7SvrSim.ViewModels.Siganls
             UndoRedoManager.Run(command);
         }
 
-        [RelayCommand]
         private void RemoveSelectedSignals()
         {
             if (Signals.Count == 0 || Grid.SelectedItems.Count == 0)
@@ -130,7 +208,6 @@ namespace S7SvrSim.ViewModels.Siganls
             UndoRedoManager.Run(command);
         }
 
-        [RelayCommand]
         private void ClearSignals()
         {
             if (Signals.Count == 0)
@@ -150,7 +227,6 @@ namespace S7SvrSim.ViewModels.Siganls
 
         private SignalSortBy? lastSignalSoryBy;
 
-        [RelayCommand]
         private void OrderBy(SignalSortBy sortBy)
         {
             IHistoryCommand command;
@@ -190,6 +266,7 @@ namespace S7SvrSim.ViewModels.Siganls
             };
             UndoRedoManager.Run(command);
         }
+        #endregion
 
         #region Quick Cal Address
         private IEnumerable<IEnumerable<SignalBase>> AssembleSignalByAddress(IEnumerable<SignalEditObj> target)
@@ -220,7 +297,6 @@ namespace S7SvrSim.ViewModels.Siganls
             return signalGroupByDbIndex.Values;
         }
 
-        [RelayCommand]
         private void UpdateAddressFromFirst()
         {
             UndoRedoManager.StartTransaction();
@@ -239,7 +315,6 @@ namespace S7SvrSim.ViewModels.Siganls
             RegistCommandEventHandle(command);
         }
 
-        [RelayCommand]
         private void UpdateAddressFromFirstSelected()
         {
             if (Grid.SelectedItems.Count == 0)
@@ -265,7 +340,6 @@ namespace S7SvrSim.ViewModels.Siganls
             RegistCommandEventHandle(command);
         }
 
-        [RelayCommand]
         private void UpdateAddressFromSelectedItems()
         {
             var signals = Grid.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf);
@@ -290,7 +364,6 @@ namespace S7SvrSim.ViewModels.Siganls
             RegistCommandEventHandle(command);
         }
 
-        [RelayCommand]
         private void ClearAddress()
         {
             UndoRedoManager.StartTransaction();

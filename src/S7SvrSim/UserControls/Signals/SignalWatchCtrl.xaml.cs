@@ -42,7 +42,7 @@ namespace S7SvrSim.UserControls
         public static readonly DependencyProperty ViewModelProperty =
             DependencyProperty.Register("ViewModel", typeof(SignalPageVM), typeof(SignalWatchCtrl), new PropertyMetadata(null));
 
-        private ValidationResult EventValidation_ValidateEvent(object value, System.Globalization.CultureInfo cultureInfo)
+        private ValidationResult SignalAddress_ValidateEvent(object value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null)
             {
@@ -167,6 +167,21 @@ namespace S7SvrSim.UserControls
                 var binding = BindingOperations.GetBindingExpression(box, ComboBox.TextProperty);
                 binding?.UpdateSource();
             }
+        }
+
+        private ValidationResult NewGroupName_ValidateEvent(object value, System.Globalization.CultureInfo cultureInfo)
+        {
+            if (value == null) return null;
+
+            if (value is string groupName)
+            {
+                if (ViewModel.Signals.SignalGroups.Any(sg => sg.Name == groupName))
+                {
+                    return new ValidationResult(false, $"名称 {groupName} 已存在");
+                }
+            }
+
+            return null;
         }
     }
 }

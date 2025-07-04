@@ -3,6 +3,7 @@ using Microsoft.Scripting.Utils;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Project;
 using S7SvrSim.S7Signal;
+using S7SvrSim.Shared;
 using S7SvrSim.ViewModels;
 using S7SvrSim.ViewModels.Siganls;
 using Splat;
@@ -99,6 +100,22 @@ namespace S7SvrSim.Services.Project
             };
         }
 
+        private SignalEditGroup MergeGroup(SignalEditGroup first, IEnumerable<SignalEditGroup> groups)
+        {
+            first.Signals.AddRange(groups.Select(g => g.Signals).Merge());
+            return first;
+        }
+
+        private IEnumerable<SignalEditGroup> MergeGroup(IEnumerable<SignalEditGroup> groups)
+        {
+            return from g in groups
+                   group g by g.Name into g
+                   let firstGroup = g.FirstOrDefault()
+                   where firstGroup != null
+                   let sg = MergeGroup(firstGroup, g.Skip(1))
+                   select sg;
+        }
+
         /// <summary>
         /// 用文件数据去配置软件数据
         /// </summary>
@@ -141,7 +158,8 @@ namespace S7SvrSim.Services.Project
 
             var groups = ProjectFile.SignalGroups.Select(sg => new SignalEditGroup(sg.Name, sg.SignalItems.Select(ItemToEditObj)));
 
-            signalsCollection.SignalGroups.AddRange(defaultGroup != null ? defaultGroup.Concat(groups) : groups);
+            signalsCollection.SignalGroups.AddRange(MergeGroup(defaultGroup != null ? defaultGroup.Concat(groups) : groups));
+            signalsCollection.GroupName = null;
             signalsCollection.GroupName = signalsCollection.SignalGroups.FirstOrDefault()?.Name;
         }
 
@@ -168,7 +186,6 @@ namespace S7SvrSim.Services.Project
                 }).ToList(),
                 SearchPaths = searchPaths.ToList(),
                 IpAddress = configS7Model.IpAddress,
-                //Signals = signalsCollection.Signals.Select(signal => signal.Value.ToSignalItem()).ToList(),
                 SignalGroups = signalsCollection.SignalGroups.Select(sg => new SignalGroup()
                 {
                     Name = sg.Name,

@@ -17,7 +17,7 @@ namespace S7SvrSim.ViewModels
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(SignaleType))]
-        public Type other;
+        private Type other;
 
         [ObservableProperty]
         private SignalBase value;
@@ -77,7 +77,6 @@ namespace S7SvrSim.ViewModels
         public SignalEditObj(Type type)
         {
             Other = type;
-
             signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<Type[]>>();
 
             isInit = true;

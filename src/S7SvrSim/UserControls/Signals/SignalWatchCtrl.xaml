@@ -35,6 +35,7 @@
             <Setter Property="Margin" Value="5 3" />
             <Setter Property="CornerRadius" Value="1" />
         </Style>
+        <shared:EqualToBooleanConverter x:Key="EqualToBooleanConverter" />
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
@@ -155,31 +156,89 @@
                 <TextBox Text="{Binding WatchVM.ScanSpan}"
                          Width="80"
                          md:TextFieldAssist.SuffixText="ms"
+                         VerticalAlignment="Center"
                          d:Text="123"
                          />
+                <TextBlock Margin="20 0 0 0"
+                           Text="新信号组: "
+                           VerticalAlignment="Center"
+                           />
+                <TextBox Width="80"
+                         VerticalAlignment="Center"
+                         >
+                    <TextBox.Text>
+                        <Binding Path="Signals.NewGroupName">
+                            <Binding.ValidationRules>
+                                <lu:EventValidation ValidateEvent="NewGroupName_ValidateEvent" />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <Button Margin="10 0 0 0"
+                        Content="{md:PackIcon Kind=Plus,
+                                              Size=20}"
+                        Padding="10 0"
+                        Command="{Binding Signals.AddGroupCommand}"
+                        />
             </StackPanel>
-
         </StackPanel>
         <DockPanel>
-            <TabControl DockPanel.Dock="Top"
-                        Style="{x:Null}"
-                        ItemsSource="{Binding Signals.SignalGroups}"
-                        SelectedValuePath="Name"
-                        SelectedValue="{Binding Signals.GroupName, Mode=TwoWay}"
-                        >
-                <TabControl.ItemTemplate>
+            <ItemsControl DockPanel.Dock="Top"
+                          Style="{x:Null}"
+                          ItemsSource="{Binding Signals.SignalGroups}"
+                          d:ItemsSource="{d:SampleData}"
+                          >
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding Name}" />
+                            <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
+                                         BorderBrush="{DynamicResource PrimaryHueMidBrush}"
+                                         GroupName="SignalTabs"
+                                         Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.SwitchGroupCommand}"
+                                         CommandParameter="{Binding Name}"
+                                         >
+                                <RadioButton.IsChecked>
+                                    <MultiBinding Converter="{StaticResource EqualToBooleanConverter}"
+                                                  Mode="OneWay"
+                                                  >
+                                        <MultiBinding.Bindings>
+                                            <Binding Path="Name" />
+                                            <Binding Source="{StaticResource DataContextProxy}"
+                                                     Path="Data.Signals.GroupName"
+                                                     />
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </RadioButton.IsChecked>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Name}" />
+                                    <Button Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.DeleteGroupCommand}"
+                                            CommandParameter="{Binding .}"
+                                            Margin="8 0 0 0"
+                                            ToolTip="删除该页"
+                                            Padding="0"
+                                            Style="{x:Null}"
+                                            >
+                                        <Button.Template>
+                                            <ControlTemplate>
+                                                <md:PackIcon Kind="Close"
+                                                             Background="Transparent"
+                                                             Foreground="Red"
+                                                             Cursor="Hand"
+                                                             />
+                                            </ControlTemplate>
+                                        </Button.Template>
+                                    </Button>
+                                </StackPanel>
+                            </RadioButton>
                         </StackPanel>
                     </DataTemplate>
-                </TabControl.ItemTemplate>
-                <TabControl.ItemContainerStyle>
-                    <Style TargetType="TabItem">
-                        <Setter Property="Content" Value="{x:Null}" />
-                    </Style>
-                </TabControl.ItemContainerStyle>
-            </TabControl>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
             <DataGrid ItemsSource="{Binding Signals.Signals, UpdateSourceTrigger=PropertyChanged}"
                       AutoGenerateColumns="False"
                       CanUserDeleteRows="False"
@@ -324,7 +383,7 @@
                                      UpdateSourceTrigger="LostFocus"
                                      >
                                 <Binding.ValidationRules>
-                                    <lu:EventValidation ValidateEvent="EventValidation_ValidateEvent" />
+                                    <lu:EventValidation ValidateEvent="SignalAddress_ValidateEvent" />
                                 </Binding.ValidationRules>
                             </Binding>
                         </DataGridTextColumn.Binding>
