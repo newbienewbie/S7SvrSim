@@ -36,11 +36,11 @@ namespace S7SvrSim.UserControls
             });
         }
 
-        public SignalPageVM ViewModel { get; set; }
+        public SignalPageVM ViewModel { get => (SignalPageVM)GetValue(ViewModelProperty); set => SetValue(ViewModelProperty, value); }
         object IViewFor.ViewModel { get => ViewModel; set => ViewModel = (SignalPageVM)value; }
 
-        //public static readonly DependencyProperty ViewModelProperty =
-        //    DependencyProperty.Register("ViewModel", typeof(SignalWatchVM), typeof(SignalWatchCtrl), new PropertyMetadata(null));
+        public static readonly DependencyProperty ViewModelProperty =
+            DependencyProperty.Register("ViewModel", typeof(SignalPageVM), typeof(SignalWatchCtrl), new PropertyMetadata(null));
 
         private ValidationResult EventValidation_ValidateEvent(object value, System.Globalization.CultureInfo cultureInfo)
         {
