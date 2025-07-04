@@ -183,62 +183,54 @@
             </StackPanel>
         </StackPanel>
         <DockPanel>
-            <ItemsControl DockPanel.Dock="Top"
-                          Style="{x:Null}"
-                          ItemsSource="{Binding Signals.SignalGroups}"
-                          d:ItemsSource="{d:SampleData}"
-                          >
-                <ItemsControl.ItemsPanel>
+            <ListBox DockPanel.Dock="top"
+                     ItemsSource="{Binding Signals.SignalGroups}"
+                     d:ItemsSource="{d:SampleData}"
+                     ScrollViewer.CanContentScroll="True"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     md:ScrollViewerAssist.IsAutoHideEnabled="True"
+                     SelectedValue="{Binding Signals.GroupName}"
+                     SelectedValuePath="Name"
+                     Style="{StaticResource MaterialDesignNavigationPrimaryListBox}"
+                     >
+                <ListBox.Resources>
+                    <Style TargetType="ScrollViewer"
+                           BasedOn="{StaticResource MaterialDesignScrollViewer}"
+                           />
+                    <Style TargetType="ScrollBar"
+                           BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"
+                           />
+                </ListBox.Resources>
+                <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal" />
                     </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
+                </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <RadioButton Style="{StaticResource MaterialDesignTabRadioButton}"
-                                         BorderBrush="{DynamicResource PrimaryHueMidBrush}"
-                                         GroupName="SignalTabs"
-                                         Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.SwitchGroupCommand}"
-                                         CommandParameter="{Binding Name}"
-                                         >
-                                <RadioButton.IsChecked>
-                                    <MultiBinding Converter="{StaticResource EqualToBooleanConverter}"
-                                                  Mode="OneWay"
-                                                  >
-                                        <MultiBinding.Bindings>
-                                            <Binding Path="Name" />
-                                            <Binding Source="{StaticResource DataContextProxy}"
-                                                     Path="Data.Signals.GroupName"
+                            <TextBlock Text="{Binding Name}" />
+                            <Button Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.DeleteGroupCommand}"
+                                    CommandParameter="{Binding .}"
+                                    Margin="8 0 0 0"
+                                    ToolTip="删除该页"
+                                    Padding="0"
+                                    Style="{x:Null}"
+                                    >
+                                <Button.Template>
+                                    <ControlTemplate>
+                                        <md:PackIcon Kind="Close"
+                                                     Background="Transparent"
+                                                     Foreground="Red"
+                                                     Cursor="Hand"
                                                      />
-                                        </MultiBinding.Bindings>
-                                    </MultiBinding>
-                                </RadioButton.IsChecked>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Name}" />
-                                    <Button Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.DeleteGroupCommand}"
-                                            CommandParameter="{Binding .}"
-                                            Margin="8 0 0 0"
-                                            ToolTip="删除该页"
-                                            Padding="0"
-                                            Style="{x:Null}"
-                                            >
-                                        <Button.Template>
-                                            <ControlTemplate>
-                                                <md:PackIcon Kind="Close"
-                                                             Background="Transparent"
-                                                             Foreground="Red"
-                                                             Cursor="Hand"
-                                                             />
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                    </Button>
-                                </StackPanel>
-                            </RadioButton>
+                                    </ControlTemplate>
+                                </Button.Template>
+                            </Button>
                         </StackPanel>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                </ListBox.ItemTemplate>
+            </ListBox>
             <DataGrid ItemsSource="{Binding Signals.Signals, UpdateSourceTrigger=PropertyChanged}"
                       AutoGenerateColumns="False"
                       CanUserDeleteRows="False"
