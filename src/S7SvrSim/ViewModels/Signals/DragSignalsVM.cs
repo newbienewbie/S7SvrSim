@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace S7SvrSim.ViewModels.Siganls
+namespace S7SvrSim.ViewModels.Signals
 {
     public partial class DragSignalsVM : ViewModelBase
     {
@@ -157,7 +157,7 @@ namespace S7SvrSim.ViewModels.Siganls
             }
             else
             {
-                MoveSignals(Signals[Signals.IndexOf(DragTargetSignal) + 1], dragItems);
+                MoveSignals(Signals[(int)(Signals.IndexOf((SignalEditObj)this.DragTargetSignal) + 1)], dragItems);
             }
         }
 

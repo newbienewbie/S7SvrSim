@@ -1,9 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DynamicData;
-using MaterialDesignThemes.Wpf;
+using MediatR;
 using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
+using S7SvrSim.Messages;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
@@ -15,16 +16,19 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace S7SvrSim.ViewModels.Siganls
+namespace S7SvrSim.ViewModels.Signals
 {
     public partial class SignalsCollection : ViewModelBase
     {
         private readonly IMemCache<WatchState> watchState;
         private readonly SignalsHelper signalsHelper;
+        private readonly IMediator mediator;
+
         public DataGrid Grid { get; set; }
 
         [Reactive]
@@ -55,11 +59,11 @@ namespace S7SvrSim.ViewModels.Siganls
         public ICommand UpdateAddressFromSelectedItemsCommand { get; }
         public ICommand ClearAddressCommand { get; }
 
-        public SignalsCollection(IMemCache<WatchState> watchState, ISetting<UpdateAddressOptions> setting, SignalsHelper signalsHelper)
+        public SignalsCollection(IMemCache<WatchState> watchState, ISetting<UpdateAddressOptions> setting, SignalsHelper signalsHelper, IMediator mediator)
         {
             this.watchState = watchState;
             this.signalsHelper = signalsHelper;
-
+            this.mediator = mediator;
             setting.Value.Subscribe(options =>
             {
                 UpdateAddressByDbIndex = true;
@@ -111,6 +115,7 @@ namespace S7SvrSim.ViewModels.Siganls
             }
         }
 
+        #region Group Edit
         [RelayCommand]
         private void AddGroup()
         {
@@ -147,16 +152,61 @@ namespace S7SvrSim.ViewModels.Siganls
             RegistCommandEventHandle(command);
             command.AfterExecute += (_, _) =>
             {
-                if (deleteName == GroupName)
+                if (deleteName == GroupName || GroupName == null)
                 {
                     GroupName = SignalGroups.FirstOrDefault()?.Name;
                 }
             };
             command.AfterUndo += (_, _) => GroupName = deleteName;
             UndoRedoManager.Run(command);
-
-
         }
+
+        [RelayCommand]
+        private async Task RenameGroup(SignalEditGroup sg)
+        {
+            if (sg == null) return;
+
+            var oldName = sg.Name;
+            var dialogViewModel = new DialogViewModel("Rename Group", "名称不能为空或重复")
+            {
+                Text = oldName,
+            };
+            dialogViewModel.ValidationEvent += (rawValue) =>
+            {
+                if (rawValue is string value)
+                {
+                    if (string.IsNullOrEmpty(value)) return false;
+
+                    var hasSameName = SignalGroups.Where(s => s.Name != oldName).Any(s => s.Name == value);
+                    if (hasSameName) return false;
+                }
+
+                return true;
+            };
+
+            var renameResult = await mediator.Send(new ShowDialogRequest(dialogViewModel));
+            if (renameResult.IsCancel || string.IsNullOrEmpty(renameResult.Result)) return;
+
+            var newName = renameResult.Result;
+            if (oldName == newName) return;
+
+            var command = new ValueChangedCommand(val =>
+            {
+                sg.Name = (string)val;
+            }, oldName, newName);
+            RegistCommandEventHandle(command);
+            command.AfterExecute += (_, _) =>
+            {
+                if (GroupName == oldName) GroupName = newName;
+            };
+            command.AfterUndo += (_, _) =>
+            {
+                if (GroupName == newName) GroupName = oldName;
+            };
+            UndoRedoManager.Run(command);
+        }
+        #endregion
+
         #region Signal Edit
         public void OpenValueSet()
         {

@@ -209,6 +209,14 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
+                            <StackPanel.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="重命名"
+                                              Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.RenameGroupCommand}"
+                                              CommandParameter="{Binding .}"
+                                              />
+                                </ContextMenu>
+                            </StackPanel.ContextMenu>
                             <TextBlock Text="{Binding Name}" />
                             <Button Command="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.DeleteGroupCommand}"
                                     CommandParameter="{Binding .}"

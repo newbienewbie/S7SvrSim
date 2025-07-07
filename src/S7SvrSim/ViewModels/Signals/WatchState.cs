@@ -1,6 +1,6 @@
 ﻿using S7SvrSim.Services;
 
-namespace S7SvrSim.ViewModels.Siganls
+namespace S7SvrSim.ViewModels.Signals
 {
     public record WatchState(bool IsInWatch);
 

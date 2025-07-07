@@ -28,7 +28,9 @@
                          Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext}"
                          />
     </Window.Resources>
-    <md:DialogHost CloseOnClickAway="True">
+    <md:DialogHost CloseOnClickAway="True"
+                   Identifier="MainWindowDialogHost"
+                   >
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <Menu>

@@ -12,7 +12,7 @@ using S7SvrSim.UserControls;
 using S7SvrSim.UserControls.Rws;
 using S7SvrSim.ViewModels;
 using S7SvrSim.ViewModels.Rw;
-using S7SvrSim.ViewModels.Siganls;
+using S7SvrSim.ViewModels.Signals;
 using Splat;
 using System;
 

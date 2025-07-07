@@ -4,7 +4,7 @@ using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
-using S7SvrSim.ViewModels.Siganls;
+using S7SvrSim.ViewModels.Signals;
 using Splat;
 using System;
 using System.Linq;

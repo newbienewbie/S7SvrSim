@@ -4,7 +4,7 @@ using S7SvrSim.S7Signal;
 using S7SvrSim.Services.Settings;
 using System;
 
-namespace S7SvrSim.ViewModels.Siganls
+namespace S7SvrSim.ViewModels.Signals
 {
     public class UpdateAddressOptionsVM : ReactiveObject
     {

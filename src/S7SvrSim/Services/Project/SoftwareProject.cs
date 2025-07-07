@@ -5,7 +5,7 @@ using S7SvrSim.Project;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Shared;
 using S7SvrSim.ViewModels;
-using S7SvrSim.ViewModels.Siganls;
+using S7SvrSim.ViewModels.Signals;
 using Splat;
 using System;
 using System.Collections.Generic;

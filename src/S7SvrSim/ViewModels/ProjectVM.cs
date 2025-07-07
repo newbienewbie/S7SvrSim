@@ -205,11 +205,13 @@ namespace S7SvrSim.ViewModels
         private static readonly char[] InvalidCharsForPath = ['\\', '/', ':', '*', '?', '"', '<', '>', '|'];
         public async Task RenameProject()
         {
-            var result = await mediator.Send(new ShowDialogRequest(new DialogViewModel("Rename Project")
+            var viewModel = new DialogViewModel("Rename Project", "名称不能为空")
             {
                 Text = Path.GetFileNameWithoutExtension(ProjectName),
                 SuffixText = ProjectConst.FILE_EXTENSION,
-            }));
+            };
+            viewModel.ValidationEvent += (name) => !string.IsNullOrEmpty(name);
+            var result = await mediator.Send(new ShowDialogRequest(viewModel));
 
             if (result.IsCancel || string.IsNullOrEmpty(result.Result)) return;
 
@@ -218,13 +220,18 @@ namespace S7SvrSim.ViewModels
 
             if (newName == ProjectName) return;
 
+            var newPath = Path.Combine(Path.GetDirectoryName(currentProject.Path), newName);
+            if (File.Exists(newPath) &&
+                MessageBox.Show("新名称下已有存在的文件，是否覆盖？", "目标文件已存在", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                return;
+
             var oldFile = RecentFiles.FirstOrDefault(f => f.Path == currentProject.Path);
             if (oldFile != null)
             {
                 recentFiles.RemoveFile(oldFile);
             }
 
-            currentProject.Move(Path.Combine(Path.GetDirectoryName(currentProject.Path), newName));
+            currentProject.Move(newPath);
             recentFiles.AddFile(new RecentFile(currentProject.Path, DateTime.Now));
 
             CallbackNeedSave();

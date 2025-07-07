@@ -1,5 +1,5 @@
 ﻿using S7SvrSim.Services;
-using S7SvrSim.ViewModels.Siganls;
+using S7SvrSim.ViewModels.Signals;
 using Splat;
 using System;
 

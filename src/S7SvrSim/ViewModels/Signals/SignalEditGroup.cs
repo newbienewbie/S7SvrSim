@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace S7SvrSim.ViewModels.Siganls
+namespace S7SvrSim.ViewModels.Signals
 {
-    public partial class SignalEditGroup : ViewModelBase
+    public class SignalEditGroup : ReactiveObject
     {
         [Reactive]
         public string Name { get; set; }
