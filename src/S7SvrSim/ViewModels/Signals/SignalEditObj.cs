@@ -1,12 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator;
+using S7SvrSim.Project;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml.Serialization;
 
 namespace S7SvrSim.ViewModels
 {
@@ -225,6 +229,34 @@ namespace S7SvrSim.ViewModels
         private void CommandEventHandle(object _object, EventArgs _args)
         {
             ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
+        }
+    }
+
+    public static class SignalEditObjExtensions
+    {
+        public static string ToXml(this IEnumerable<SignalEditObj> obj)
+        {
+            var serialize = new XmlSerializer(typeof(List<SignalItem>));
+            using var stream = new MemoryStream();
+            serialize.Serialize(stream, obj.Select(s => s.Value.ToSignalItem()).ToList());
+
+            stream.Position = 0;
+
+            using var streamReader = new StreamReader(stream);
+            return streamReader.ReadToEnd();
+        }
+
+        public static IEnumerable<SignalEditObj> FromXml(this string xml, SignalsHelper helper)
+        {
+            var serialize = new XmlSerializer(typeof(List<SignalItem>));
+            using var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+            var result = serialize.Deserialize(stream);
+
+            if (result == null) throw new Exception("解析为空");
+
+            if (result is List<SignalItem> list) return list.Select(helper.ItemToEditObj);
+
+            throw new Exception("解析类型错误");
         }
     }
 }

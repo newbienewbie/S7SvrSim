@@ -1,7 +1,9 @@
-﻿using S7SvrSim.Services;
+﻿using S7SvrSim.Project;
+using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
 using S7SvrSim.Services.Settings;
 using S7SvrSim.Shared;
+using S7SvrSim.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,22 +13,36 @@ namespace S7SvrSim.S7Signal
     public class SignalsHelper
     {
         private readonly IS7BlockFactory blockFactory;
+        private readonly IMemCache<Type[]> signalTypes;
         private readonly ISignalAddressUesdCollection signalAddressUsed;
 
         private bool ForbidIndexHasOddNumber { get; set; }
         private bool AllowBoolIndexHasOddNumber { get; set; }
         private bool AllowByteIndexHAsOddNumber { get; set; }
-        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockFactory blockFactory, ISetting<UpdateAddressOptions> setting)
+
+        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockFactory blockFactory, ISetting<UpdateAddressOptions> setting, IMemCache<Type[]> signalTypes)
         {
             this.signalAddressUsed = signalAddressUsed;
             this.blockFactory = blockFactory;
-
+            this.signalTypes = signalTypes;
             setting.Value.Subscribe(options =>
             {
                 ForbidIndexHasOddNumber = options.ForbidIndexHasOddNumber;
                 AllowBoolIndexHasOddNumber = options.AllowBoolIndexHasOddNumber;
                 AllowByteIndexHAsOddNumber = options.AllowByteIndexHAsOddNumber;
             });
+        }
+
+        public SignalEditObj ItemToEditObj(SignalItem item)
+        {
+            var signalType = signalTypes.Value.First(ty => ty.Name == item.Type);
+            var signal = (SignalBase)Activator.CreateInstance(signalType);
+            signal.CopyFromSignalItem(item);
+
+            return new SignalEditObj(signalType)
+            {
+                Value = signal
+            };
         }
 
         public void RefreshValue(IEnumerable<SignalBase> signals)

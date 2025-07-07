@@ -1,4 +1,5 @@
-﻿using System;
+﻿using S7SvrSim.S7Signal;
+using System;
 using System.IO;
 
 namespace S7SvrSim.Services.Project
@@ -6,15 +7,17 @@ namespace S7SvrSim.Services.Project
     public class ProjectFractory : IProjectFactory
     {
         private readonly IServiceProvider serviceProvider;
+        private readonly SignalsHelper signalsHelper;
 
-        public ProjectFractory(IServiceProvider serviceProvider)
+        public ProjectFractory(IServiceProvider serviceProvider, SignalsHelper signalsHelper)
         {
             this.serviceProvider = serviceProvider;
+            this.signalsHelper = signalsHelper;
         }
 
         private IProject GetProjectByPath(string path)
         {
-            return path == null ? new DefaultProject(serviceProvider) : new SoftwareProject(path, serviceProvider);
+            return path == null ? new DefaultProject(serviceProvider, signalsHelper) : new SoftwareProject(path, serviceProvider, signalsHelper);
         }
 
         public IProject CreateProject(string path)

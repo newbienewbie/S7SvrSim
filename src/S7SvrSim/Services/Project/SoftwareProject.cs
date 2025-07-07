@@ -22,18 +22,21 @@ namespace S7SvrSim.Services.Project
         private readonly SignalWatchVM signalWatchModel;
         private readonly SignalsCollection signalsCollection;
         private readonly IServiceProvider serviceProvider;
+        private readonly SignalsHelper signalsHelper;
         private readonly IMemCache<Type[]> signalTypes;
 
         public ProjectFile ProjectFile { get; private set; }
         public string Path { get; private set; }
 
-        public SoftwareProject(string path, IServiceProvider serviceProvider)
+        public SoftwareProject(string path, IServiceProvider serviceProvider, SignalsHelper signalsHelper)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentNullException(nameof(path));
             }
+
             this.serviceProvider = serviceProvider;
+            this.signalsHelper = signalsHelper;
 
             Path = path;
 
@@ -86,18 +89,6 @@ namespace S7SvrSim.Services.Project
             var oldPath = Path;
             File.Move(oldPath, newPath, true);
             Path = newPath;
-        }
-
-        private SignalEditObj ItemToEditObj(SignalItem item)
-        {
-            var signalType = signalTypes.Value.First(ty => ty.Name == item.Type);
-            var signal = (SignalBase)Activator.CreateInstance(signalType);
-            signal.CopyFromSignalItem(item);
-
-            return new SignalEditObj(signalType)
-            {
-                Value = signal
-            };
         }
 
         private SignalEditGroup MergeGroup(SignalEditGroup first, IEnumerable<SignalEditGroup> groups)
@@ -153,10 +144,10 @@ namespace S7SvrSim.Services.Project
 
             if (ProjectFile.Signals.Count > 0)
             {
-                defaultGroup = [new SignalEditGroup("default", ProjectFile.Signals.Select(ItemToEditObj))];
+                defaultGroup = [new SignalEditGroup("default", ProjectFile.Signals.Select(signalsHelper.ItemToEditObj))];
             }
 
-            var groups = ProjectFile.SignalGroups.Select(sg => new SignalEditGroup(sg.Name, sg.SignalItems.Select(ItemToEditObj)));
+            var groups = ProjectFile.SignalGroups.Select(sg => new SignalEditGroup(sg.Name, sg.SignalItems.Select(signalsHelper.ItemToEditObj)));
 
             signalsCollection.SignalGroups.AddRange(MergeGroup(defaultGroup != null ? defaultGroup.Concat(groups) : groups));
             signalsCollection.GroupName = null;

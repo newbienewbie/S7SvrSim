@@ -54,6 +54,9 @@ namespace S7SvrSim.ViewModels.Signals
         public ICommand RemoveSignalCommand { get; }
         public ICommand ClearSignalsCommand { get; }
         public ICommand OrderByCommand { get; }
+        public ICommand CopySignalsCommand { get; }
+        public ICommand PasteSignalsCommand { get; }
+
         public ICommand UpdateAddressFromFirstCommand { get; }
         public ICommand UpdateAddressFromFirstSelectedCommand { get; }
         public ICommand UpdateAddressFromSelectedItemsCommand { get; }
@@ -84,6 +87,8 @@ namespace S7SvrSim.ViewModels.Signals
             RemoveSignalCommand = ReactiveCommand.Create<SignalEditObj>(RemoveSignal, watchCanEditSignal);
             ClearSignalsCommand = ReactiveCommand.Create(ClearSignals, watchCanEditSignal);
             OrderByCommand = ReactiveCommand.Create<SignalSortBy>(OrderBy, watchCanEditSignal);
+            CopySignalsCommand = ReactiveCommand.Create(CopySignals, watchCanEditSignal);
+            PasteSignalsCommand = ReactiveCommand.Create(PasteSignals, watchCanEditSignal);
 
             UpdateAddressFromFirstCommand = ReactiveCommand.Create(UpdateAddressFromFirst, watchCanEditSignal);
             UpdateAddressFromFirstSelectedCommand = ReactiveCommand.Create(UpdateAddressFromFirstSelected, watchCanEditSignal);
@@ -251,14 +256,19 @@ namespace S7SvrSim.ViewModels.Signals
             UndoRedoManager.Run(command);
         }
 
+        private void InsertSignals(IEnumerable<SignalEditObj> objs)
+        {
+            var indexInsert = (Grid.SelectedItems.Count == 0) ? -1 : Signals.IndexOf(Grid.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf).Last()) + 1;
+            var command = ListChangedCommand.Insert(Signals, indexInsert, objs);
+            RegistCommandEventHandle(command);
+            command.AfterExecute += (_, _) => SetGridSelectedItems(objs);
+            UndoRedoManager.Run(command);
+        }
+
         private void InsertSignal(Type signalType)
         {
             var newSignal = new SignalEditObj(signalType);
-            var indexInsert = (Grid.SelectedItems.Count == 0) ? -1 : Signals.IndexOf(Grid.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf).Last()) + 1;
-            var command = ListChangedCommand.Insert(Signals, indexInsert, [newSignal]);
-            RegistCommandEventHandle(command);
-            command.AfterExecute += (_, _) => SetGridSelectedItems([newSignal]);
-            UndoRedoManager.Run(command);
+            InsertSignals([newSignal]);
         }
 
         private void RemoveSignal(SignalEditObj signal)
@@ -339,6 +349,29 @@ namespace S7SvrSim.ViewModels.Signals
                 lastSignalSoryBy = lastSignalSoryByCp;
             };
             UndoRedoManager.Run(command);
+        }
+
+        private void CopySignals()
+        {
+            if (Grid.SelectedItems.Count == 0) return;
+
+            var signals = Grid.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf);
+            Clipboard.SetText(signals.ToXml(), TextDataFormat.Xaml);
+        }
+
+        private void PasteSignals()
+        {
+            var clipData = Clipboard.GetText(TextDataFormat.Xaml);
+            IEnumerable<SignalEditObj> signals;
+            try
+            {
+                signals = clipData.FromXml(signalsHelper);
+            }
+            catch (Exception)
+            {
+                return;
+            }
+            InsertSignals(signals);
         }
         #endregion
 
