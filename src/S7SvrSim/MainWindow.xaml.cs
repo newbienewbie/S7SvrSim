@@ -60,11 +60,11 @@ namespace S7Svr.Simulator
         {
             if (needSave)
             {
-                return $"* {ViewModel.ProjectVM.ProjectTitle} - Siemens PLC 通讯模拟器";
+                return $"* {ViewModel.ProjectVM.ProjectName} - Siemens PLC 通讯模拟器";
             }
             else
             {
-                return $"{ViewModel.ProjectVM.ProjectTitle} - Siemens PLC 通讯模拟器";
+                return $"{ViewModel.ProjectVM.ProjectName} - Siemens PLC 通讯模拟器";
             }
         }
 
@@ -109,11 +109,6 @@ namespace S7Svr.Simulator
             {
                 tabControl.SelectedIndex = index;
             }
-        }
-
-        private void DialogHost_DialogOpened(object sender, MaterialDesignThemes.Wpf.DialogOpenedEventArgs eventArgs)
-        {
-            renameProjectTextBox.Text = Path.GetFileNameWithoutExtension(ViewModel.ProjectVM.ProjectTitle);
         }
     }
 }

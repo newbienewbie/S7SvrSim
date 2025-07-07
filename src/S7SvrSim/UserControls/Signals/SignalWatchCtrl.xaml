@@ -183,7 +183,7 @@
             </StackPanel>
         </StackPanel>
         <DockPanel>
-            <ListBox DockPanel.Dock="top"
+            <ListBox DockPanel.Dock="Top"
                      ItemsSource="{Binding Signals.SignalGroups}"
                      d:ItemsSource="{d:SampleData}"
                      ScrollViewer.CanContentScroll="True"

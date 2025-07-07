@@ -1,7 +1,9 @@
 ﻿using DynamicData;
 using DynamicData.Binding;
+using MediatR;
 using Microsoft.Win32;
 using ReactiveUI.Fody.Helpers;
+using S7SvrSim.Messages;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
 using S7SvrSim.Services.Recent;
@@ -11,6 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
@@ -20,6 +23,7 @@ namespace S7SvrSim.ViewModels
     {
         private readonly IProjectFactory projectFactory;
         private readonly RecentFilesCollection recentFiles;
+        private readonly IMediator mediator;
         private IProject currentProject;
 
         [Reactive]
@@ -40,12 +44,16 @@ namespace S7SvrSim.ViewModels
         public ICommand RenameCommand { get; }
         public ICommand OpenRecentCommand { get; }
         public ICommand RemoveRecentCommand { get; }
-        public string ProjectTitle => Path.GetFileName(currentProject.Path);
+        /// <summary>
+        /// 项目文件名
+        /// </summary>
+        public string ProjectName => Path.GetFileName(currentProject.Path);
 
-        public ProjectVM(IProjectFactory projectFactory, RecentFilesCollection recentFilesVM)
+        public ProjectVM(IProjectFactory projectFactory, RecentFilesCollection recentFilesVM, IMediator mediator)
         {
             this.projectFactory = projectFactory;
             this.recentFiles = recentFilesVM;
+            this.mediator = mediator;
             currentProject = projectFactory.GetOrCreateProject(null);
 
             UndoRedoManager.UndoRedoChanged += () =>
@@ -64,7 +72,7 @@ namespace S7SvrSim.ViewModels
 
             UndoCommand = ReactiveCommand.Create(UndoRedoManager.Undo, this.WhenAnyValue(vm => vm.UndoCount).Select(c => c > 0));
             RedoCommand = ReactiveCommand.Create(UndoRedoManager.Redo, this.WhenAnyValue(vm => vm.RedoCount).Select(c => c > 0));
-            RenameCommand = ReactiveCommand.Create<string>(RenameProject);
+            RenameCommand = ReactiveCommand.CreateFromTask(RenameProject);
             OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile);
             RemoveRecentCommand = ReactiveCommand.Create<RecentFile>(RemoveRecentFile);
         }
@@ -195,19 +203,20 @@ namespace S7SvrSim.ViewModels
             CallbackNeedSave();
         }
         private static readonly char[] InvalidCharsForPath = ['\\', '/', ':', '*', '?', '"', '<', '>', '|'];
-        public void RenameProject(string newName)
+        public async Task RenameProject()
         {
-            if (string.IsNullOrEmpty(newName))
+            var result = await mediator.Send(new ShowDialogRequest(new DialogViewModel("Rename Project")
             {
-                return;
-            }
+                Text = Path.GetFileNameWithoutExtension(ProjectName),
+                SuffixText = ProjectConst.FILE_EXTENSION,
+            }));
 
-            if (!newName.EndsWith(".s7proj"))
-            {
-                newName = $"{newName}.s7proj";
-            }
+            if (result.IsCancel || string.IsNullOrEmpty(result.Result)) return;
 
-            newName = new string(newName.Select(c => InvalidCharsForPath.Contains(c) ? ' ' : c).ToArray());
+            var newName = new string(result.Result.Select(c => InvalidCharsForPath.Contains(c) ? ' ' : c).ToArray());
+            newName = $"{newName}{ProjectConst.FILE_EXTENSION}";
+
+            if (newName == ProjectName) return;
 
             var oldFile = RecentFiles.FirstOrDefault(f => f.Path == currentProject.Path);
             if (oldFile != null)

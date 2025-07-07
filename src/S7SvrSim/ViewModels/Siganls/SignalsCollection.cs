@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DynamicData;
+using MaterialDesignThemes.Wpf;
 using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7SvrSim.S7Signal;

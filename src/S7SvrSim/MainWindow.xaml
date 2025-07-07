@@ -28,44 +28,7 @@
                          Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext}"
                          />
     </Window.Resources>
-    <md:DialogHost CloseOnClickAway="True"
-                   DialogOpened="DialogHost_DialogOpened"
-                   >
-        <md:DialogHost.DialogContent>
-            <StackPanel Margin="16">
-                <TextBlock Text="Rename" />
-                <TextBox md:TextFieldAssist.SuffixText=".s7proj"
-                         VerticalAlignment="Center"
-                         Width="120"
-                         x:Name="renameProjectTextBox"
-                         FontSize="12"
-                         />
-                <StackPanel Orientation="Horizontal">
-                    <Button Content="{md:PackIcon Kind=Check}"
-                            Style="{StaticResource MaterialDesignFlatButton}"
-                            Command="{x:Static md:DialogHost.CloseDialogCommand}"
-                            IsDefault="True"
-                            Margin="0 8 8 0"
-                            >
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="Click">
-                                <i:EventTrigger.Actions>
-                                    <i:InvokeCommandAction Command="{Binding ProjectVM.RenameCommand}"
-                                                           CommandParameter="{Binding Text, ElementName=renameProjectTextBox}"
-                                                           />
-                                </i:EventTrigger.Actions>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
-                    </Button>
-                    <Button Content="{md:PackIcon Kind=Close}"
-                            Style="{StaticResource MaterialDesignFlatButton}"
-                            Command="{x:Static md:DialogHost.CloseDialogCommand}"
-                            Margin="0 8 8 0"
-                            IsCancel="True"
-                            />
-                </StackPanel>
-            </StackPanel>
-        </md:DialogHost.DialogContent>
+    <md:DialogHost CloseOnClickAway="True">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <Menu>
@@ -123,7 +86,7 @@
                                   />
                         <Separator />
                         <MenuItem Header="项目重命名"
-                                  Command="{x:Static md:DialogHost.OpenDialogCommand}"
+                                  Command="{Binding ProjectVM.RenameCommand}"
                                   Icon="{md:PackIcon Kind=FormTextbox}"
                                   />
                         <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
