@@ -24,3 +24,4 @@ nuget CommunityToolkit.MVVM 8.4
 
 nuget Less.Utils.WPF 1.0.2
 nuget Microsoft.Xaml.Behaviors.Wpf 1.1.135
+nuget EPPlus 8.0.7

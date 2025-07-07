@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
 using S7SvrSim;
 using System;
 using System.Threading;
@@ -19,6 +20,11 @@ namespace S7Svr.Simulator
         public IServiceProvider ServiceProvider { get; internal set; }
 
         private CancellationTokenSource cts = new CancellationTokenSource();
+
+        static App()
+        {
+            ExcelPackage.License.SetNonCommercialPersonal("S7SvrSim");
+        }
 
         public App()
         {
