@@ -99,20 +99,23 @@ namespace S7SvrSim.UserControls
 
         private void DataGridRow_Drop(object sender, DragEventArgs e)
         {
-            if (e.Data.GetData(typeof(List<SignalEditObj>)) is List<SignalEditObj> draggedItems &&
-                sender is DataGridRow targetRow && targetRow.DataContext is SignalEditObj targetItem)
+            if (sender is DataGridRow targetRow)
             {
                 targetRow.Background = Brushes.Transparent;
 
-                if (draggedItems.Contains(targetItem))
+                if (e.Data.GetData(typeof(List<SignalEditObj>)) is List<SignalEditObj> draggedItems
+                    && targetRow.DataContext is SignalEditObj targetItem)
                 {
-                    return;
+                    if (draggedItems.Contains(targetItem))
+                    {
+                        return;
+                    }
+
+                    ViewModel.DragSignalsVM.DragTargetSignal = targetItem;
+                    ViewModel.DragSignalsVM.IsDragSignals = true;
+
+                    signalGrid.ContextMenu.IsOpen = true;
                 }
-
-                ViewModel.DragSignalsVM.DragTargetSignal = targetItem;
-                ViewModel.DragSignalsVM.IsDragSignals = true;
-
-                signalGrid.ContextMenu.IsOpen = true;
             }
         }
 
