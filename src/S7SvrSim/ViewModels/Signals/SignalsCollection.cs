@@ -116,6 +116,29 @@ namespace S7SvrSim.ViewModels.Signals
         }
 
         #region Group Edit
+        private async Task<ShowDialogResult> GetNewGroupName(string title, string oldName, bool checkOldName = false)
+        {
+            var dialogViewModel = new DialogViewModel(title, "名称不能为空或重复")
+            {
+                Text = oldName,
+            };
+            dialogViewModel.ValidationEvent += (rawValue) =>
+            {
+                if (rawValue is string value)
+                {
+                    if (string.IsNullOrEmpty(value)) return false;
+
+                    if (checkOldName) return !SignalGroups.Any(s => s.Name == value);
+                    else return !SignalGroups.Where(s => s.Name != oldName).Any(s => s.Name == value);
+                }
+
+                return true;
+            };
+
+            var renameResult = await mediator.Send(new ShowDialogRequest(dialogViewModel));
+            return renameResult;
+        }
+
         [RelayCommand]
         private void AddGroup()
         {
@@ -167,33 +190,14 @@ namespace S7SvrSim.ViewModels.Signals
             if (sg == null) return;
 
             var oldName = sg.Name;
-            var dialogViewModel = new DialogViewModel("Rename Group", "名称不能为空或重复")
-            {
-                Text = oldName,
-            };
-            dialogViewModel.ValidationEvent += (rawValue) =>
-            {
-                if (rawValue is string value)
-                {
-                    if (string.IsNullOrEmpty(value)) return false;
 
-                    var hasSameName = SignalGroups.Where(s => s.Name != oldName).Any(s => s.Name == value);
-                    if (hasSameName) return false;
-                }
-
-                return true;
-            };
-
-            var renameResult = await mediator.Send(new ShowDialogRequest(dialogViewModel));
+            var renameResult = await GetNewGroupName("Rename Group", oldName);
             if (renameResult.IsCancel || string.IsNullOrEmpty(renameResult.Result)) return;
 
             var newName = renameResult.Result;
             if (oldName == newName) return;
 
-            var command = new ValueChangedCommand(val =>
-            {
-                sg.Name = (string)val;
-            }, oldName, newName);
+            var command = new ValueChangedCommand<string>(val => sg.Name = val, oldName, newName);
             RegistCommandEventHandle(command);
             command.AfterExecute += (_, _) =>
             {
@@ -202,6 +206,24 @@ namespace S7SvrSim.ViewModels.Signals
             command.AfterUndo += (_, _) =>
             {
                 if (GroupName == newName) GroupName = oldName;
+            };
+            UndoRedoManager.Run(command);
+        }
+
+        [RelayCommand]
+        private async Task CopyGroup(SignalEditGroup sg)
+        {
+            if (sg == null) return;
+
+            var renameResult = await GetNewGroupName("Rename Group", sg.Name, true);
+            if (renameResult.IsCancel || string.IsNullOrEmpty(renameResult.Result)) return;
+
+            var newSg = new SignalEditGroup(renameResult.Result, sg.Signals);
+            var command = ListChangedCommand.Insert(SignalGroups, SignalGroups.IndexOf(sg) + 1, [newSg]);
+            RegistCommandEventHandle(command);
+            command.AfterUndo += (_, _) =>
+            {
+                if (GroupName == newSg.Name || string.IsNullOrEmpty(GroupName)) GroupName = SignalGroups.FirstOrDefault()?.Name;
             };
             UndoRedoManager.Run(command);
         }
@@ -232,7 +254,8 @@ namespace S7SvrSim.ViewModels.Signals
         private void InsertSignal(Type signalType)
         {
             var newSignal = new SignalEditObj(signalType);
-            var command = ListChangedCommand.Insert(Signals, (Grid.SelectedItems.Count == 0) ? -1 : Signals.IndexOf(Grid.SelectedItems.Cast<SignalEditObj>().First()), [newSignal]);
+            var indexInsert = (Grid.SelectedItems.Count == 0) ? -1 : Signals.IndexOf(Grid.SelectedItems.Cast<SignalEditObj>().OrderBy(Signals.IndexOf).Last()) + 1;
+            var command = ListChangedCommand.Insert(Signals, indexInsert, [newSignal]);
             RegistCommandEventHandle(command);
             command.AfterExecute += (_, _) => SetGridSelectedItems([newSignal]);
             UndoRedoManager.Run(command);

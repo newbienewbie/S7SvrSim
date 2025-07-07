@@ -16,6 +16,9 @@ namespace S7SvrSim.ViewModels
         [Reactive]
         public string Text { get; set; }
 
+        [Reactive]
+        private bool ValidateTrigger { get; set; }
+
         public event Func<string, bool> ValidationEvent;
 
         public ICommand AcceptCommand { get; }
@@ -25,13 +28,23 @@ namespace S7SvrSim.ViewModels
             Title = title;
             ErrorText = errorText;
 
-            this.ValidationRule(vm => vm.Text, text => ValidationEvent?.Invoke(text) ?? true, ErrorText ?? "error");
+            this.ValidationRule(vm => vm.Text,
+                this.WhenAnyValue(vm => vm.Text, vm => vm.ValidateTrigger, (text, _) => text),
+                text => ValidationEvent?.Invoke(text) ?? true,
+                _ => ErrorText ?? "Error");
 
             AcceptCommand = ReactiveCommand.Create(Accept);
         }
 
+        private void TriggerValidate()
+        {
+            ValidateTrigger = !ValidateTrigger;
+        }
+
         private void Accept()
         {
+            TriggerValidate();
+
             if (!ValidationContext.GetIsValid()) return;
 
             DialogHost.Close("MainWindowDialogHost", Text);

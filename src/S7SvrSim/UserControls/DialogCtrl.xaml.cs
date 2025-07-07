@@ -1,6 +1,7 @@
-﻿using ReactiveUI.Validation.Extensions;
-using S7SvrSim.ViewModels;
+﻿using S7SvrSim.ViewModels;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace S7SvrSim.UserControls
 {
@@ -18,10 +19,6 @@ namespace S7SvrSim.UserControls
             this.WhenActivated(d =>
             {
                 this.BindWithValidation(ViewModel, vm => vm.Text, view => view.inputTextBox.Text).DisposeWith(d);
-                //this.BindValidation(ViewModel, view => view.errorText.Text).DisposeWith(d);
-                //this.WhenAnyValue(view => view.errorText.Text, text => !string.IsNullOrEmpty(text))
-                //    .BindTo(this, view => view.errorText.Visibility)
-                //    .DisposeWith(d);
             });
         }
 
