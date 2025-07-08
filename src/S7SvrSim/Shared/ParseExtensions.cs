@@ -12,5 +12,14 @@ namespace S7SvrSim.Shared
 
             return Optional.None<bool>();
         }
+
+        public static Optional<T> ParseEnum<T>(this string value)
+            where T : Enum
+        {
+            if (Enum.TryParse(typeof(T), value, true, out var result))
+                return (Optional<T>)(T)result;
+
+            return Optional.None<T>();
+        }
     }
 }

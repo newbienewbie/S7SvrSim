@@ -60,6 +60,21 @@ namespace S7SvrSim.Services
             return resCmd;
         }
 
+        public static void RollbackTransaction()
+        {
+            if (TransactionCommand != null && TransactionCommand.Any())
+            {
+                IsInUndoRedo = true;
+                foreach (var item in TransactionCommand.Reverse())
+                {
+                    item.Undo();
+                }
+                IsInUndoRedo = false;
+            }
+
+            TransactionCommand = null;
+        }
+
         public static IHistoryCommand EndTransaction()
         {
             if (TransactionCommand != null && TransactionCommand.Any())

@@ -13,6 +13,7 @@ namespace S7SvrSim.ViewModels
             WatchVM = Locator.Current.GetRequiredService<SignalWatchVM>();
             DragSignalsVM = Locator.Current.GetRequiredService<DragSignalsVM>();
             UpdateAddressOptionsVM = Locator.Current.GetRequiredService<UpdateAddressOptionsVM>();
+            SignalExcelVM = Locator.Current.GetRequiredService<SignalExcelVM>();
             SignalTypes = signalTypes.Value;
         }
 
@@ -20,6 +21,7 @@ namespace S7SvrSim.ViewModels
         public SignalWatchVM WatchVM { get; }
         public DragSignalsVM DragSignalsVM { get; }
         public UpdateAddressOptionsVM UpdateAddressOptionsVM { get; }
+        public SignalExcelVM SignalExcelVM { get; }
         public Type[] SignalTypes { get; }
     }
 }

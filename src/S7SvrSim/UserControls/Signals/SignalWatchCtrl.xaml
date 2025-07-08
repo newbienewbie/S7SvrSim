@@ -10,6 +10,7 @@
              xmlns:shared="clr-namespace:S7SvrSim.Shared"
              xmlns:signal="clr-namespace:S7SvrSim.S7Signal"
              xmlns:ucs="clr-namespace:S7SvrSim.UserControls.Signals"
+             xmlns:vms="clr-namespace:S7SvrSim.ViewModels.Signals"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
@@ -144,6 +145,39 @@
                         <MenuItem.CommandParameter>
                             <vm:SignalSortBy>Type</vm:SignalSortBy>
                         </MenuItem.CommandParameter>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Excel">
+                    <MenuItem Header="导出"
+                              Command="{Binding SignalExcelVM.ExportSignalsCommand}"
+                              Icon="{md:PackIcon Kind=FileExport}"
+                              />
+                    <MenuItem Header="导入"
+                              Command="{Binding SignalExcelVM.ImportSignalsCommand}"
+                              Icon="{md:PackIcon Kind=FileImport}"
+                              />
+                    <Separator />
+                    <MenuItem Header="导入设置">
+                        <MenuItem Header="同名组替换规则">
+                            <MenuItem Header="无操作"
+                                      IsCheckable="True"
+                                      IsChecked="{Binding SignalExcelVM.SameGroupImportRule, Converter={StaticResource EqualToBooleanConverter}, ConverterParameter={x:Static vms:SameGroupImportRule.None}, Mode=OneWay}"
+                                      Command="{Binding SignalExcelVM.SetSameGroupRuleCommand}"
+                                      CommandParameter="{x:Static vms:SameGroupImportRule.None}"
+                                      />
+                            <MenuItem Header="替换组"
+                                      IsCheckable="True"
+                                      IsChecked="{Binding SignalExcelVM.SameGroupImportRule, Converter={StaticResource EqualToBooleanConverter}, ConverterParameter={x:Static vms:SameGroupImportRule.ReplaceGroup}, Mode=OneWay}"
+                                      Command="{Binding SignalExcelVM.SetSameGroupRuleCommand}"
+                                      CommandParameter="{x:Static vms:SameGroupImportRule.ReplaceGroup}"
+                                      />
+                            <MenuItem Header="补充"
+                                      IsCheckable="True"
+                                      IsChecked="{Binding SignalExcelVM.SameGroupImportRule, Converter={StaticResource EqualToBooleanConverter}, ConverterParameter={x:Static vms:SameGroupImportRule.ExtendGroup}, Mode=OneWay}"
+                                      Command="{Binding SignalExcelVM.SetSameGroupRuleCommand}"
+                                      CommandParameter="{x:Static vms:SameGroupImportRule.ExtendGroup}"
+                                      />
+                        </MenuItem>
                     </MenuItem>
                 </MenuItem>
             </Menu>
@@ -382,7 +416,7 @@
                                 <ComboBox ItemsSource="{Binding Data.SignalTypes, Source={StaticResource DataContextProxy}}"
                                           SelectedValuePath="Name"
                                           DisplayMemberPath="Name"
-                                          Text="{Binding SignaleType, UpdateSourceTrigger=Explicit}"
+                                          Text="{Binding SignalType, UpdateSourceTrigger=Explicit}"
                                           LostFocus="ComboBox_LostFocus"
                                           IsEditable="True"
                                           />

@@ -20,15 +20,22 @@ namespace S7SvrSim.ViewModels
         private bool isInit = false;
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(SignaleType))]
+        [NotifyPropertyChangedFor(nameof(SignalType))]
         private Type other;
 
         [ObservableProperty]
         private SignalBase value;
 
-        public string SignaleType
+        public string SignalType
         {
-            get => (Other.IsSubclassOf(typeof(SignalWithLengthBase)) && Value is SignalWithLengthBase lengthSignal) ? $"{Other.Name}[{lengthSignal?.Length}]" : Other.Name;
+            get
+            {
+                if (Other == null)
+                {
+                    return null;
+                }
+                return (Other.IsSubclassOf(typeof(SignalWithLengthBase)) && Value is SignalWithLengthBase lengthSignal) ? $"{Other.Name}[{lengthSignal?.Length}]" : Other.Name;
+            }
             set
             {
                 if (!UndoRedoManager.IsInUndoRedo)
@@ -38,7 +45,7 @@ namespace S7SvrSim.ViewModels
                         return;
                     }
 
-                    if (SignaleType.Equals(value, StringComparison.OrdinalIgnoreCase))
+                    if (SignalType?.Equals(value, StringComparison.OrdinalIgnoreCase) == true)
                     {
                         return;
                     }
@@ -63,6 +70,25 @@ namespace S7SvrSim.ViewModels
             }
         }
 
+        private Type ParseType(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                throw new ArgumentNullException(nameof(value));
+            }
+
+            var tyStr = value.Split('[')[0];
+
+            var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
+
+            if (typeQuery.Any())
+            {
+                return typeQuery.First();
+            }
+
+            throw new NotSupportedException($"不支持的 S7 类型: {tyStr}");
+        }
+
         private int GetLength(string value)
         {
             var leftBaket = value.IndexOf('[');
@@ -82,6 +108,24 @@ namespace S7SvrSim.ViewModels
         {
             Other = type;
             signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<Type[]>>();
+
+            isInit = true;
+        }
+
+        public SignalEditObj(string signalType, string signalName, string formatAddress, string remark)
+        {
+            signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<Type[]>>();
+
+            Other = ParseType(signalType);
+
+            Value.Name = signalName;
+            Value.FormatAddress = formatAddress;
+            Value.Remark = remark;
+
+            if (Value is SignalWithLengthBase lenSignal)
+            {
+                lenSignal.Length = GetLength(signalType);
+            }
 
             isInit = true;
         }
@@ -144,7 +188,7 @@ namespace S7SvrSim.ViewModels
                     ReleaseBind();
                     this.value = signal.Value;
                     OnPropertyChanged(nameof(Value));
-                    OnPropertyChanged(nameof(SignaleType));
+                    OnPropertyChanged(nameof(SignalType));
                 }, new SignalEditObj(preValue.GetType()) { Value = preValue }, CloneCurrent());
                 command.AfterExecute += CommandEventHandle;
                 command.AfterUndo += CommandEventHandle;
@@ -159,7 +203,7 @@ namespace S7SvrSim.ViewModels
                 if (Value is SignalWithLengthBase lengthSignal)
                 {
                     lengthSignal.Length = val;
-                    OnPropertyChanged(nameof(SignaleType));
+                    OnPropertyChanged(nameof(SignalType));
                 }
             }, oldValue, newValue);
 
@@ -182,7 +226,7 @@ namespace S7SvrSim.ViewModels
 
         private void RegistValueChangedCommand<T>(Action<T> update, T oldValue, T newValue)
         {
-            if (UndoRedoManager.IsInUndoRedo || EqualityComparer<T>.Default.Equals(oldValue, newValue))
+            if (UndoRedoManager.IsInUndoRedo || !isInit || EqualityComparer<T>.Default.Equals(oldValue, newValue))
             {
                 return;
             }

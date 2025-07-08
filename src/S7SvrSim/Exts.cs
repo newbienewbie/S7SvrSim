@@ -38,6 +38,7 @@ namespace S7SvrSim
             services.AddSingleton<ISettingFactory, SettingFactory>();
             services.AddSetting(new UpdateAddressOptionsConveter(), "UpdateAddressOptions");
             services.AddSetting(new RecentFileConverter(), "RecentFiles");
+            services.AddSetting(new SignalExcelOptionConverter(), "SignalExcelOption");
             services.AddSingleton<RecentFilesCollection>();
 
             return services;
@@ -71,6 +72,7 @@ namespace S7SvrSim
             Locator.CurrentMutable.RegisterLazySingletonEx<SignalsCollection>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<DragSignalsVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<SignalWatchVM>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<SignalExcelVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<SignalPageVM>(sp);
 
             Locator.CurrentMutable.Register<IViewFor<RwBitVM>, BitOpsView>();
