@@ -324,7 +324,7 @@
                                 </Style>
                             </MenuItem.ItemContainerStyle>
                         </MenuItem>
-                        <Separator />
+                        <Separator Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}" />
                         <MenuItem Header="复制"
                                   Command="{Binding Signals.CopySignalsCommand}"
                                   Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
@@ -333,7 +333,7 @@
                                   Command="{Binding Signals.PasteSignalsCommand}"
                                   Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
                                   />
-                        <Separator />
+                        <Separator Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}" />
                         <MenuItem Header="删除选择的信号"
                                   Command="{Binding Signals.RemoveSelectedSignalsCommand}"
                                   Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
