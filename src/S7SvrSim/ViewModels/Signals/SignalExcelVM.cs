@@ -131,7 +131,9 @@ namespace S7SvrSim.ViewModels.Signals
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                return;
             }
+            MessageBox.Show("导出成功！");
         }
 
         private void ImportSignals()
@@ -210,6 +212,7 @@ namespace S7SvrSim.ViewModels.Signals
                     signals.GroupName = groupName;
                 }
             };
+            MessageBox.Show("导入成功！");
         }
     }
 }
