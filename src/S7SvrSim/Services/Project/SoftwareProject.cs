@@ -129,11 +129,11 @@ namespace S7SvrSim.Services.Project
             var defaultQuery = ProjectFile.SearchPaths.Where(s => s.Equals(ProjectFile.DEFAULT_PATH_KEY, StringComparison.OrdinalIgnoreCase));
             if (defaultQuery.Any())
             {
-                searchPaths = ProjectFile.DefaultPaths.Concat([IOPath.GetDirectoryName(Path)]).Concat(ProjectFile.SearchPaths.Where(s => !s.Equals(ProjectFile.DEFAULT_PATH_KEY, StringComparison.OrdinalIgnoreCase)));
+                searchPaths = ProjectFile.DefaultPaths.Concat([IOPath.GetDirectoryName(Path)]).Concat(ProjectFile.SearchPaths.Where(s => !s.Equals(ProjectFile.DEFAULT_PATH_KEY, StringComparison.OrdinalIgnoreCase))).Distinct();
             }
             else
             {
-                searchPaths = ProjectFile.SearchPaths;
+                searchPaths = ProjectFile.SearchPaths.Distinct();
             }
 
             pyConfigModel.PyEngineSearchPaths.AddRange(searchPaths);
