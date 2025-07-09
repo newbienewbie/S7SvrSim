@@ -69,7 +69,7 @@ namespace S7SvrSim.ViewModels.Signals
             this.mediator = mediator;
             setting.Value.Subscribe(options =>
             {
-                UpdateAddressByDbIndex = true;
+                UpdateAddressByDbIndex = options.UpdateAddressByDbIndex;
             });
 
             var watchGroupName = this.WhenAnyValue(vm => vm.GroupName);
