@@ -23,7 +23,7 @@ namespace S7SvrSim.Services
 
         }
         public static bool IsInUndoRedo { get; private set; } = false;
-        public static int MaxOfCommands { get; set; } = 100;
+        public static int MaxOfCommands { get; set; } = 999;
         private static List<IHistoryCommand> UndoCommands { get; } = [];
         public static int UndoCount => UndoCommands.Count;
         private static List<IHistoryCommand> RedoCommands { get; } = [];
@@ -53,6 +53,10 @@ namespace S7SvrSim.Services
             {
                 UndoCommands.AddRange(TransactionCommand);
                 RedoCommands.Clear();
+                if (UndoCommands.Count >= MaxOfCommands)
+                {
+                    UndoCommands.RemoveRange(0, UndoCount - MaxOfCommands);
+                }
                 UndoRedoChanged?.Invoke();
             }
             var resCmd = TransactionCommand.AsEnumerable();
@@ -79,9 +83,7 @@ namespace S7SvrSim.Services
         {
             if (TransactionCommand != null && TransactionCommand.Any())
             {
-                UndoCommands.Add(TransactionCommand);
-                RedoCommands.Clear();
-                UndoRedoChanged?.Invoke();
+                Regist(TransactionCommand);
             }
             var resCmd = TransactionCommand;
             TransactionCommand = null;
@@ -90,7 +92,7 @@ namespace S7SvrSim.Services
 
         private static void AddCommand(List<IHistoryCommand> target, IHistoryCommand command, bool clearRedo = true)
         {
-            if (target.Count >= 100)
+            if (target.Count >= MaxOfCommands)
             {
                 target.RemoveAt(0);
             }
