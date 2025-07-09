@@ -3,10 +3,12 @@ using DynamicData.Binding;
 using MediatR;
 using Microsoft.Win32;
 using ReactiveUI.Fody.Helpers;
+using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Messages;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
 using S7SvrSim.Services.Recent;
+using Splat;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -70,10 +72,13 @@ namespace S7SvrSim.ViewModels
 
             RecentFiles = data;
 
+            var runningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
+            var watchRunningStatus = runningVM.WhenAnyValue(vm => vm.RunningStatus).Select(rs => !rs);
+
             UndoCommand = ReactiveCommand.Create(UndoRedoManager.Undo, this.WhenAnyValue(vm => vm.UndoCount).Select(c => c > 0));
             RedoCommand = ReactiveCommand.Create(UndoRedoManager.Redo, this.WhenAnyValue(vm => vm.RedoCount).Select(c => c > 0));
             RenameCommand = ReactiveCommand.CreateFromTask(RenameProject);
-            OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile);
+            OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile, watchRunningStatus);
             RemoveRecentCommand = ReactiveCommand.Create<RecentFile>(RemoveRecentFile);
         }
 
