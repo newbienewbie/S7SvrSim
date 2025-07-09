@@ -21,6 +21,7 @@ namespace S7SvrSim.Services.Project
         private readonly ConfigPyEngineVM pyConfigModel;
         private readonly SignalWatchVM signalWatchModel;
         private readonly SignalsCollection signalsCollection;
+        private readonly MsgLoggerVM msgLoggerVM;
         private readonly IServiceProvider serviceProvider;
         private readonly SignalsHelper signalsHelper;
         private readonly IMemCache<Type[]> signalTypes;
@@ -37,7 +38,6 @@ namespace S7SvrSim.Services.Project
 
             this.serviceProvider = serviceProvider;
             this.signalsHelper = signalsHelper;
-
             Path = path;
 
             signalTypes = serviceProvider.GetRequiredService<IMemCache<Type[]>>();
@@ -46,6 +46,7 @@ namespace S7SvrSim.Services.Project
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
             signalWatchModel = Locator.Current.GetRequiredService<SignalWatchVM>();
             signalsCollection = Locator.Current.GetRequiredService<SignalsCollection>();
+            msgLoggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>();
         }
 
         public void New()
@@ -59,12 +60,14 @@ namespace S7SvrSim.Services.Project
         {
             ProjectFile = BuildFromApp();
             ProjectFile.Save(Path);
+            msgLoggerVM.LogInfo("保存成功！");
         }
 
         public void SaveAs(string path)
         {
             var project = BuildFromApp();
             project.Save(path);
+            msgLoggerVM.LogInfo($"保存成功！路径：{path}");
         }
 
         public void Load()
@@ -76,6 +79,7 @@ namespace S7SvrSim.Services.Project
 
             ProjectFile = ProjectFile.Load(Path) ?? throw new NullReferenceException("反序列化文件内容结果为空");
             SetSoftware();
+            msgLoggerVM.LogInfo($"已加载项目：{Path}");
         }
 
         public void Move(string newPath)
@@ -89,6 +93,8 @@ namespace S7SvrSim.Services.Project
             var oldPath = Path;
             File.Move(oldPath, newPath, true);
             Path = newPath;
+
+            msgLoggerVM.LogInfo($"移动成功");
         }
 
         private SignalEditGroup MergeGroup(SignalEditGroup first, IEnumerable<SignalEditGroup> groups)

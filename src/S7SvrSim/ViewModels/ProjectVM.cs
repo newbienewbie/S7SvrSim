@@ -133,11 +133,6 @@ namespace S7SvrSim.ViewModels
 
         private void OpenProject(string file)
         {
-            if (file == currentProject.Path)
-            {
-                return;
-            }
-
             IProject project;
 
             try
