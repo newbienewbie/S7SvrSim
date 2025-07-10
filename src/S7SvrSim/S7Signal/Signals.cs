@@ -1,11 +1,11 @@
-﻿using S7SvrSim.Services;
+﻿using S7SvrSim.Services.S7Blocks;
 using System.ComponentModel;
 
 namespace S7SvrSim.S7Signal
 {
     [AddressUsed(OffsetSize = 1)]
     [SignalVaueType(typeof(bool))]
-    public class Bool : SignalBase
+    public class BoolSignal : SignalBase
     {
         public override string FormatAddress
         {
@@ -65,7 +65,7 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(IndexSize = 1)]
     [SignalVaueType(typeof(byte))]
-    public class Byte : SignalBase
+    public class ByteSignal : SignalBase
     {
         public override void Refresh(IS7Block block)
         {
@@ -95,7 +95,7 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(IndexSize = 2)]
     [SignalVaueType(typeof(short))]
-    public class Int : SignalBase
+    public class IntSignal : SignalBase
     {
         public override void Refresh(IS7Block block)
         {
@@ -119,7 +119,7 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(IndexSize = 4)]
     [SignalVaueType(typeof(int))]
-    public class DInt : SignalBase
+    public class DIntSignal : SignalBase
     {
         public override void Refresh(IS7Block block)
         {
@@ -143,7 +143,7 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(IndexSize = 2)]
     [SignalVaueType(typeof(ushort))]
-    public class UInt : SignalBase
+    public class UIntSignal : SignalBase
     {
         public override void Refresh(IS7Block block)
         {
@@ -167,7 +167,7 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(IndexSize = 4)]
     [SignalVaueType(typeof(uint))]
-    public class UDInt : SignalBase
+    public class UDIntSignal : SignalBase
     {
         public override void Refresh(IS7Block block)
         {
@@ -191,7 +191,7 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(IndexSize = 8)]
     [SignalVaueType(typeof(ulong))]
-    public class ULong : SignalBase
+    public class ULongSignal : SignalBase
     {
         public override void Refresh(IS7Block block)
         {
@@ -215,7 +215,7 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(IndexSize = 4)]
     [SignalVaueType(typeof(float))]
-    public class Real : SignalBase
+    public class RealSignal : SignalBase
     {
         public override void Refresh(IS7Block block)
         {
@@ -239,7 +239,7 @@ namespace S7SvrSim.S7Signal
 
     [AddressUsed(IndexSize = 8)]
     [SignalVaueType(typeof(double))]
-    public class LReal : SignalBase
+    public class LRealSignal : SignalBase
     {
         public override void Refresh(IS7Block block)
         {
@@ -262,7 +262,7 @@ namespace S7SvrSim.S7Signal
     }
 
     [SignalVaueType(typeof(string))]
-    public partial class String : SignalWithLengthBase
+    public partial class StringSignal : SignalWithLengthBase
     {
         public static bool UseTenCeiling = false;
 
@@ -310,7 +310,7 @@ namespace S7SvrSim.S7Signal
     /// 地址占用
     /// </summary>
     [Description("Holding 是一个特殊类型，用于占用对应长度的字节")]
-    public class Holding : SignalWithLengthBase
+    public class HoldingSignal : SignalWithLengthBase
     {
         public AddressUsed AddressUse()
         {

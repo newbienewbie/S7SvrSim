@@ -120,8 +120,8 @@ namespace S7SvrSim.Services.Project
             configS7Model.AreaConfigs.AddRange(ProjectFile.AreaConfigs.Select(config => new AreaConfigVM()
             {
                 AreaKind = config.AreaKind,
-                DBNumber = config.BlockNumber,
-                DBSize = config.BlockSize,
+                BlockNumber = config.BlockNumber,
+                BlockSize = config.BlockSize,
             }));
             configS7Model.SetIpAddress(string.IsNullOrEmpty(ProjectFile.IpAddress) ? "127.0.0.1" : ProjectFile.IpAddress);
 
@@ -172,8 +172,8 @@ namespace S7SvrSim.Services.Project
                 AreaConfigs = configS7Model.AreaConfigs.Select(config => new AreaConfig()
                 {
                     AreaKind = config.AreaKind,
-                    BlockNumber = config.DBNumber,
-                    BlockSize = config.DBSize,
+                    BlockNumber = config.BlockNumber,
+                    BlockSize = config.BlockSize,
                 }).ToList(),
                 SearchPaths = searchPaths.ToList(),
                 IpAddress = configS7Model.IpAddress,

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Scripting.Hosting;
 using S7Svr.Simulator.ViewModels;
+using S7SvrSim.Services.S7Blocks;
 using S7SvrSim.ViewModels;
 using Splat;
 using System;
@@ -18,13 +19,13 @@ namespace S7SvrSim.Services
     public class PyScriptRunner
     {
         private readonly IS7DataBlockService _db;
-        private readonly IS7MBService _mb;
+        private readonly IS7MBlock _mb;
         private readonly IS7ServerService _server;
         private readonly MsgLoggerVM _loggerVM;
         private readonly ILogger<PyScriptRunner> _logger;
         public ScriptEngine PyEngine { get; }
 
-        public PyScriptRunner(IS7DataBlockService db, IS7MBService mb, IS7ServerService server, ILogger<PyScriptRunner> logger)
+        public PyScriptRunner(IS7DataBlockService db, IS7MBlock mb, IS7ServerService server, ILogger<PyScriptRunner> logger)
         {
             this._db = db;
             this._mb = mb;

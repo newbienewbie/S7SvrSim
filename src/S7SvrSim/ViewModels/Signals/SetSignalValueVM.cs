@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
-using S7SvrSim.Services;
+using S7SvrSim.Services.S7Blocks;
 using System;
 using System.Reflection;
 using System.Windows;
@@ -13,7 +13,7 @@ namespace S7SvrSim.ViewModels
 {
     public partial class SetSignalValueVM : ViewModelBase
     {
-        private readonly IS7BlockFactory blockFactory;
+        private readonly IS7BlockProvider blockFactory;
 
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(ValueType))]
@@ -31,7 +31,7 @@ namespace S7SvrSim.ViewModels
 
         public SetSignalValueVM()
         {
-            blockFactory = ((App)Application.Current).ServiceProvider.GetRequiredService<IS7BlockFactory>();
+            blockFactory = ((App)Application.Current).ServiceProvider.GetRequiredService<IS7BlockProvider>();
         }
 
         partial void OnSelectedSignalChanged(SignalEditObj value)

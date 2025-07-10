@@ -12,7 +12,12 @@ namespace S7SvrSim.Project
     public class ProjectFile
     {
         public const string DEFAULT_PATH_KEY = "$DEFAULT";
-        public readonly static string[] DefaultPaths = [".", Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "lib"), Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "DLLs"), Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "predefined")];
+        public readonly static string[] DefaultPaths = [
+            ".", 
+            Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "lib"), 
+            Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "DLLs"), 
+            Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "predefined")
+            ];
 
         [XmlAttribute]
         public string IpAddress { get; set; }
