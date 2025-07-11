@@ -55,6 +55,49 @@
             <Setter Property="CommandParameter" Value="{Binding Type}" />
             <Setter Property="ToolTip" Value="{Binding Type, Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
         </Style>
+        <shared:LeftOrRightMultiConverter x:Key="LeftOrRightMultiConverter" />
+        <ContextMenu x:Key="NormalSignalGridContextMenu"
+                     StaysOpen="True"
+                     Closed="SignalGridContextMenu_Closed"
+                     >
+            <MenuItem Header="新建信号"
+                      ItemsSource="{Binding SignalTypes}"
+                      ItemContainerStyle="{StaticResource NewSignalMenuItemStyle}"
+                      />
+            <MenuItem Header="插入信号"
+                      ItemsSource="{Binding SignalTypes}"
+                      ToolTip="在当前选择的信号前插入新的信号"
+                      ItemContainerStyle="{StaticResource InsertSignalMenuItemStyle}"
+                      />
+            <Separator />
+            <MenuItem Header="复制"
+                      Command="{Binding Signals.CopySignalsCommand}"
+                      />
+            <MenuItem Header="粘贴"
+                      Command="{Binding Signals.PasteSignalsCommand}"
+                      />
+            <Separator />
+            <MenuItem Header="删除选择的信号"
+                      Command="{Binding Signals.RemoveSelectedSignalsCommand}"
+                      />
+            <MenuItem Header="删除所有信号"
+                      Command="{Binding Signals.ClearSignalsCommand}"
+                      />
+        </ContextMenu>
+        <ContextMenu x:Key="DragSignalGridContextMenu"
+                     StaysOpen="True"
+                     Closed="SignalGridContextMenu_Closed"
+                     >
+            <MenuItem Header="替换"
+                      Command="{Binding DragSignalsVM.ReplaceSignalCommand}"
+                      />
+            <MenuItem Header="移动到之前"
+                      Command="{Binding DragSignalsVM.MoveSignlsBeforeCommand}"
+                      />
+            <MenuItem Header="移动到之后"
+                      Command="{Binding DragSignalsVM.MoveSignalsAfterCommand}"
+                      />
+        </ContextMenu>
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
@@ -287,51 +330,13 @@
                       EnableRowVirtualization="True"
                       >
                 <DataGrid.ContextMenu>
-                    <ContextMenu StaysOpen="True"
-                                 Closed="SignalGridContextMenu_Closed"
-                                 >
-                        <MenuItem Header="新建信号"
-                                  ItemsSource="{Binding SignalTypes}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
-                                  ItemContainerStyle="{StaticResource NewSignalMenuItemStyle}"
-                                  />
-                        <MenuItem Header="插入信号"
-                                  ItemsSource="{Binding SignalTypes}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
-                                  ToolTip="在当前选择的信号前插入新的信号"
-                                  ItemContainerStyle="{StaticResource InsertSignalMenuItemStyle}"
-                                  />
-                        <Separator Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}" />
-                        <MenuItem Header="复制"
-                                  Command="{Binding Signals.CopySignalsCommand}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
-                                  />
-                        <MenuItem Header="粘贴"
-                                  Command="{Binding Signals.PasteSignalsCommand}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
-                                  />
-                        <Separator Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}" />
-                        <MenuItem Header="删除选择的信号"
-                                  Command="{Binding Signals.RemoveSelectedSignalsCommand}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
-                                  />
-                        <MenuItem Header="删除所有信号"
-                                  Command="{Binding Signals.ClearSignalsCommand}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
-                                  />
-                        <MenuItem Header="替换"
-                                  Command="{Binding DragSignalsVM.ReplaceSignalCommand}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                  />
-                        <MenuItem Header="移动到之前"
-                                  Command="{Binding DragSignalsVM.MoveSignlsBeforeCommand}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                  />
-                        <MenuItem Header="移动到之后"
-                                  Command="{Binding DragSignalsVM.MoveSignalsAfterCommand}"
-                                  Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                  />
-                    </ContextMenu>
+                    <MultiBinding Converter="{StaticResource LeftOrRightMultiConverter}"
+                                  Mode="OneWay"
+                                  >
+                        <Binding Path="DragSignalsVM.IsDragSignals" />
+                        <Binding Source="{StaticResource DragSignalGridContextMenu}" />
+                        <Binding Source="{StaticResource NormalSignalGridContextMenu}" />
+                    </MultiBinding>
                 </DataGrid.ContextMenu>
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow"
