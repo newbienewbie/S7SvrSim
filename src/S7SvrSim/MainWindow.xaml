@@ -21,23 +21,15 @@
         Width="800"
         >
     <Window.Resources>
-        <shared:IsTypeValueConverter x:Key="IsAreaConfigVM"
-                                     Type="{x:Type viewmodels:AreaConfigVM}"
-                                     />
-        <lu:BindingProxy x:Key="DataContextProxy"
-                         Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext}"
-                         />
+        <shared:IsTypeValueConverter x:Key="IsAreaConfigVM" Type="{x:Type viewmodels:AreaConfigVM}" />
+        <lu:BindingProxy x:Key="DataContextProxy" Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext}" />
     </Window.Resources>
-    <md:DialogHost CloseOnClickAway="True"
-                   Identifier="MainWindowDialogHost"
-                   >
+    <md:DialogHost CloseOnClickAway="True" Identifier="MainWindowDialogHost">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <Menu>
                     <MenuItem Header="文件">
-                        <MenuItem Command="ApplicationCommands.New"
-                                  Icon="{md:PackIcon Kind=FileOutline}"
-                                  />
+                        <MenuItem Command="ApplicationCommands.New" Icon="{md:PackIcon Kind=FileOutline}" />
                         <MenuItem Header="打开"
                                   Icon="{md:PackIcon Kind=FolderOpenOutline}"
                                   Command="ApplicationCommands.Open"
@@ -47,9 +39,7 @@
                                   IsEnabled="{Binding ProjectVM.CanOpenRecent}"
                                   >
                             <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem"
-                                       BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                       >
+                                <Style TargetType="MenuItem" BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}">
                                     <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.ProjectVM.OpenRecentCommand}" />
                                     <Setter Property="CommandParameter" Value="{Binding .}" />
                                 </Style>
@@ -72,9 +62,7 @@
                                                 </ControlTemplate>
                                             </Button.Template>
                                         </Button>
-                                        <TextBlock Text="{Binding Path}"
-                                                   VerticalAlignment="Center"
-                                                   />
+                                        <TextBlock Text="{Binding Path}" VerticalAlignment="Center" />
                                     </DockPanel>
                                 </DataTemplate>
                             </MenuItem.ItemTemplate>
@@ -83,17 +71,13 @@
                                   Icon="{md:PackIcon Kind=ContentSaveOutline}"
                                   Command="ApplicationCommands.Save"
                                   />
-                        <MenuItem Header="另存为"
-                                  Command="ApplicationCommands.SaveAs"
-                                  />
+                        <MenuItem Header="另存为" Command="ApplicationCommands.SaveAs" />
                         <Separator />
                         <MenuItem Header="项目重命名"
                                   Command="{Binding ProjectVM.RenameCommand}"
                                   Icon="{md:PackIcon Kind=FormTextbox}"
                                   />
-                        <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}"
-                                  Icon="{md:PackIcon Kind=Redo}"
-                                  />
+                        <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}" Icon="{md:PackIcon Kind=Redo}" />
                     </MenuItem>
                     <Separator />
                     <MenuItem Header="编辑">
@@ -215,13 +199,9 @@
                     <RowDefinition Height="auto" />
                     <RowDefinition Height="200" />
                 </Grid.RowDefinitions>
-                <TabControl TabStripPlacement="Left"
-                            x:Name="tabControl"
-                            >
+                <TabControl TabStripPlacement="Left" x:Name="tabControl">
                     <TabControl.Resources>
-                        <Style TargetType="TabItem"
-                               BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}"
-                               />
+                        <Style TargetType="TabItem" BasedOn="{StaticResource MaterialDesignNavigationRailTabItem}" />
                     </TabControl.Resources>
                     <TabItem Header="配置">
                         <DockPanel>
@@ -237,16 +217,17 @@
                                              VerticalAlignment="Center"
                                              />
                                 </StackPanel>
-                                <StackPanel Orientation="Horizontal"
-                                            Margin="0 10"
-                                            >
-                                    <Button Command="{Binding ConfigVM.CmdAddArea}"
-                                            Style="{StaticResource MaterialDesignOutlinedButton}"
-                                            >
+                                <StackPanel Orientation="Horizontal" Margin="0 10">
+                                    <Button Command="{Binding ConfigVM.CmdAddArea}" Style="{StaticResource MaterialDesignOutlinedButton}">
                                         添加
                                     </Button>
                                 </StackPanel>
                             </StackPanel>
+                            <usercontrols:ActiveBlock DataContext="{Binding RunningVM}"
+                                                      DockPanel.Dock="Bottom"
+                                                      MaxHeight="100"
+                                                      x:Name="activeBlock"
+                                                      />
                             <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}"
                                       CanUserAddRows="False"
                                       CanUserDeleteRows="False"
@@ -315,9 +296,7 @@
                               Height="3"
                               HorizontalAlignment="Stretch"
                               />
-                <usercontrols:MsgLoggerCtrl DataContext="{Binding LoggerVM}"
-                                            Grid.Row="2"
-                                            />
+                <usercontrols:MsgLoggerCtrl DataContext="{Binding LoggerVM}" Grid.Row="2" />
             </Grid>
         </DockPanel>
     </md:DialogHost>

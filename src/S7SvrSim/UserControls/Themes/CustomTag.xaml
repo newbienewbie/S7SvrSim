@@ -1,0 +1,58 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:uc="clr-namespace:S7SvrSim.UserControls"
+                    >
+    <Style TargetType="uc:CustomTag">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="uc:CustomTag">
+                    <StackPanel Orientation="Horizontal" Margin="2 0">
+                        <Label Content="#"
+                               Foreground="{TemplateBinding uc:CustomTag.MarkForeground}"
+                               Padding="2 0 2 0"
+                               />
+                        <Border BorderThickness="0 0 0 1"
+                                BorderBrush="{TemplateBinding uc:CustomTag.MarkForeground}"
+                                VerticalAlignment="Center"
+                                Name="PART_UnderlineBorder"
+                                >
+                            <Border.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform />
+                                    <SkewTransform />
+                                    <RotateTransform />
+                                    <TranslateTransform Y="-2" />
+                                </TransformGroup>
+                            </Border.RenderTransform>
+                            <ContentPresenter>
+                                <ContentPresenter.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform />
+                                        <SkewTransform />
+                                        <RotateTransform />
+                                        <TranslateTransform Y="2" />
+                                    </TransformGroup>
+                                </ContentPresenter.RenderTransform>
+                            </ContentPresenter>
+                        </Border>
+                        <Label x:Name="PART_Suffix"
+                               Content="{TemplateBinding uc:CustomTag.Suffix}"
+                               Padding="0"
+                               Margin="1 0 0 0"
+                               VerticalAlignment="Bottom"
+                               Foreground="Gray"
+                               />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Suffix" Value="{x:Null}">
+                            <Setter TargetName="PART_Suffix" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Underline" Value="False">
+                            <Setter TargetName="PART_UnderlineBorder" Property="BorderThickness" Value="0" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

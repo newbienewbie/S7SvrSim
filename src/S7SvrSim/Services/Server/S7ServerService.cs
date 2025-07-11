@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace S7Svr.Simulator.ViewModels
 {
-    public class S7ServerService: IDisposable, IS7ServerService
+    public class S7ServerService : IDisposable, IS7ServerService
     {
         private readonly RunningSnap7ServerVM _runningVM;
         private readonly MsgLoggerVM _loggerVM;
@@ -20,7 +20,7 @@ namespace S7Svr.Simulator.ViewModels
         {
             this._mediator = mediator;
             this._runningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
-            this._loggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>(); 
+            this._loggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>();
             this._logger = logger;
         }
 
@@ -38,12 +38,12 @@ namespace S7Svr.Simulator.ViewModels
                     return;
                 }
 
-                _runningVM.RunningsItems.Clear();
+                _runningVM.Clear();
 
                 foreach (var area in _runningVM.AreaConfigs)
                 {
                     var buffer = new byte[area.DBSize];
-                    _runningVM.RunningsItems.Add(new RunningServerItem
+                    _runningVM.Add(new RunningServerItem
                     {
                         AreaKind = area.AreaKind,
                         BlockNumber = area.DBNumber,
