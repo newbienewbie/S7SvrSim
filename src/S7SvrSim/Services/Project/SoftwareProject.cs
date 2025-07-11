@@ -24,7 +24,7 @@ namespace S7SvrSim.Services.Project
         private readonly MsgLoggerVM msgLoggerVM;
         private readonly IServiceProvider serviceProvider;
         private readonly SignalsHelper signalsHelper;
-        private readonly IMemCache<Type[]> signalTypes;
+        private readonly IMemCache<SignalType[]> signalTypes;
 
         public ProjectFile ProjectFile { get; private set; }
         public string Path { get; private set; }
@@ -40,7 +40,7 @@ namespace S7SvrSim.Services.Project
             this.signalsHelper = signalsHelper;
             Path = path;
 
-            signalTypes = serviceProvider.GetRequiredService<IMemCache<Type[]>>();
+            signalTypes = serviceProvider.GetRequiredService<IMemCache<SignalType[]>>();
 
             configS7Model = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();

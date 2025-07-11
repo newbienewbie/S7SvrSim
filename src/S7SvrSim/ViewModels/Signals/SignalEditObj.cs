@@ -16,7 +16,7 @@ namespace S7SvrSim.ViewModels
 {
     public partial class SignalEditObj : ObservableObject
     {
-        private readonly IMemCache<Type[]> signalTypes;
+        private readonly IMemCache<SignalType[]> signalTypes;
         private bool isInit = false;
 
         [ObservableProperty]
@@ -30,11 +30,12 @@ namespace S7SvrSim.ViewModels
         {
             get
             {
-                if (Other == null)
-                {
-                    return null;
-                }
-                return (Other.IsSubclassOf(typeof(SignalWithLengthBase)) && Value is SignalWithLengthBase lengthSignal) ? $"{Other.Name}[{lengthSignal?.Length}]" : Other.Name;
+                if (Other == null) return null;
+
+                var signalTypeName = signalTypes.Value.Where(ty => ty.Type == Other).FirstOrDefault();
+                if (signalTypeName == null) return null;
+
+                return (Other.IsSubclassOf(typeof(SignalWithLengthBase)) && Value is SignalWithLengthBase lengthSignal) ? $"{signalTypeName.Name}[{lengthSignal?.Length}]" : signalTypeName.Name;
             }
             set
             {
@@ -53,11 +54,11 @@ namespace S7SvrSim.ViewModels
                     var tyStr = value.Split('[')[0];
                     var len = GetLength(value);
 
-                    var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
+                    var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase) || ty.Type.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
                     if (typeQuery.Any())
                     {
                         UndoRedoManager.StartTransaction();
-                        Other = typeQuery.First();
+                        Other = typeQuery.First().Type;
                         if (Value is SignalWithLengthBase lengthValue)
                         {
                             lengthValue.Length = len;
@@ -79,11 +80,11 @@ namespace S7SvrSim.ViewModels
 
             var tyStr = value.Split('[')[0];
 
-            var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
+            var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase) || ty.Type.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
 
             if (typeQuery.Any())
             {
-                return typeQuery.First();
+                return typeQuery.First().Type;
             }
 
             throw new NotSupportedException($"不支持的 S7 类型: {tyStr}");
@@ -107,14 +108,14 @@ namespace S7SvrSim.ViewModels
         public SignalEditObj(Type type)
         {
             Other = type;
-            signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<Type[]>>();
+            signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<SignalType[]>>();
 
             isInit = true;
         }
 
         public SignalEditObj(string signalType, string signalName, string formatAddress, string remark)
         {
-            signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<Type[]>>();
+            signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<SignalType[]>>();
 
             Other = ParseType(signalType);
 

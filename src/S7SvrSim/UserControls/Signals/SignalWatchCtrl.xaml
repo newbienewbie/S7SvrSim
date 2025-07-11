@@ -37,6 +37,24 @@
             <Setter Property="CornerRadius" Value="1" />
         </Style>
         <shared:EqualToBooleanConverter x:Key="EqualToBooleanConverter" />
+        <Style TargetType="MenuItem"
+               BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
+               x:Key="NewSignalMenuItemStyle"
+               >
+            <Setter Property="Header" Value="{Binding Name}" />
+            <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.NewSignalCommand}" />
+            <Setter Property="CommandParameter" Value="{Binding Type}" />
+            <Setter Property="ToolTip" Value="{Binding Type, Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
+        </Style>
+        <Style TargetType="MenuItem"
+               BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
+               x:Key="InsertSignalMenuItemStyle"
+               >
+            <Setter Property="Header" Value="{Binding Name}" />
+            <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.InsertSignalCommand}" />
+            <Setter Property="CommandParameter" Value="{Binding Type}" />
+            <Setter Property="ToolTip" Value="{Binding Type, Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
+        </Style>
     </UserControl.Resources>
     <DockPanel>
         <StackPanel DockPanel.Dock="Top">
@@ -44,34 +62,13 @@
                 <MenuItem Header="信号">
                     <MenuItem Header="新建信号"
                               ItemsSource="{Binding SignalTypes}"
-                              >
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem"
-                                   BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                   >
-                                <Setter Property="Header" Value="{Binding Name}" />
-                                <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.NewSignalCommand}" />
-                                <Setter Property="CommandParameter" Value="{Binding .}" />
-                                <Setter Property="ToolTip" Value="{Binding ., Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
+                              ItemContainerStyle="{StaticResource NewSignalMenuItemStyle}"
+                              />
                     <MenuItem Header="插入信号"
                               ItemsSource="{Binding SignalTypes}"
-                              Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
-                              ToolTip="在当前选择的信号前插入新的信号"
-                              >
-                        <MenuItem.ItemContainerStyle>
-                            <Style TargetType="MenuItem"
-                                   BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                   >
-                                <Setter Property="Header" Value="{Binding Name}" />
-                                <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.InsertSignalCommand}" />
-                                <Setter Property="CommandParameter" Value="{Binding .}" />
-                                <Setter Property="ToolTip" Value="{Binding ., Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
-                            </Style>
-                        </MenuItem.ItemContainerStyle>
-                    </MenuItem>
+                              ToolTip="在当前选择的信号后插入新的信号"
+                              ItemContainerStyle="{StaticResource InsertSignalMenuItemStyle}"
+                              />
                     <MenuItem Header="删除选择的信号"
                               Command="{Binding Signals.RemoveSelectedSignalsCommand}"
                               />
@@ -296,34 +293,14 @@
                         <MenuItem Header="新建信号"
                                   ItemsSource="{Binding SignalTypes}"
                                   Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
-                                  >
-                            <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem"
-                                       BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                       >
-                                    <Setter Property="Header" Value="{Binding Name}" />
-                                    <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.NewSignalCommand}" />
-                                    <Setter Property="CommandParameter" Value="{Binding .}" />
-                                    <Setter Property="ToolTip" Value="{Binding ., Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
-                                </Style>
-                            </MenuItem.ItemContainerStyle>
-                        </MenuItem>
+                                  ItemContainerStyle="{StaticResource NewSignalMenuItemStyle}"
+                                  />
                         <MenuItem Header="插入信号"
                                   ItemsSource="{Binding SignalTypes}"
                                   Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}"
                                   ToolTip="在当前选择的信号前插入新的信号"
-                                  >
-                            <MenuItem.ItemContainerStyle>
-                                <Style TargetType="MenuItem"
-                                       BasedOn="{StaticResource ResourceKey={x:Type MenuItem}}"
-                                       >
-                                    <Setter Property="Header" Value="{Binding Name}" />
-                                    <Setter Property="Command" Value="{Binding Source={StaticResource DataContextProxy}, Path=Data.Signals.InsertSignalCommand}" />
-                                    <Setter Property="CommandParameter" Value="{Binding .}" />
-                                    <Setter Property="ToolTip" Value="{Binding ., Converter={StaticResource DescriptionConverter}, Mode=OneWay}" />
-                                </Style>
-                            </MenuItem.ItemContainerStyle>
-                        </MenuItem>
+                                  ItemContainerStyle="{StaticResource InsertSignalMenuItemStyle}"
+                                  />
                         <Separator Visibility="{Binding DragSignalsVM.IsDragSignals, Converter={StaticResource InverseBoolToVisConverter}}" />
                         <MenuItem Header="复制"
                                   Command="{Binding Signals.CopySignalsCommand}"

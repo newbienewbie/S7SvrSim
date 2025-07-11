@@ -14,14 +14,14 @@ namespace S7SvrSim.S7Signal
     public class SignalsHelper
     {
         private readonly IS7BlockProvider blockProvider;
-        private readonly IMemCache<Type[]> signalTypes;
+        private readonly IMemCache<SignalType[]> signalTypes;
         private readonly ISignalAddressUesdCollection signalAddressUsed;
 
         private bool ForbidIndexHasOddNumber { get; set; }
         private bool AllowBoolIndexHasOddNumber { get; set; }
         private bool AllowByteIndexHAsOddNumber { get; set; }
 
-        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockProvider blockFactory, ISetting<UpdateAddressOptions> setting, IMemCache<Type[]> signalTypes)
+        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockProvider blockFactory, ISetting<UpdateAddressOptions> setting, IMemCache<SignalType[]> signalTypes)
         {
             this.signalAddressUsed = signalAddressUsed;
             this.blockProvider = blockFactory;
@@ -36,11 +36,11 @@ namespace S7SvrSim.S7Signal
 
         public SignalEditObj ItemToEditObj(SignalItem item)
         {
-            var signalType = signalTypes.Value.First(ty => ty.Name == item.Type);
-            var signal = (SignalBase)Activator.CreateInstance(signalType);
+            var signalType = signalTypes.Value.First(ty => ty.Name.Equals(item.Type, StringComparison.OrdinalIgnoreCase) || ty.Type.Name.Equals(item.Type, StringComparison.OrdinalIgnoreCase));
+            var signal = (SignalBase)Activator.CreateInstance(signalType.Type);
             signal.CopyFromSignalItem(item);
 
-            return new SignalEditObj(signalType)
+            return new SignalEditObj(signalType.Type)
             {
                 Value = signal
             };
@@ -62,8 +62,8 @@ namespace S7SvrSim.S7Signal
                         continue;
                     }
 
-                    var block = signal.Address.AreaKind == S7Svr.Simulator.ViewModels.AreaKind.DB ? 
-                        blockProvider.GetDataBlockService(signal.Address.DbIndex) : 
+                    var block = signal.Address.AreaKind == S7Svr.Simulator.ViewModels.AreaKind.DB ?
+                        blockProvider.GetDataBlockService(signal.Address.DbIndex) :
                         blockProvider.GetMemoryBlockService();
                     try
                     {

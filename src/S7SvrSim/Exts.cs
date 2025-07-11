@@ -30,7 +30,7 @@ namespace S7SvrSim
             services.AddSingleton<IS7MBlock, S7MBlock>();
             services.AddSingleton<IProjectFactory, ProjectFractory>();
             services.AddSingleton<IS7BlockProvider, S7BlockProvider>();
-            services.AddSingleton<IMemCache<Type[]>, SignalTypeCache>();
+            services.AddSingleton<IMemCache<SignalType[]>, SignalTypeCache>();
             services.AddSingleton<IMemCache<WatchState>, WatchStateCache>();
             services.AddSingleton<ISignalAddressUesdCollection, SignalAddressUesedCollection>();
             services.AddAddressUsedCalc();
