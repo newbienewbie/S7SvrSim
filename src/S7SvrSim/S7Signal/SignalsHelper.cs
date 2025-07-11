@@ -1,6 +1,7 @@
 ﻿using S7SvrSim.Project;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
+using S7SvrSim.Services.S7Blocks;
 using S7SvrSim.Services.Settings;
 using S7SvrSim.Shared;
 using S7SvrSim.ViewModels;
@@ -12,7 +13,7 @@ namespace S7SvrSim.S7Signal
 {
     public class SignalsHelper
     {
-        private readonly IS7BlockFactory blockFactory;
+        private readonly IS7BlockProvider blockProvider;
         private readonly IMemCache<Type[]> signalTypes;
         private readonly ISignalAddressUesdCollection signalAddressUsed;
 
@@ -20,10 +21,10 @@ namespace S7SvrSim.S7Signal
         private bool AllowBoolIndexHasOddNumber { get; set; }
         private bool AllowByteIndexHAsOddNumber { get; set; }
 
-        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockFactory blockFactory, ISetting<UpdateAddressOptions> setting, IMemCache<Type[]> signalTypes)
+        public SignalsHelper(ISignalAddressUesdCollection signalAddressUsed, IS7BlockProvider blockFactory, ISetting<UpdateAddressOptions> setting, IMemCache<Type[]> signalTypes)
         {
             this.signalAddressUsed = signalAddressUsed;
-            this.blockFactory = blockFactory;
+            this.blockProvider = blockFactory;
             this.signalTypes = signalTypes;
             setting.Value.Subscribe(options =>
             {
@@ -48,6 +49,7 @@ namespace S7SvrSim.S7Signal
         public void RefreshValue(IEnumerable<SignalBase> signals)
         {
             signals.Where(s => s.Address == null).Each(s => s.Value = null);
+
             foreach (var blockSignals in signals.Where(s => s.Address != null).GroupBy(s => s.Address.AreaKind))
             {
                 object preValue = null;
@@ -60,12 +62,14 @@ namespace S7SvrSim.S7Signal
                         continue;
                     }
 
-                    var block = signal.Address.AreaKind == S7Svr.Simulator.ViewModels.AreaKind.DB ? blockFactory.GetDataBlockService(signal.Address.DbIndex) : blockFactory.GetMemoryBlockService();
+                    var block = signal.Address.AreaKind == S7Svr.Simulator.ViewModels.AreaKind.DB ? 
+                        blockProvider.GetDataBlockService(signal.Address.DbIndex) : 
+                        blockProvider.GetMemoryBlockService();
                     try
                     {
-                        if (signal is Bool boolSignal)
+                        if (signal is BoolSignal boolSignal)
                         {
-                            if (preSignal is Bool && preSignal.Address.DbIndex == signal.Address.DbIndex && preSignal.Address.Index == signal.Address.Index)
+                            if (preSignal is BoolSignal && preSignal.Address.DbIndex == signal.Address.DbIndex && preSignal.Address.Index == signal.Address.Index)
                             {
                                 preValue ??= block.ReadByte(signal.Address.Index);
                             }
@@ -130,13 +134,13 @@ namespace S7SvrSim.S7Signal
                     int index;
                     byte offset = 0;
 
-                    if (signal is Holding)
+                    if (signal is HoldingSignal)
                     {
                         index = preAddress.Index + preUsed.IndexSize;
                     }
                     else
                     {
-                        if (preUsed.IndexSize == 0 && used.IndexSize == 0 && preSignal is Bool && signal is Bool)
+                        if (preUsed.IndexSize == 0 && used.IndexSize == 0 && preSignal is BoolSignal && signal is BoolSignal)
                         {
                             if (preAddress.Offset >= 7)
                             {
@@ -154,7 +158,7 @@ namespace S7SvrSim.S7Signal
                             index = preAddress.Index + (preUsed.IndexSize == 0 ? 1 : preUsed.IndexSize);
                         }
 
-                        if (index % 2 == 1 && (signal is not Bool || !AllowBoolIndexHasOddNumber) && (signal is not Byte || !AllowByteIndexHAsOddNumber) && ForbidIndexHasOddNumber)
+                        if (index % 2 == 1 && (signal is not BoolSignal || !AllowBoolIndexHasOddNumber) && (signal is not ByteSignal || !AllowByteIndexHAsOddNumber) && ForbidIndexHasOddNumber)
                         {
                             index += 1;
                         }
@@ -162,7 +166,7 @@ namespace S7SvrSim.S7Signal
 
                     var newAddress = new SignalAddress(dbIndex, index, offset)
                     {
-                        HideOffset = used.IndexSize != 0 || signal is Holding,
+                        HideOffset = used.IndexSize != 0 || signal is HoldingSignal,
                         AreaKind = preAddress.AreaKind
                     };
 

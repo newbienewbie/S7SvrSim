@@ -74,7 +74,7 @@ namespace S7Svr.Simulator.ViewModels
             }
         }
 
-        public int DBNumber
+        public int BlockNumber
         {
             get => this._currentConfig.BlockNumber;
             set
@@ -86,7 +86,7 @@ namespace S7Svr.Simulator.ViewModels
                 }
             }
         }
-        public int DBSize
+        public int BlockSize
         {
             get => this._currentConfig.BlockSize;
             set
@@ -127,8 +127,8 @@ namespace S7Svr.Simulator.ViewModels
                 var command = new ValueChangedCommand<AreaConfig>(config =>
                 {
                     this.AreaKind = config.AreaKind;
-                    this.DBNumber = config.BlockNumber;
-                    this.DBSize = config.BlockSize;
+                    this.BlockNumber = config.BlockNumber;
+                    this.BlockSize = config.BlockSize;
                 }, (AreaConfig)this._bakeup.Clone(), (AreaConfig)this._currentConfig.Clone());
                 command.AfterExecute += CommandEventHandle;
                 command.AfterUndo += CommandEventHandle;

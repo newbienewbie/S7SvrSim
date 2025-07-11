@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using S7SvrSim.Project;
-using S7SvrSim.Services;
+using S7SvrSim.Services.S7Blocks;
 using S7SvrSim.Shared;
 using System;
 

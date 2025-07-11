@@ -27,7 +27,7 @@ namespace S7SvrSim.S7Signal
         }
     }
 
-    public class StringCalc : IAddressUsedCalc<String>
+    public class StringCalc : IAddressUsedCalc<StringSignal>
     {
         private bool UseTenCeiling { get; set; }
 
@@ -39,7 +39,7 @@ namespace S7SvrSim.S7Signal
             });
         }
 
-        public IAddressUsed CalcAddressUsed(String signal)
+        public IAddressUsed CalcAddressUsed(StringSignal signal)
         {
             var length = signal.Length;
             if (UseTenCeiling)
@@ -61,9 +61,9 @@ namespace S7SvrSim.S7Signal
         }
     }
 
-    public class HoldingCalc : IAddressUsedCalc<Holding>
+    public class HoldingCalc : IAddressUsedCalc<HoldingSignal>
     {
-        public IAddressUsed CalcAddressUsed(Holding signal) =>
+        public IAddressUsed CalcAddressUsed(HoldingSignal signal) =>
             new AddressUsed()
             {
                 IndexSize = signal.Length
@@ -88,8 +88,8 @@ namespace S7SvrSim.S7Signal
                 services.AddTransient(interfaceTy, attrCalcTy);
             }
 
-            services.AddTransient<IAddressUsedCalc<String>, StringCalc>();
-            services.AddTransient<IAddressUsedCalc<Holding>, HoldingCalc>();
+            services.AddTransient<IAddressUsedCalc<StringSignal>, StringCalc>();
+            services.AddTransient<IAddressUsedCalc<HoldingSignal>, HoldingCalc>();
 
             return services;
         }
