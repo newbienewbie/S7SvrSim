@@ -46,7 +46,6 @@ namespace S7SvrSim.Services.Project
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
             signalWatchModel = Locator.Current.GetRequiredService<SignalWatchVM>();
             signalsCollection = Locator.Current.GetRequiredService<SignalsCollection>();
-            msgLoggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>();
         }
 
         public void New()
@@ -60,14 +59,12 @@ namespace S7SvrSim.Services.Project
         {
             ProjectFile = BuildFromApp();
             ProjectFile.Save(Path);
-            msgLoggerVM.LogInfo("保存成功！");
         }
 
         public void SaveAs(string path)
         {
             var project = BuildFromApp();
             project.Save(path);
-            msgLoggerVM.LogInfo($"保存成功！路径：{path}");
         }
 
         public void Load()
@@ -79,7 +76,6 @@ namespace S7SvrSim.Services.Project
 
             ProjectFile = ProjectFile.Load(Path) ?? throw new NullReferenceException("反序列化文件内容结果为空");
             SetSoftware();
-            msgLoggerVM.LogInfo($"已加载项目：{Path}");
         }
 
         public void Move(string newPath)

@@ -26,6 +26,7 @@ namespace S7SvrSim.ViewModels
         private readonly IProjectFactory projectFactory;
         private readonly RecentFilesCollection recentFiles;
         private readonly IMediator mediator;
+        private readonly MsgLoggerVM logger;
         private IProject currentProject;
 
         [Reactive]
@@ -56,7 +57,9 @@ namespace S7SvrSim.ViewModels
             this.projectFactory = projectFactory;
             this.recentFiles = recentFilesVM;
             this.mediator = mediator;
-            currentProject = projectFactory.GetOrCreateProject(null);
+            logger = Locator.Current.GetRequiredService<MsgLoggerVM>();
+
+            OpenDefaultProject();
 
             UndoRedoManager.UndoRedoChanged += () =>
             {
@@ -80,6 +83,18 @@ namespace S7SvrSim.ViewModels
             RenameCommand = ReactiveCommand.CreateFromTask(RenameProject);
             OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile, watchRunningStatus);
             RemoveRecentCommand = ReactiveCommand.Create<RecentFile>(RemoveRecentFile);
+        }
+
+        private void OpenDefaultProject()
+        {
+            try
+            {
+                currentProject = projectFactory.GetOrCreateProject(null);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"打开默认项目失败: {ex.Message}");
+            }
         }
 
         private void CallbackNeedSave()
@@ -128,7 +143,11 @@ namespace S7SvrSim.ViewModels
             }
 
             currentProject = projectFactory.CreateProject(saveFileDialog.FileName);
+            recentFiles.AddFile(new RecentFile(currentProject.Path, DateTime.Now));
             UndoRedoManager.Reset();
+            NeedSave = false;
+
+            logger.LogInfo($"已新建项目: {currentProject.Path}");
         }
 
         private void OpenProject(string file)
@@ -149,6 +168,8 @@ namespace S7SvrSim.ViewModels
             UndoRedoManager.Reset();
 
             CallbackNeedSave();
+
+            logger.LogInfo($"已加载项目: {currentProject.Path}");
         }
 
         public void LoadProject()
@@ -180,6 +201,7 @@ namespace S7SvrSim.ViewModels
         {
             currentProject.Save();
             NeedSave = false;
+            logger.LogInfo($"保存成功！路径: {currentProject.Path}");
         }
 
         public void SaveProjectAs()
@@ -201,7 +223,9 @@ namespace S7SvrSim.ViewModels
             currentProject = projectFactory.GetProject(saveFileDialog.FileName);
 
             CallbackNeedSave();
+            logger.LogInfo($"另存成功！当前项目已切换到另存路径: {saveFileDialog.FileName}");
         }
+
         private static readonly char[] InvalidCharsForPath = ['\\', '/', ':', '*', '?', '"', '<', '>', '|'];
         public async Task RenameProject()
         {
@@ -235,6 +259,8 @@ namespace S7SvrSim.ViewModels
             recentFiles.AddFile(new RecentFile(currentProject.Path, DateTime.Now));
 
             CallbackNeedSave();
+
+            logger.LogInfo($"重命名成功！新路径: {currentProject.Path}");
         }
 
         private void OpenRecentFile(RecentFile file)
@@ -262,6 +288,7 @@ namespace S7SvrSim.ViewModels
         private void RemoveRecentFile(RecentFile file)
         {
             recentFiles.RemoveFile(file);
+            logger.LogInfo($"已移除最近文件记录: {file.Path}");
         }
     }
 }
