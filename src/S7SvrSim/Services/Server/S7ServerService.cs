@@ -38,12 +38,12 @@ internal class S7ServerService: IDisposable, IS7ServerService
                 return;
             }
 
-            _runningVM.RunningsItems.Clear();
+                _runningVM.Clear();
 
             foreach (var area in _runningVM.AreaConfigs)
             {
                 var buffer = new byte[area.BlockSize];
-                _runningVM.RunningsItems.Add(new RunningServerItem
+                _runningVM.Add(new RunningServerItem
                 {
                     AreaKind = area.AreaKind,
                     BlockNumber = area.BlockNumber,

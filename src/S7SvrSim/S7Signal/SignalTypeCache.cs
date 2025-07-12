@@ -5,16 +5,30 @@ using System.Linq;
 
 namespace S7SvrSim.Services
 {
-    public class SignalTypeCache : IMemCache<Type[]>
+    public record SignalType(string Name, Type Type);
+
+    public class SignalTypeCache : IMemCache<SignalType[]>
     {
+        private const string SIGNAL_TYPE_SUFFIX = "Signal";
+
         public SignalTypeCache()
         {
-            Value = [.. typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase)))];
+            Value = typeof(SignalWatchVM).Assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(SignalBase))).Select(ty =>
+            {
+                var tyName = ty.Name;
+                var suffixIndex = tyName.IndexOf(SIGNAL_TYPE_SUFFIX, StringComparison.OrdinalIgnoreCase);
+                if (suffixIndex >= 0)
+                {
+                    tyName = tyName.Remove(suffixIndex, SIGNAL_TYPE_SUFFIX.Length);
+                }
+
+                return new SignalType(tyName, ty);
+            }).ToArray();
         }
 
-        public Type[] Value { get; }
+        public SignalType[] Value { get; }
 
-        public void Write(Type[] value)
+        public void Write(SignalType[] value)
         {
 
         }

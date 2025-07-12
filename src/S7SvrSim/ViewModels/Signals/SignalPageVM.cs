@@ -7,7 +7,7 @@ namespace S7SvrSim.ViewModels
 {
     public class SignalPageVM
     {
-        public SignalPageVM(IMemCache<Type[]> signalTypes)
+        public SignalPageVM(IMemCache<SignalType[]> signalTypes)
         {
             Signals = Locator.Current.GetRequiredService<SignalsCollection>();
             WatchVM = Locator.Current.GetRequiredService<SignalWatchVM>();
@@ -22,6 +22,6 @@ namespace S7SvrSim.ViewModels
         public DragSignalsVM DragSignalsVM { get; }
         public UpdateAddressOptionsVM UpdateAddressOptionsVM { get; }
         public SignalExcelVM SignalExcelVM { get; }
-        public Type[] SignalTypes { get; }
+        public SignalType[] SignalTypes { get; }
     }
 }

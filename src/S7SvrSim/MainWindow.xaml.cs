@@ -6,7 +6,6 @@ using S7SvrSim.Services.Command;
 using Splat;
 using System;
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -29,6 +28,8 @@ namespace S7Svr.Simulator
                 this.OneWayBind(ViewModel, vm => vm.ProjectVM.NeedSave, w => w.Title, GetTitle).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.ProjectVM.UndoCount, win => win.undoBadged.Badge).DisposeWith(d);
                 this.Bind(ViewModel, vm => vm.ProjectVM.RedoCount, win => win.redoBadged.Badge).DisposeWith(d);
+                this.OneWayBind(ViewModel, vm => vm.RunningVM.RunningStatus, w => w.activeBlock.Visibility, isRun => isRun ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
+
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.New, (_, _) => ViewModel.ProjectVM.NewProject(), NotRunningStatus_CanExecute));
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Open, (_, _) => ViewModel.ProjectVM.LoadProject(), NotRunningStatus_CanExecute));
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.Save, (_, _) => ViewModel.ProjectVM.SaveProject(), CanExecuteTrue));

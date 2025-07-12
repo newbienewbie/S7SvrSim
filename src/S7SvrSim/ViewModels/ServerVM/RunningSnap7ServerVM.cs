@@ -1,5 +1,6 @@
-﻿using ReactiveUI.Fody.Helpers;
-using System.Collections.Generic;
+﻿using DynamicData;
+using ReactiveUI.Fody.Helpers;
+using System.Collections.ObjectModel;
 
 namespace S7Svr.Simulator.ViewModels
 {
@@ -8,17 +9,25 @@ namespace S7Svr.Simulator.ViewModels
     /// </summary>
     public partial class RunningSnap7ServerVM : ConfigSnap7ServerVM
     {
+
         [Reactive]
         public bool RunningStatus { get; set; }
 
-        /// <summary>
-        /// 正在运行的——一旦开始，就不在变化。停止后Clear、再重建。所以这里直接使用了List
-        /// </summary>
-        public IList<RunningServerItem> RunningsItems { get; } = new List<RunningServerItem>();
+        public ObservableCollection<RunningServerItem> RunningsItems { get; } = new ObservableCollection<RunningServerItem>();
 
         public RunningSnap7ServerVM()
         {
             registCommand = false;
+        }
+
+        public void Clear()
+        {
+            RunningsItems.Clear();
+        }
+
+        public void Add(RunningServerItem item)
+        {
+            RunningsItems.Add(item);
         }
     }
 
