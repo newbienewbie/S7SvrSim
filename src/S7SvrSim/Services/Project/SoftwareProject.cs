@@ -21,9 +21,10 @@ namespace S7SvrSim.Services.Project
         private readonly ConfigPyEngineVM pyConfigModel;
         private readonly SignalWatchVM signalWatchModel;
         private readonly SignalsCollection signalsCollection;
+        private readonly MsgLoggerVM msgLoggerVM;
         private readonly IServiceProvider serviceProvider;
         private readonly SignalsHelper signalsHelper;
-        private readonly IMemCache<Type[]> signalTypes;
+        private readonly IMemCache<SignalType[]> signalTypes;
 
         public ProjectFile ProjectFile { get; private set; }
         public string Path { get; private set; }
@@ -37,10 +38,9 @@ namespace S7SvrSim.Services.Project
 
             this.serviceProvider = serviceProvider;
             this.signalsHelper = signalsHelper;
-
             Path = path;
 
-            signalTypes = serviceProvider.GetRequiredService<IMemCache<Type[]>>();
+            signalTypes = serviceProvider.GetRequiredService<IMemCache<SignalType[]>>();
 
             configS7Model = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
@@ -89,6 +89,8 @@ namespace S7SvrSim.Services.Project
             var oldPath = Path;
             File.Move(oldPath, newPath, true);
             Path = newPath;
+
+            msgLoggerVM.LogInfo($"移动成功");
         }
 
         private SignalEditGroup MergeGroup(SignalEditGroup first, IEnumerable<SignalEditGroup> groups)

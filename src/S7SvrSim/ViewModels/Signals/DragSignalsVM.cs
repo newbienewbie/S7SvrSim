@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
@@ -22,8 +21,9 @@ namespace S7SvrSim.ViewModels.Signals
         [NotifyPropertyChangedFor(nameof(CanMoveBefore))]
         private SignalEditObj dragTargetSignal;
 
-        [Reactive]
-        public bool IsDragSignals { get; set; }
+        [ObservableProperty]
+        private bool isDragSignals;
+
         public ObservableCollection<SignalEditObj> DragSignals { get; } = [];
 
         public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;

@@ -32,7 +32,6 @@ namespace S7SvrSim.UserControls
                 ViewModel = Locator.Current.GetRequiredService<SignalPageVM>();
                 ViewModel.Signals.Grid = signalGrid;
                 ViewModel.DragSignalsVM.AfterDragEvent += ViewModel_AfterDragEvent;
-                signalGrid.ContextMenu.PlacementTarget = signalGrid;
             });
         }
 
@@ -114,7 +113,11 @@ namespace S7SvrSim.UserControls
                     ViewModel.DragSignalsVM.DragTargetSignal = targetItem;
                     ViewModel.DragSignalsVM.IsDragSignals = true;
 
-                    signalGrid.ContextMenu.IsOpen = true;
+                    if (signalGrid.ContextMenu != null)
+                    {
+                        signalGrid.ContextMenu.PlacementTarget = signalGrid;
+                        signalGrid.ContextMenu.IsOpen = true;
+                    }
                 }
             }
         }
