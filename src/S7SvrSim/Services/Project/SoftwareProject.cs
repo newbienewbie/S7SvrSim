@@ -24,12 +24,13 @@ namespace S7SvrSim.Services.Project
         private readonly MsgLoggerVM msgLoggerVM;
         private readonly IServiceProvider serviceProvider;
         private readonly SignalsHelper signalsHelper;
+        private readonly IEnvProvider envProvider;
         private readonly IMemCache<SignalType[]> signalTypes;
 
         public ProjectFile ProjectFile { get; private set; }
         public string Path { get; private set; }
 
-        public SoftwareProject(string path, IServiceProvider serviceProvider, SignalsHelper signalsHelper)
+        public SoftwareProject(string path, IServiceProvider serviceProvider, SignalsHelper signalsHelper, IEnvProvider envProvider)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -38,6 +39,7 @@ namespace S7SvrSim.Services.Project
 
             this.serviceProvider = serviceProvider;
             this.signalsHelper = signalsHelper;
+            this.envProvider = envProvider;
             Path = path;
 
             signalTypes = serviceProvider.GetRequiredService<IMemCache<SignalType[]>>();
@@ -46,6 +48,8 @@ namespace S7SvrSim.Services.Project
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
             signalWatchModel = Locator.Current.GetRequiredService<SignalWatchVM>();
             signalsCollection = Locator.Current.GetRequiredService<SignalsCollection>();
+
+            envProvider.Set(DefaultEnvConsts.PROJECT_DIR, IOPath.GetDirectoryName(Path));
         }
 
         public void New()
@@ -65,6 +69,7 @@ namespace S7SvrSim.Services.Project
         {
             var project = BuildFromApp();
             project.Save(path);
+            envProvider.Set(DefaultEnvConsts.PROJECT_DIR, IOPath.GetDirectoryName(path));
         }
 
         public void Load()
@@ -90,7 +95,7 @@ namespace S7SvrSim.Services.Project
             File.Move(oldPath, newPath, true);
             Path = newPath;
 
-            msgLoggerVM.LogInfo($"移动成功");
+            envProvider.Set(DefaultEnvConsts.PROJECT_DIR, IOPath.GetDirectoryName(Path));
         }
 
         private SignalEditGroup MergeGroup(SignalEditGroup first, IEnumerable<SignalEditGroup> groups)
@@ -131,7 +136,7 @@ namespace S7SvrSim.Services.Project
             var defaultQuery = ProjectFile.SearchPaths.Where(s => s.Equals(ProjectFile.DEFAULT_PATH_KEY, StringComparison.OrdinalIgnoreCase));
             if (defaultQuery.Any())
             {
-                searchPaths = ProjectFile.DefaultPaths.Concat([IOPath.GetDirectoryName(Path)]).Concat(ProjectFile.SearchPaths.Where(s => !s.Equals(ProjectFile.DEFAULT_PATH_KEY, StringComparison.OrdinalIgnoreCase))).Distinct();
+                searchPaths = ProjectFile.DefaultPaths.Concat(ProjectFile.SearchPaths.Where(s => !s.Equals(ProjectFile.DEFAULT_PATH_KEY, StringComparison.OrdinalIgnoreCase))).Distinct();
             }
             else
             {
@@ -163,7 +168,7 @@ namespace S7SvrSim.Services.Project
         private ProjectFile BuildFromApp()
         {
             IEnumerable<string> searchPaths = pyConfigModel.PyEngineSearchPaths;
-            var defaultSearchPaths = ProjectFile.DefaultPaths.Concat([IOPath.GetDirectoryName(Path)]);
+            var defaultSearchPaths = ProjectFile.DefaultPaths;
             if (pyConfigModel.PyEngineSearchPaths.Intersect(defaultSearchPaths).Count() == defaultSearchPaths.Count())
             {
                 searchPaths = pyConfigModel.PyEngineSearchPaths.Except(defaultSearchPaths).Concat([ProjectFile.DEFAULT_PATH_KEY]);

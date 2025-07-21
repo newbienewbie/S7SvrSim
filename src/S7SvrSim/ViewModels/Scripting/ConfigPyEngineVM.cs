@@ -4,6 +4,8 @@ using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7SvrSim.Services;
 using S7SvrSim.Services.Command;
+using S7SvrSim.Services.Project;
+using S7SvrSim.Shared;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,10 +18,12 @@ namespace S7SvrSim.ViewModels
     {
 
         private readonly PyScriptRunner _pyRunner;
+        private readonly IPyPathService pyPathService;
 
-        public ConfigPyEngineVM(PyScriptRunner pyRunner)
+        public ConfigPyEngineVM(PyScriptRunner pyRunner, IPyPathService pyPathService)
         {
             this._pyRunner = pyRunner;
+            this.pyPathService = pyPathService;
             var searchpathes = this._pyRunner.PyEngine.GetSearchPaths();
 
             if (searchpathes != null)
@@ -51,16 +55,20 @@ namespace S7SvrSim.ViewModels
                 CommandEventRegist(command);
                 UndoRedoManager.Run(command);
             });
+
+            PyEngineSearchPaths.CollectionChanged += (_, _) =>
+            {
+                SetSearchPaths(_pyRunner.PyEngine);
+            };
         }
 
         internal void SetSearchPaths(ScriptEngine engine)
         {
-            engine.SetSearchPaths(PyEngineSearchPaths);
+            engine.SetSearchPaths(PyEngineSearchPaths.Select(pyPathService.ReplaceEnv).Distinct().ToArray());
         }
 
         private void CommandEventHandle(object _object, EventArgs _args)
         {
-            SetSearchPaths(_pyRunner.PyEngine);
             ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(3);
         }
 

@@ -16,6 +16,7 @@ using S7SvrSim.ViewModels.Rw;
 using S7SvrSim.ViewModels.Signals;
 using Splat;
 using System;
+using System.IO;
 
 namespace S7SvrSim
 {
@@ -41,6 +42,13 @@ namespace S7SvrSim
             services.AddSetting(new RecentFileConverter(), "RecentFiles");
             services.AddSetting(new SignalExcelOptionConverter(), "SignalExcelOption");
             services.AddSingleton<RecentFilesCollection>();
+            services.AddSingleton<IEnvProvider>(s =>
+            {
+                var envPro = new EnvProvider();
+                envPro.Set("PROCESS", Path.GetDirectoryName(Environment.ProcessPath));
+                return envPro;
+            });
+            services.AddTransient<IPyPathService, PyPathService>();
 
             return services;
         }

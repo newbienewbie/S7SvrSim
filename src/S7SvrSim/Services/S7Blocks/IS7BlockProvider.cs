@@ -22,6 +22,7 @@ public class S7BlockProvider : IS7BlockProvider
         this.mb = mb;
     }
 
+    // 可能存在的问题：一直在添加，没有对 DB 配置中不存在的索引进行删除，可能会导致额外的内存占用
     public IS7Block GetDataBlockService(int dbIndex)
     {
         if (DataBlocks.TryGetValue(dbIndex, out IS7Block dataBlock))

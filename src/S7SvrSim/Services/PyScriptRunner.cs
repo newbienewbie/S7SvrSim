@@ -63,8 +63,6 @@ namespace S7SvrSim.Services
             var code = source.Compile();
 
             code.Execute(pyScope);
-            
-
         }
     }
 }
