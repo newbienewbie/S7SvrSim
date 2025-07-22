@@ -1,4 +1,5 @@
-﻿using S7SvrSim.S7Signal;
+﻿using S7SvrSim.Project;
+using S7SvrSim.S7Signal;
 using System;
 using IOPath = System.IO.Path;
 
@@ -8,11 +9,13 @@ namespace S7SvrSim.Services.Project
     {
         protected const string DEFAULT_FILENAME = "unamed";
 
-        public DefaultProject(IServiceProvider serviceProvider, SignalsHelper signalsHelper)
-            : base(IOPath.Combine(IOPath.GetDirectoryName(Environment.ProcessPath)
-                , DEFAULT_FILENAME
-                , $"{DEFAULT_FILENAME}{ProjectConst.FILE_EXTENSION}")
-              , serviceProvider, signalsHelper)
+        public DefaultProject(IServiceProvider serviceProvider, SignalsHelper signalsHelper, IEnvProvider envProvider)
+            : base(IOPath.Combine(envProvider.Get(DefaultEnvConsts.PROCESS).Value,
+                                  DEFAULT_FILENAME,
+                                  $"{DEFAULT_FILENAME}{ProjectConst.FILE_EXTENSION}"),
+                   serviceProvider,
+                   signalsHelper,
+                   envProvider)
         {
         }
     }

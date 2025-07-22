@@ -19,9 +19,9 @@ namespace S7SvrSim.Services.Recent
         public string Convert(RecentFile[] value)
         {
             var root = new XElement(Structure.Root);
-            var files = value.Select(f => new XElement(Structure.File
-                , new XAttribute(Structure.FilePath, f.Path)
-                , new XAttribute(Structure.OpenTime, f.OpenTime)));
+            var files = value.Select(f => new XElement(Structure.File,
+                                                       new XAttribute(Structure.FilePath, f.Path),
+                                                       new XAttribute(Structure.OpenTime, f.OpenTime)));
             files.Each(root.Add);
             XDocument doc = new(root);
             return doc.ToString();

@@ -13,10 +13,11 @@ namespace S7SvrSim.Project
     {
         public const string DEFAULT_PATH_KEY = "$DEFAULT";
         public readonly static string[] DefaultPaths = [
-            ".", 
-            Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "lib"), 
-            Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "DLLs"), 
-            Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "predefined")
+            ".",
+            Path.Combine($"%{DefaultEnvConsts.PROCESS}%", "lib"),
+            Path.Combine($"%{DefaultEnvConsts.PROCESS}%", "DLLs"),
+            Path.Combine($"%{DefaultEnvConsts.PROCESS}%", "predefined"),
+            $"%{DefaultEnvConsts.PROJECT_DIR}%"
             ];
 
         [XmlAttribute]
