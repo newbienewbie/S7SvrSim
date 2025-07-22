@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace S7SvrSim.Services.Project
 {
+#nullable enable
     public interface IEnvProvider
     {
-        EnvReadonly Get(string name);
-        void Set([NotNull] string name, [NotNull] string value);
-        void Set([NotNull] string name, [NotNull] EnvReadonly value);
-        IEnumerable<KeyValuePair<string, EnvReadonly>> GetAll();
+        Env? Get(string name);
+        void Set(string name, string value);
+        void Set(string name, Env value);
+        Env? Remove(string name);
+        IEnumerable<KeyValuePair<string, Env>> GetAll();
     }
+#nullable restore
 }
