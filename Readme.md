@@ -34,7 +34,7 @@
 
 请到本项目的Release下，直接下载对应的zip包即可。
 
-启动程序后，在 **DB配置** 界面中:
+启动程序后，在 **DB/MB配置** 界面中:
 - 设置好要监听的IP地址，
 - 配置一个或者多个`DB`的号码、大小
 - 点击 **"启动"** 按钮
@@ -51,50 +51,44 @@
 更多的时候，为了减少重复工作，我们会编写一些`Python`脚本来实现自动化测试。
 
 ```python
-# -*- coding: UTF-8 -*-
 import time
-import shell  
+from s7svrsim import hints
 
-DB_INDEX= 200
-OFFSET_FLAGS_BASE = 1082  
-SIZEOF_DEV_BELT_MSG = 56
 
-FUNC = shell.accept_input_int("请选择皮带线： 1-belt1; 2-belt2; 3-belt3; 4-belt4")
-if FUNC < 1 and FUNC > 4 :
-    shell.show_message_box("请选择正确的皮带线！")
-else:
-	# 计算地址偏移
-    OFFSET_FLAGS = OFFSET_FLAGS_BASE + (FUNC - 1) * SIZEOF_DEV_BELT_MSG
-    OFFSET_VEC_NUMBER = OFFSET_FLAGS + 1
+# main 函数是测试入口，固定接受一个ctx参数
+def main(ctx :hints.S7Context):
+    logger = ctx.Logger
+    s7 = ctx.DBService
 
-	# 让用户输入来料信息
-    vector_num = shell.accept_input_int("incoming vector number")
-
-    DB.WriteByte(DB_INDEX, OFFSET_VEC_NUMBER , vector_num)
-    DB.WriteBit(DB_INDEX, OFFSET_FLAGS, 0, True)
-
-	# 3s后清除信号
-    time.sleep(3)
-    DB.WriteByte(DB_INDEX, OFFSET_VEC_NUMBER , 0)
-    DB.WriteBit(DB_INDEX, OFFSET_FLAGS, 0, False) 
+    logger.LogInfo("wait for DB201.1.1")
+    flag = s7.ReadBit(201, 1, 1)          # 从 DB201.1.1 读取一个位
+    if flag:
+        s7.WriteUInt32(202, 100, 10001)   # 向 DB202.100 写入 10001
+    logger.LogInfo("done")
 ```
 
-> 注：这里的`shell`是用户自定义的模块。
+这里的 **`main(ctx)`** 是一个测试脚本的入口，由模拟器进行调用，其中`ctx` 是一个`S7Context`类型的参数：
 
-有了这些测试脚本，我们只需要在合适的时间点导入这些脚本即可自动完成动作模拟。(更多示例参考 `docs/sample scripts`文件夹)
+```c#
+public record S7Context(
+    IS7DataBlockService DBService, 
+    IS7MBlock MB, 
+    MsgLoggerVM Logger, 
+    CancellationToken CancellationToken
+    );
+```
 
+> 早期，为了简单，我们可以直接在脚本中编写测试代码，而无需把测试代码定义在 `main(ctx)`函数中。如今，我认为这是一种糟糕的设计。
+> 虽然我们现在仍然兼容这一种写法，但是不再建议，将来我们会合适的时候移除这种支持。
 
 ### Python的版本支持
 
-底层用的是`IronPython`，<del>由于到目前为之，`IronPython 3.x`尚未成熟，故这里`IronPython`的版本是`2.7.11`。</del>
+底层用的是`IronPython`，这意味着有一些可能有一些兼容性问题。
 
-<del>这意味着：</del>
-- <del>只能使用 **Python2.x** 的语法和特性</del>
-- <del>如果要写中文，应该指定文件编码 `# -*- coding: UTF-8 -*-`</del>
+> 我目前遇到过的一个问题是，.NET Core中创建的整数，打包后(object)，在Python中一些较新的格式化场景(`f-string`)不符合预期。
 
-
-从0.4.0开始，使用`IronPython 3.4.1`
-
+但是，目前来说够用就好。世上没有完美的语言，更不会有完美的运行时；就算有，等到也不可能全部准备好再开始我们的工作。
+也许将来我会换成 Python.NET 之类的实现，甚至换成C#脚本。不过，对于现在而言，放过自己，承认不完美，享受生活！
 
 ### 智能提示
 
@@ -108,7 +102,7 @@ pip install s7svrsim
 from s7svrsim import hints
 ```
 
-![intellisense](./docs/intellisense.PNG)
+![intellisense](./docs/intellisense.gif)
 
 
 ### 自定义模块的检索路径
@@ -124,82 +118,93 @@ from s7svrsim import hints
 
 点击 **"DB配置"** 里的 **停止**、**"启动"** 会清空当前模拟器中的数据。
 
-### Python 脚本
+### API
 
-用户可以自定义一个`Python`脚本，然后在程序运行后导入。一旦导入，该脚本就会被立刻执行。
-为了操作模拟器，我向`Python`暴露了一个预定义的`S7`对象(类型为`IS7ServerService`)，用于对当前正在运行的 **S7 PLC模拟器** 进行操作。
-
-通过这些API方法，我们可以通过编写`Python`脚本来动态执行一系列操作，比如：
+用户提供的`Python`测试脚本中，需要定义一个`main(ctx)`函数：
 
 ```python
-DB.WriteString(200, 2000, 40, "abcdefghijklmn")
-DB.WriteBit(200, 2060, 0, True)
-DB.WriteShort(200, 2062, 1)
+def main(ctx: hints.S7Context):
+    ...
 ```
 
-### API
+这里的`ctx`提供几个属性：
+- `DBService`: 一个`IS7DataBlockService`接口对象
+- `MB`: 一个`IS7MBService`接口对象
+- `Logger`: 一个日志对象，用于在界面中打印日志
+- `CancellationToken`：用于从外部取消当前任务。
 
 #### `S7`
 
-Python可以使用的`DB`其实是一个`IS7DataBlockService`接口对象：
+Python测试脚本的卖弄可以使用的`DB`其实是一个`IS7DataBlockService`接口对象：
 
 ```C#
-    public interface IS7DataBlockService
-    {
-        bool ReadBit(int dbNumber, int offset, byte bit);
-        void WriteBit(int dbNumber, int offset, byte bit, bool flag);
+public interface IS7DataBlockService
+{
+    bool ReadBit(int dbNumber, int offset, byte bit);
+    void WriteBit(int dbNumber, int offset, byte bit, bool flag);
 
-        byte ReadByte(int dbNumber, int pos);
-        void WriteByte(int dbNumber, int pos, byte value);
+    byte ReadByte(int dbNumber, int pos);
+    void WriteByte(int dbNumber, int pos, byte value);
 
-        short ReadShort(int dbNumber, int pos);
-        void WriteShort(int dbNumber, int pos, short value);
+    short ReadShort(int dbNumber, int pos);
+    void WriteShort(int dbNumber, int pos, short value);
 
-        uint ReadUInt32(int dbNumber, int pos);
-        void WriteUInt32(int dbNumber, int pos, uint value);
+    ushort ReadUShort(int dbNumber, int pos);
+    void WriteUShort(int dbNumber, int pos, ushort value);
 
-        ulong ReadULong(int dbNumber, int pos);
-        void WriteULong(int dbNumber, int pos, ulong value);
+    uint ReadUInt32(int dbNumber, int pos);
+    void WriteUInt32(int dbNumber, int pos, uint value);
 
-        float ReadReal(int dbNumber, int pos);
-        void WriteReal(int dbNumber, int pos, float real);
+    ulong ReadULong(int dbNumber, int pos);
+    void WriteULong(int dbNumber, int pos, ulong value);
 
-        double ReadLReal(int dbNumber, int pos);
-        void WriteLReal(int dbNumber, int pos, double real);
+    float ReadReal(int dbNumber, int pos);
+    void WriteReal(int dbNumber, int pos, float real);
 
-        string ReadString(int dbNumber, int offset);
-        void WriteString(int dbNumber, int offset, int maxlen, string str);
-    }
+    double ReadLReal(int dbNumber, int pos);
+    void WriteLReal(int dbNumber, int pos, double real);
+
+    string ReadString(int dbNumber, int offset);
+    void WriteString(int dbNumber, int offset, int maxlen, string str);
+
+    int ReadInt(int dbNumber, int pos);
+    void WriteInt(int dbNumber, int pos, int value);
+}
 ```
 
 而`MB`则是一个`IS7MBService`:
 ```C#
-    public interface IS7MBService
-    {
-        bool ReadBit(int offset, byte bit);
-        void WriteBit(int offset, byte bit, bool flag);
+public interface IS7MBService
+{
+    bool ReadBit(int offset, byte bit);
+    void WriteBit(int offset, byte bit, bool flag);
 
-        byte ReadByte(int pos);
-        void WriteByte(int pos, byte value);
+    byte ReadByte(int pos);
+    void WriteByte(int pos, byte value);
 
-        short ReadShort(int pos);
-        void WriteShort(int pos, short value);
+    short ReadShort(int pos);
+    void WriteShort(int pos, short value);
 
-        uint ReadUInt32(int pos);
-        void WriteUInt32(int pos, uint value);
+    ushort ReadUShort(int pos);
+    void WriteUShort(int pos, ushort value);
 
-        ulong ReadULong(int pos);
-        void WriteULong(int pos, ulong value);
+    uint ReadUInt32(int pos);
+    void WriteUInt32(int pos, uint value);
 
-        float ReadReal(int pos);
-        void WriteReal(int pos, float real);
+    ulong ReadULong(int pos);
+    void WriteULong(int pos, ulong value);
 
-        double ReadLReal(int pos);
-        void WriteLReal(int pos, double real);
+    float ReadReal(int pos);
+    void WriteReal(int pos, float value);
 
-        string ReadString(int offset);
-        void WriteString(int offset, int maxlen, string str);
-    }
+    double ReadLReal(int pos);
+    void WriteLReal(int pos, double value);
+
+    string ReadString(int offset);
+    void WriteString(int offset, int maxlen, string str);
+    int ReadDInt(int pos);
+    void WriteDInt(int pos, int value);
+}
 ```
 
 #### `Logger`
@@ -210,6 +215,26 @@ void LogInfo(string content);
 void LogError(string content);
 ```
 
+#### 取消任务
+
+`ctx`参数暴露一个`CancellationToken`属性，当用户从外部（比如界面按钮）取消任务时，`CancellationToken`会触发取消事件。注意：正确响应取消事件，是脚本的编写者的责任。
+
+比如：
+```python
+def block_and_poll(predicate, ct: hints.CancellationToken):
+
+    while True:
+        ct.ThrowIfCancellationRequested()  # 检测取消事件
+        condition = predicate()
+        if not condition:
+            time.sleep(0.02)
+            continue
+        break
+```
+
+> 你可能会想这是把麻烦丢给了脚本编写者。从某种程度上，的确是这样。
+> 上古时代的`.NET Framework`支持`Thread.Abort()`方法，但是`.NET Core`已经废弃了这个方法。我们当然可以通过多进程的方式模拟，但是我觉得这样会带来很多不确定性。
+> 如果这是一个好的设计，`.NET Core`的`async-await`异步编程就不会蔓延着`CancellationToken`参数了。
 
 
 ## 已知问题

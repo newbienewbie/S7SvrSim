@@ -63,6 +63,22 @@ namespace S7SvrSim.Services
             var code = source.Compile();
 
             code.Execute(pyScope);
+
+            
+            var func = pyScope.GetVariable<Action<S7Context>>("main");
+            if(func is not null)
+            {
+                var ctx = new S7Context(this._db, this._mb, this._loggerVM, token);
+                func(ctx);
+            }
         }
     }
 }
+
+
+public record S7Context(
+    IS7DataBlockService DBService, 
+    IS7MBlock MB, 
+    MsgLoggerVM Logger, 
+    CancellationToken CancellationToken
+    );
