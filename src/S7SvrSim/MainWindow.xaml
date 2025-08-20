@@ -215,7 +215,13 @@
                                     <TextBox Text="{Binding ConfigVM.IpAddress}"
                                              Width="160"
                                              VerticalAlignment="Center"
-                                             />
+                                             >
+                                        <i:Interaction.Triggers>
+                                            <i:KeyTrigger Key="Return">
+                                                <i:InvokeCommandAction Command="commands:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                            </i:KeyTrigger>
+                                        </i:Interaction.Triggers>
+                                    </TextBox>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0 10">
                                     <Button Command="{Binding ConfigVM.CmdAddArea}" Style="{StaticResource MaterialDesignOutlinedButton}">
