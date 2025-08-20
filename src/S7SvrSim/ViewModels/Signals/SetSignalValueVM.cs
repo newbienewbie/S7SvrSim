@@ -22,7 +22,7 @@ namespace S7SvrSim.ViewModels
         public Type ValueType => SelectedSignal?.Value?.GetType().GetCustomAttribute<SignalVaueTypeAttribute>()?.ValueType;
 
         [ObservableProperty]
-        private object value;
+        private string value;
 
         [ObservableProperty]
         private bool hasValidationError;
@@ -36,7 +36,7 @@ namespace S7SvrSim.ViewModels
 
         partial void OnSelectedSignalChanged(SignalEditObj value)
         {
-            Value = value.Value.Value;
+            Value = (string)Convert.ChangeType(value.Value.Value, typeof(string));
             if (Value != null)
             {
                 return;
@@ -50,11 +50,11 @@ namespace S7SvrSim.ViewModels
             {
                 if (valueType.IsPrimitive || valueType.GetConstructor(Type.EmptyTypes) != null)
                 {
-                    Value = Activator.CreateInstance(valueType);
+                    Value = (string)Convert.ChangeType(Activator.CreateInstance(valueType), typeof(string));
                 }
                 else
                 {
-                    Value = null;
+                    Value = "";
                 }
             }
         }
@@ -69,7 +69,7 @@ namespace S7SvrSim.ViewModels
             if (SelectedSignal != null && SelectedSignal.Value.Address != null && SelectedSignal.Value.Address.IsValid())
             {
                 var block = SelectedSignal.Value.Address.AreaKind == AreaKind.DB ? blockFactory.GetDataBlockService(SelectedSignal.Value.Address.DbIndex) : blockFactory.GetMemoryBlockService();
-                SelectedSignal.Value.SetValue(block, Value);
+                SelectedSignal.Value.SetValue(block, Convert.ChangeType(Value, ValueType));
             }
             AfterSetValue?.Invoke();
         }
