@@ -116,10 +116,6 @@ namespace S7SvrSim.UserControls.Signals
                     binding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
                     if (newType != typeof(string))
                     {
-                        binding.Converter = new StringToTargetType()
-                        {
-                            TargetType = newType
-                        };
                         var validationRule = new StringToTargetTypeValidation()
                         {
                             TargetType = newType,
@@ -137,32 +133,6 @@ namespace S7SvrSim.UserControls.Signals
                 currentDisplayControl = newContent;
             }
             HasValidationError = false;
-        }
-
-        private class StringToTargetType : IValueConverter
-        {
-            public Type TargetType { get; set; }
-            public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                return value;
-            }
-
-            public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            {
-                if (value is string str && TargetType != null)
-                {
-                    try
-                    {
-                        return System.Convert.ChangeType(str, TargetType);
-                    }
-                    catch (Exception)
-                    {
-                        return Binding.DoNothing;
-                    }
-                }
-
-                return Binding.DoNothing;
-            }
         }
 
         private class StringToTargetTypeValidation : ValidationRule
