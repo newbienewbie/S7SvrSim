@@ -66,12 +66,19 @@ namespace S7SvrSim.ViewModels
             {
                 return;
             }
-            if (SelectedSignal != null && SelectedSignal.Value.Address != null && SelectedSignal.Value.Address.IsValid())
+            try
             {
-                var block = SelectedSignal.Value.Address.AreaKind == AreaKind.DB ? blockFactory.GetDataBlockService(SelectedSignal.Value.Address.DbIndex) : blockFactory.GetMemoryBlockService();
-                SelectedSignal.Value.SetValue(block, Convert.ChangeType(Value, ValueType));
+                if (SelectedSignal != null && SelectedSignal.Value.Address != null && SelectedSignal.Value.Address.IsValid())
+                {
+                    var block = SelectedSignal.Value.Address.AreaKind == AreaKind.DB ? blockFactory.GetDataBlockService(SelectedSignal.Value.Address.DbIndex) : blockFactory.GetMemoryBlockService();
+                    SelectedSignal.Value.SetValue(block, Convert.ChangeType(Value, ValueType));
+                }
+                AfterSetValue?.Invoke();
             }
-            AfterSetValue?.Invoke();
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "设置值时发生错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
