@@ -8,7 +8,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:string" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
@@ -33,7 +33,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:byte" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
@@ -49,7 +49,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:int(C#:short)" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
@@ -65,7 +65,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:dint(C#: int)" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
@@ -81,7 +81,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:uint(C#: ushort)" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
@@ -97,7 +97,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:udint(C#: uint)" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
@@ -113,7 +113,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:ulong" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
@@ -129,7 +129,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:real(C#: float)" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
@@ -145,7 +145,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                    <TextBox md:ValidationAssist.UsePopup="True" md:HintAssist.Hint="type:lreal(C#: double)" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
                         <i:Interaction.Triggers>
                             <i:KeyTrigger Key="Enter">
                                 <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
