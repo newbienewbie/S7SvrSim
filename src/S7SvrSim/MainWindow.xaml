@@ -19,7 +19,6 @@
         Title="Siemens PLC 通讯模拟器"
         Height="850"
         Width="800"
-        PreviewMouseDown="Window_PreviewMouseDown"
         >
     <Window.Resources>
         <shared:IsTypeValueConverter x:Key="IsAreaConfigVM" Type="{x:Type viewmodels:AreaConfigVM}" />
