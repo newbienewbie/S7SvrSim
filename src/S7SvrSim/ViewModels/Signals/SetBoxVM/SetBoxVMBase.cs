@@ -15,6 +15,7 @@ namespace S7SvrSim.ViewModels.Signals.SetBoxVM
         public virtual SignalBase Signal { get; set; }
 
         public Func<bool> HasValidationError { get; set; }
+        public Action ErrorReFocus { get; set; }
 
         public abstract ReactiveCommand<Unit, Unit> SetValueCmd { get; }
         public event Action AfterSetValue;
@@ -53,6 +54,7 @@ namespace S7SvrSim.ViewModels.Signals.SetBoxVM
         {
             if (HasValidationError != null && HasValidationError())
             {
+                ErrorReFocus?.Invoke();
                 return;
             }
 

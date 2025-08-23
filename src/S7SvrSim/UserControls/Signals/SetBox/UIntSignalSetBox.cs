@@ -1,6 +1,7 @@
 ﻿using S7SvrSim.ViewModels.Signals.SetBoxVM;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace S7SvrSim.UserControls.Signals.SetBox
 {
@@ -22,7 +23,16 @@ namespace S7SvrSim.UserControls.Signals.SetBox
                     }
                     return false;
                 };
+                ViewModel.ErrorReFocus = () =>
+                {
+                    Focus();
+                };
             });
+        }
+
+        protected override void OnGotFocus(RoutedEventArgs e)
+        {
+            FocusManager.SetFocusedElement(this, PART_ValueBox);
         }
 
         public UIntSignalSetBoxVM ViewModel { get => (UIntSignalSetBoxVM)GetValue(ViewModelProperty); set => SetValue(ViewModelProperty, value); }
