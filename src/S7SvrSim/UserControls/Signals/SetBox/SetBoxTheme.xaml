@@ -1,0 +1,160 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:setbox="clr-namespace:S7SvrSim.UserControls.Signals.SetBox"
+                    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                    xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+                    xmlns:app="clr-namespace:S7SvrSim.Commands">
+    <Style TargetType="setbox:StringSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:BoolSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <CheckBox IsChecked="{Binding Value, Mode=TwoWay}"></CheckBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:ByteSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:IntSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:DIntSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:UIntSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:UDIntSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:ULongSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:RealSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style TargetType="setbox:LRealSignalSetBox">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <TextBox md:ValidationAssist.UsePopup="True" Name="PART_ValueBox" Text="{Binding Value, Mode=TwoWay}" Width="160" VerticalAlignment="Center">
+                        <i:Interaction.Triggers>
+                            <i:KeyTrigger Key="Enter">
+                                <i:InvokeCommandAction Command="app:AppCommands.LostFocus"></i:InvokeCommandAction>
+                                <i:InvokeCommandAction Command="{Binding SetValueCmd}"></i:InvokeCommandAction>
+                            </i:KeyTrigger>
+                        </i:Interaction.Triggers>
+                    </TextBox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

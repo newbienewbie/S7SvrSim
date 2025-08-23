@@ -11,9 +11,11 @@ using S7SvrSim.Services.S7Blocks;
 using S7SvrSim.Services.Settings;
 using S7SvrSim.UserControls;
 using S7SvrSim.UserControls.Rws;
+using S7SvrSim.UserControls.Signals.SetBox;
 using S7SvrSim.ViewModels;
 using S7SvrSim.ViewModels.Rw;
 using S7SvrSim.ViewModels.Signals;
+using S7SvrSim.ViewModels.Signals.SetBoxVM;
 using Splat;
 using System;
 using System.IO;
@@ -94,7 +96,27 @@ namespace S7SvrSim
             Locator.CurrentMutable.Register<IViewFor<RwStringVM>, StringOpsView>();
             //Locator.CurrentMutable.Register<IViewFor<ScriptTaskWindowVM>, ScriptTaskWindow>();
 
+            Locator.CurrentMutable.Register<SetBoxVMBase<bool>, BoolSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<byte>, ByteSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<short>, IntSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<int>, DIntSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<ushort>, UIntSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<uint>, UDIntSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<ulong>, ULongSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<float>, RealSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<double>, LRealSignalSetBoxVM>();
+            Locator.CurrentMutable.Register<SetBoxVMBase<string>, StringSignalSetBoxVM>();
 
+            Locator.CurrentMutable.Register<IViewFor<BoolSignalSetBoxVM>, BoolSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<ByteSignalSetBoxVM>, ByteSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<IntSignalSetBoxVM>, IntSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<DIntSignalSetBoxVM>, DIntSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<UIntSignalSetBoxVM>, UIntSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<UDIntSignalSetBoxVM>, UDIntSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<ULongSignalSetBoxVM>, ULongSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<RealSignalSetBoxVM>, RealSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<LRealSignalSetBoxVM>, LRealSignalSetBox>();
+            Locator.CurrentMutable.Register<IViewFor<StringSignalSetBoxVM>, StringSignalSetBox>();
 
         }
     }
