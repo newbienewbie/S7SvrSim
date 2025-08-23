@@ -11,11 +11,14 @@ using S7SvrSim.Services.Command;
 using S7SvrSim.Services.Settings;
 using S7SvrSim.Shared;
 using S7SvrSim.UserControls.Signals;
+using S7SvrSim.ViewModels.Signals.SetBoxVM;
+using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -241,10 +244,28 @@ namespace S7SvrSim.ViewModels.Signals
             {
                 return;
             }
-            var setWindow = new SetSignalValueWindow();
-            setWindow.viewModel.SelectedSignal = SelectedEditObj;
+            var valueType = GetSignalValueType(SelectedEditObj.Value);
+            var viewModelType = typeof(SetBoxVMBase<>).MakeGenericType(valueType);
+            var viewModel = (SetBoxVMBase)Locator.Current.GetService(viewModelType);
+            viewModel.Signal = SelectedEditObj.Value;
+
+            if (viewModel == null) return;
+
+            var setWindow = new SetSignalValueWindow() { ViewModel = viewModel };
 
             setWindow.ShowDialog();
+        }
+
+        private Type GetSignalValueType(SignalBase signal)
+        {
+            var signalType = signal.GetType();
+            var signalVaueTypeAttribute = signalType.GetCustomAttribute<SignalVaueTypeAttribute>();
+            if (signalVaueTypeAttribute == null)
+            {
+                return null;
+            }
+
+            return signalVaueTypeAttribute.ValueType;
         }
 
         private void NewSignal(Type signalType)

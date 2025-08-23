@@ -6,6 +6,8 @@
         xmlns:local="clr-namespace:S7SvrSim.UserControls.Signals"
         xmlns:vm="clr-namespace:S7SvrSim.ViewModels"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:setbox="clr-namespace:S7SvrSim.UserControls.Signals.SetBox"
+        xmlns:rx="http://reactiveui.net"
         mc:Ignorable="d"
         Title="信号值设置"
         SizeToContent="Width"
@@ -19,11 +21,6 @@
         Opacity="0"
         d:Opacity="100"
         >
-    <Window.DataContext>
-        <vm:SetSignalValueVM x:Name="viewModel"
-                             AfterSetValue="Close"
-                             />
-    </Window.DataContext>
     <Window.CommandBindings>
         <CommandBinding Command="ApplicationCommands.Close"
                         CanExecute="CanExecuteTrue"
@@ -31,7 +28,7 @@
                         />
     </Window.CommandBindings>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding SetValueCommand}"
+        <KeyBinding Command="{Binding SetValueCmd}"
                     Key="Enter"
                     />
         <KeyBinding Command="ApplicationCommands.Close"
@@ -63,27 +60,13 @@
                     <Setter Property="CornerRadius" Value="1" />
                 </Style>
             </StackPanel.Resources>
-            <local:SignalValueSetBox ValueType="{Binding ValueType}"
-                                     Value="{Binding Value}"
-                                     TextBoxWidth="100"
-                                     VerticalAlignment="Center"
-                                     HasValidationError="{Binding HasValidationError, Mode=TwoWay}"
-                                     x:Name="setValueBox"
-                                     >
-                <local:SignalValueSetBox.TextBoxStyle>
-                    <Style TargetType="TextBox"
-                           BasedOn="{StaticResource MaterialDesignTextBox}"
-                           >
-                        <Setter Property="md:ValidationAssist.UsePopup" Value="True" />
-                    </Style>
-                </local:SignalValueSetBox.TextBoxStyle>
-            </local:SignalValueSetBox>
+            <ContentControl x:Name="viewModelHost"></ContentControl>
             <Border Width="1"
                     Style="{StaticResource SepectorBorder}"
                     />
-            <Button Content="{md:PackIcon Kind=Check}"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    Command="{Binding SetValueCommand}"
+            <Button x:Name="btnOk"
+                Content="{md:PackIcon Kind=Check}"
+                Style="{StaticResource MaterialDesignFlatButton}"
                     />
             <Border Width="1"
                     Style="{StaticResource SepectorBorder}"

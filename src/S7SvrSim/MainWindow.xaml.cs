@@ -111,10 +111,5 @@ namespace S7Svr.Simulator
                 tabControl.SelectedIndex = index;
             }
         }
-
-        private void Window_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            AppCommands.LostFocusImpl([typeof(TextBox)]);
-        }
     }
 }
