@@ -46,7 +46,7 @@ namespace S7SvrSim.ViewModels.Signals.SetBoxVM
             {
                 if (s != null)
                 {
-                    this.Value = (T)s.Value;
+                    Value = s.Value == null ? default : (T)s.Value;
                 }
             });
         }
