@@ -1,9 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using S7Svr.Simulator;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using S7SvrSim.ViewModels.Signals;
 using Splat;
 using System;
@@ -18,29 +16,20 @@ namespace S7SvrSim.ViewModels
         private readonly SignalsHelper signalsHelper;
         private readonly SignalsCollection signals;
         private readonly IMemCache<WatchState> watchStateCache;
+        private readonly ISaveNotifier saveNotifier;
 
         [ObservableProperty]
         private int scanSpan = 50;
 
-        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache)
+        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache, ISaveNotifier saveNotifier)
         {
             this.signalsHelper = signalsHelper;
             this.signals = Locator.Current.GetRequiredService<SignalsCollection>();
             this.watchStateCache = watchStateCache;
+            this.saveNotifier = saveNotifier;
 
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
-        }
-
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
-        }
-
-        private void RegistCommandEventHandle(IHistoryCommand command)
-        {
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
         }
 
         #region ScanSpan For UndoRedo
@@ -54,9 +43,7 @@ namespace S7SvrSim.ViewModels
 
         partial void OnScanSpanChanged(int oldValue, int newValue)
         {
-            var command = new ValueChangedCommand<int>(SetScanSpan, oldValue, newValue);
-            RegistCommandEventHandle(command);
-            UndoRedoManager.Run(command);
+            saveNotifier.NotifyNeedSave();
         }
         #endregion
 

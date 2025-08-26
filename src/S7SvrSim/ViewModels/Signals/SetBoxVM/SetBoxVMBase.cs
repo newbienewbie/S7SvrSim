@@ -6,10 +6,11 @@ using S7SvrSim.S7Signal;
 using S7SvrSim.Services.S7Blocks;
 using System;
 using System.Windows;
+using System.Windows.Input;
 
 namespace S7SvrSim.ViewModels.Signals.SetBoxVM
 {
-    public abstract class SetBoxVMBase : ViewModelBase
+    public abstract class SetBoxVMBase : ReactiveObject
     {
         [Reactive]
         public virtual SignalBase Signal { get; set; }
@@ -17,7 +18,7 @@ namespace S7SvrSim.ViewModels.Signals.SetBoxVM
         public Func<bool> HasValidationError { get; set; }
         public Action ErrorReFocus { get; set; }
 
-        public abstract ReactiveCommand<Unit, Unit> SetValueCmd { get; }
+        public abstract ICommand SetValueCmd { get; }
         public event Action AfterSetValue;
         protected abstract void SetSignalValue();
 
@@ -32,7 +33,7 @@ namespace S7SvrSim.ViewModels.Signals.SetBoxVM
         [Reactive]
         public T Value { get; set; }
 
-        public override ReactiveCommand<Unit, Unit> SetValueCmd { get; }
+        public override ICommand SetValueCmd { get; }
 
         private readonly IS7BlockProvider blockFactory;
 

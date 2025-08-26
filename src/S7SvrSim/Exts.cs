@@ -51,6 +51,7 @@ namespace S7SvrSim
                 return envPro;
             });
             services.AddTransient<IPyPathService, PyPathService>();
+            services.AddSingleton<ISaveNotifier, SaveNotifier>();
 
             return services;
         }

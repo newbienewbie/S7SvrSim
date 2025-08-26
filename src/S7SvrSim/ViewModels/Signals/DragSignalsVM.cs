@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using S7Svr.Simulator;
-using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
+using DynamicData;
+using S7SvrSim.Shared;
 using Splat;
 using System;
 using System.Collections.Generic;
@@ -40,17 +39,6 @@ namespace S7SvrSim.ViewModels.Signals
             };
         }
 
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
-        }
-
-        private void RegistCommandEventHandle(IHistoryCommand command)
-        {
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
-        }
-
         public bool DragSignalsIsOne => DragSignals.Count == 1;
 
         [RelayCommand(CanExecute = nameof(DragSignalsIsOne))]
@@ -73,20 +61,7 @@ namespace S7SvrSim.ViewModels.Signals
 
             if (oldIndex != newIndex)
             {
-                var command = ListChangedCommand.Replace(Signals, [(oldItem, newItem), (newItem, oldItem)]);
-                RegistCommandEventHandle(command);
-                if (AfterDragEvent != null)
-                {
-                    command.AfterExecute += (_, _) =>
-                    {
-                        AfterDragEvent?.Invoke([newItem]);
-                    };
-                    command.AfterUndo += (_, _) =>
-                    {
-                        AfterDragEvent?.Invoke([newItem]);
-                    };
-                }
-                UndoRedoManager.Run(command);
+                Signals.Swap(oldItem, newItem);
             }
         }
 
@@ -168,20 +143,9 @@ namespace S7SvrSim.ViewModels.Signals
                 return;
             }
 
-            var command = ListChangedCommand.Move(Signals, signal, moved);
-            RegistCommandEventHandle(command);
-            if (AfterDragEvent != null)
-            {
-                command.AfterExecute += (_, _) =>
-                {
-                    AfterDragEvent?.Invoke(moved);
-                };
-                command.AfterUndo += (_, _) =>
-                {
-                    AfterDragEvent?.Invoke(moved);
-                };
-            }
-            UndoRedoManager.Run(command);
+            var indexOfSignal = Signals.IndexOf(signal);
+            Signals.RemoveMany(moved);
+            Signals.AddOrInsertRange(moved, indexOfSignal);
         }
     }
 }

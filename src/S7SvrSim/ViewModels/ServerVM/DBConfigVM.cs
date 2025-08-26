@@ -1,6 +1,4 @@
 ﻿using ReactiveUI.Fody.Helpers;
-using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -122,19 +120,6 @@ namespace S7Svr.Simulator.ViewModels
 
         public void EndEdit()
         {
-            if (this._bakeup != null && (_bakeup.AreaKind != _currentConfig.AreaKind || _bakeup.BlockNumber != _currentConfig.BlockNumber || _bakeup.BlockSize != _currentConfig.BlockSize))
-            {
-                var command = new ValueChangedCommand<AreaConfig>(config =>
-                {
-                    this.AreaKind = config.AreaKind;
-                    this.BlockNumber = config.BlockNumber;
-                    this.BlockSize = config.BlockSize;
-                }, (AreaConfig)this._bakeup.Clone(), (AreaConfig)this._currentConfig.Clone());
-                command.AfterExecute += CommandEventHandle;
-                command.AfterUndo += CommandEventHandle;
-                UndoRedoManager.Regist(command);
-            }
-
             this._bakeup = default;
         }
     }

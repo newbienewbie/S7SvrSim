@@ -4,7 +4,6 @@ using S7Svr.Simulator;
 using S7SvrSim.Project;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,31 +38,26 @@ namespace S7SvrSim.ViewModels
             }
             set
             {
-                if (!UndoRedoManager.IsInUndoRedo)
+                if (string.IsNullOrEmpty(value))
                 {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    if (SignalType?.Equals(value, StringComparison.OrdinalIgnoreCase) == true)
-                    {
-                        return;
-                    }
+                if (SignalType?.Equals(value, StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return;
+                }
 
-                    var tyStr = value.Split('[')[0];
-                    var len = GetLength(value);
+                var tyStr = value.Split('[')[0];
+                var len = GetLength(value);
 
-                    var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase) || ty.Type.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
-                    if (typeQuery.Any())
+                var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase) || ty.Type.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
+                if (typeQuery.Any())
+                {
+                    Other = typeQuery.First().Type;
+                    if (Value is SignalWithLengthBase lengthValue)
                     {
-                        UndoRedoManager.StartTransaction();
-                        Other = typeQuery.First().Type;
-                        if (Value is SignalWithLengthBase lengthValue)
-                        {
-                            lengthValue.Length = len;
-                        }
-                        UndoRedoManager.EndTransaction();
+                        lengthValue.Length = len;
                     }
                 }
 
@@ -131,37 +125,8 @@ namespace S7SvrSim.ViewModels
             isInit = true;
         }
 
-        partial void OnValueChanged(SignalBase value)
-        {
-            Value.NameChanged += OnNameChanged;
-            Value.RemarkChanged += OnRemarkChanged;
-            Value.FormatAddressChanged += OnFormtAddressChanged;
-            if (Value is SignalWithLengthBase lengthValue)
-            {
-                lengthValue.LengthChanged += OnSignalLengthChanged;
-                lengthValue.NotifyLengthChanged();
-            }
-        }
-
-        void ReleaseBind()
-        {
-            Value.NameChanged -= OnNameChanged;
-            Value.RemarkChanged -= OnRemarkChanged;
-            Value.FormatAddressChanged -= OnFormtAddressChanged;
-            if (Value is SignalWithLengthBase lengthValue)
-            {
-                lengthValue.LengthChanged -= OnSignalLengthChanged;
-                lengthValue.NotifyLengthChanged();
-            }
-        }
-
         partial void OnOtherChanged(Type value)
         {
-            if (UndoRedoManager.IsInUndoRedo)
-            {
-                return;
-            }
-
             var newVal = (SignalBase)Activator.CreateInstance(value);
             var preValue = CloneValue();
 
@@ -180,65 +145,6 @@ namespace S7SvrSim.ViewModels
             this.value = newVal;
             OnPropertyChanged(nameof(Value));
             OnValueChanged(Value);
-
-            if (isInit)
-            {
-                var command = new ValueChangedCommand<SignalEditObj>(signal =>
-                {
-                    Other = signal.Other;
-                    ReleaseBind();
-                    this.value = signal.Value;
-                    OnPropertyChanged(nameof(Value));
-                    OnPropertyChanged(nameof(SignalType));
-                }, new SignalEditObj(preValue.GetType()) { Value = preValue }, CloneCurrent());
-                command.AfterExecute += CommandEventHandle;
-                command.AfterUndo += CommandEventHandle;
-                UndoRedoManager.Regist(command);
-            }
-        }
-
-        private void OnSignalLengthChanged(int oldValue, int newValue)
-        {
-            RegistValueChangedCommand(val =>
-            {
-                if (Value is SignalWithLengthBase lengthSignal)
-                {
-                    lengthSignal.Length = val;
-                    OnPropertyChanged(nameof(SignalType));
-                }
-            }, oldValue, newValue);
-
-        }
-
-        private void OnFormtAddressChanged(string oldValue, string newValue)
-        {
-            RegistValueChangedCommand(val => Value.FormatAddress = val, oldValue, newValue);
-        }
-
-        private void OnRemarkChanged(string oldValue, string newValue)
-        {
-            RegistValueChangedCommand(val => Value.Remark = val, oldValue, newValue);
-        }
-
-        private void OnNameChanged(string oldValue, string newValue)
-        {
-            RegistValueChangedCommand(val => Value.Name = val, oldValue, newValue);
-        }
-
-        private void RegistValueChangedCommand<T>(Action<T> update, T oldValue, T newValue)
-        {
-            if (UndoRedoManager.IsInUndoRedo || !isInit || EqualityComparer<T>.Default.Equals(oldValue, newValue))
-            {
-                return;
-            }
-
-            var command = new ValueChangedCommand<T>(val =>
-            {
-                update?.Invoke(val);
-            }, oldValue, newValue);
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
-            UndoRedoManager.Regist(command);
         }
 
         private SignalBase CloneValue()
@@ -260,20 +166,6 @@ namespace S7SvrSim.ViewModels
             }
 
             return value;
-        }
-
-        private SignalEditObj CloneCurrent()
-        {
-            return new SignalEditObj(Other)
-            {
-                Other = Other,
-                Value = CloneValue()
-            };
-        }
-
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
         }
     }
 

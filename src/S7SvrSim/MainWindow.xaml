@@ -80,18 +80,6 @@
                         <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}" Icon="{md:PackIcon Kind=Redo}" />
                     </MenuItem>
                     <Separator />
-                    <MenuItem Header="编辑">
-                        <MenuItem Command="{Binding ProjectVM.UndoCommand}"
-                                  Icon="{md:PackIcon Kind=UndoVariant}"
-                                  Header="撤回"
-                                  InputGestureText="Ctrl+Z"
-                                  />
-                        <MenuItem Command="{Binding ProjectVM.RedoCommand}"
-                                  Icon="{md:PackIcon Kind=RedoVariant}"
-                                  Header="重做"
-                                  InputGestureText="Ctrl+Y"
-                                  />
-                    </MenuItem>
                     <MenuItem Header="S7服务">
                         <MenuItem Icon="{md:PackIcon Kind=Play}"
                                   Header="开启"
@@ -161,24 +149,6 @@
                                 shared:RoutedCommandTooltip.Enabled="True"
                                 />
                     </ToolBar>
-                    <ToolBar ClipToBounds="False">
-                        <md:Badged x:Name="undoBadged">
-                            <Button Content="{md:PackIcon Kind=UndoVariant}"
-                                    Command="{Binding ProjectVM.UndoCommand}"
-                                    Padding="{StaticResource ButtonPadding}"
-                                    shared:RoutedCommandTooltip.Enabled="True"
-                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                    />
-                        </md:Badged>
-                        <md:Badged x:Name="redoBadged">
-                            <Button Content="{md:PackIcon Kind=RedoVariant}"
-                                    Command="{Binding ProjectVM.RedoCommand}"
-                                    Padding="{StaticResource ButtonPadding}"
-                                    shared:RoutedCommandTooltip.Enabled="True"
-                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                    />
-                        </md:Badged>
-                    </ToolBar>
                     <ToolBar>
                         <Button Content="{md:PackIcon Kind=LanguagePython}"
                                 ToolTip="导入 Python 脚本"
@@ -237,7 +207,6 @@
                             <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}"
                                       CanUserAddRows="False"
                                       CanUserDeleteRows="False"
-                                      InitializingNewItem="AreaConfigGrid_InitializingNewItem"
                                       >
                                 <DataGrid.Columns>
                                     <DataGridTemplateColumn Header="删除">

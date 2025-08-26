@@ -1,8 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using S7SvrSim.ViewModels;
-using System;
 using System.Collections.ObjectModel;
 
 namespace S7Svr.Simulator.ViewModels
@@ -30,29 +27,8 @@ namespace S7Svr.Simulator.ViewModels
 
         public ConfigSnap7ServerVM()
         {
-            this.CmdAddArea = ReactiveCommand.Create<Unit>(_ =>
-            {
-                var command = ListChangedCommand<AreaConfigVM>.Add(AreaConfigs, [new AreaConfigVM()]);
-                CommandEventRegist(command);
-                UndoRedoManager.Run(command);
-            });
-            this.CmdRemoveArea = ReactiveCommand.Create<AreaConfigVM>(area =>
-            {
-                var command = ListChangedCommand<AreaConfigVM>.Remove(AreaConfigs, [area]);
-                CommandEventRegist(command);
-                UndoRedoManager.Run(command);
-            });
-        }
-
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(0);
-        }
-
-        internal void CommandEventRegist(IHistoryCommand command)
-        {
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
+            this.CmdAddArea = ReactiveCommand.Create<Unit>(_ => AreaConfigs.Add(new AreaConfigVM()));
+            this.CmdRemoveArea = ReactiveCommand.Create<AreaConfigVM>(area => AreaConfigs.Remove(area));
         }
 
         internal void SetIpAddress(object value)
@@ -61,16 +37,6 @@ namespace S7Svr.Simulator.ViewModels
             ipAddress = (string)value;
 #pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
             OnPropertyChanged(nameof(IpAddress));
-        }
-
-        partial void OnIpAddressChanged(string oldValue, string newValue)
-        {
-            if (registCommand)
-            {
-                var command = new ValueChangedCommand(SetIpAddress, oldValue, newValue);
-                CommandEventRegist(command);
-                UndoRedoManager.Regist(command);
-            }
         }
     }
 }

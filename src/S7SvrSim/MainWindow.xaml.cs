@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Commands;
-using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using Splat;
 using System;
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace S7Svr.Simulator
@@ -26,8 +23,6 @@ namespace S7Svr.Simulator
                 this.ViewModel = Locator.Current.GetRequiredService<MainVM>();
                 this.DataContext = this.ViewModel;
                 this.OneWayBind(ViewModel, vm => vm.ProjectVM.NeedSave, w => w.Title, GetTitle).DisposeWith(d);
-                this.Bind(ViewModel, vm => vm.ProjectVM.UndoCount, win => win.undoBadged.Badge).DisposeWith(d);
-                this.Bind(ViewModel, vm => vm.ProjectVM.RedoCount, win => win.redoBadged.Badge).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.RunningVM.RunningStatus, w => w.activeBlock.Visibility, isRun => isRun ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
 
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.New, (_, _) => ViewModel.ProjectVM.NewProject(), NotRunningStatus_CanExecute));
@@ -38,8 +33,6 @@ namespace S7Svr.Simulator
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdStartServer, new KeyGesture(Key.F5)));
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdStopServer, new KeyGesture(Key.F5, ModifierKeys.Shift)));
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdRestartServer, new KeyGesture(Key.F5, ModifierKeys.Control)));
-                this.InputBindings.Add(new KeyBinding(ViewModel.ProjectVM.UndoCommand, new KeyGesture(Key.Z, ModifierKeys.Control)));
-                this.InputBindings.Add(new KeyBinding(ViewModel.ProjectVM.RedoCommand, new KeyGesture(Key.Y, ModifierKeys.Control)));
             });
         }
 
@@ -82,16 +75,6 @@ namespace S7Svr.Simulator
         {
             e.CanExecute = true;
             e.Handled = true;
-        }
-
-        private void AreaConfigGrid_InitializingNewItem(object sender, InitializingNewItemEventArgs e)
-        {
-            if (e.NewItem is AreaConfigVM areaConfigVM)
-            {
-                var command = ListChangedCommand<AreaConfigVM>.Add(ViewModel.ConfigVM.AreaConfigs, [areaConfigVM]);
-                ViewModel.ConfigVM.CommandEventRegist(command);
-                UndoRedoManager.Regist(command);
-            }
         }
 
         protected override void OnClosing(CancelEventArgs e)

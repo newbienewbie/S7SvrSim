@@ -32,18 +32,10 @@ namespace S7SvrSim.ViewModels
         [Reactive]
         public bool NeedSave { get; set; }
 
-        [Reactive]
-        public int UndoCount { get; set; }
-
-        [Reactive]
-        public int RedoCount { get; set; }
-
         public ReadOnlyObservableCollection<RecentFile> RecentFiles { get; }
 
         public bool CanOpenRecent => RecentFiles.Count > 0;
 
-        public ICommand UndoCommand { get; }
-        public ICommand RedoCommand { get; }
         public ICommand RenameCommand { get; }
         public ICommand OpenRecentCommand { get; }
         public ICommand RemoveRecentCommand { get; }
@@ -61,13 +53,6 @@ namespace S7SvrSim.ViewModels
 
             OpenDefaultProject();
 
-            UndoRedoManager.UndoRedoChanged += () =>
-            {
-                UndoCount = UndoRedoManager.UndoCount;
-                RedoCount = UndoRedoManager.RedoCount;
-                NeedSave = true;
-            };
-
             recentFiles.Files.Connect()
                 .Sort(SortExpressionComparer<RecentFile>.Descending(file => file.OpenTime))
                 .Bind(out var data)
@@ -78,8 +63,6 @@ namespace S7SvrSim.ViewModels
             var runningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             var watchRunningStatus = runningVM.WhenAnyValue(vm => vm.RunningStatus).Select(rs => !rs);
 
-            UndoCommand = ReactiveCommand.Create(UndoRedoManager.Undo, this.WhenAnyValue(vm => vm.UndoCount).Select(c => c > 0));
-            RedoCommand = ReactiveCommand.Create(UndoRedoManager.Redo, this.WhenAnyValue(vm => vm.RedoCount).Select(c => c > 0));
             RenameCommand = ReactiveCommand.CreateFromTask(RenameProject);
             OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile, watchRunningStatus);
             RemoveRecentCommand = ReactiveCommand.Create<RecentFile>(RemoveRecentFile);
@@ -144,7 +127,6 @@ namespace S7SvrSim.ViewModels
 
             currentProject = projectFactory.CreateProject(saveFileDialog.FileName);
             recentFiles.AddFile(new RecentFile(currentProject.Path, DateTime.Now));
-            UndoRedoManager.Reset();
             NeedSave = false;
 
             logger.LogInfo($"已新建项目: {currentProject.Path}");
@@ -165,8 +147,6 @@ namespace S7SvrSim.ViewModels
             }
 
             currentProject = project;
-            UndoRedoManager.Reset();
-
             CallbackNeedSave();
 
             logger.LogInfo($"已加载项目: {currentProject.Path}");
