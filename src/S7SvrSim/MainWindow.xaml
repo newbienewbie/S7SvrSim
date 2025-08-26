@@ -29,15 +29,25 @@
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding ProjectVM.NewProjectCommand}" Key="N" Modifiers="Ctrl"></KeyBinding>
+        <KeyBinding Command="{Binding ProjectVM.LoadProjectCommand}" Key="O" Modifiers="Ctrl"></KeyBinding>
+        <KeyBinding Command="{Binding ProjectVM.SaveProjectCommand}" Key="S" Modifiers="Ctrl"></KeyBinding>
+
+        <KeyBinding Command="{Binding CmdStartServer}" Key="F5"></KeyBinding>
+        <KeyBinding Command="{Binding CmdStopServer}" Key="F5" Modifiers="Shift"></KeyBinding>
+        <KeyBinding Command="{Binding CmdRestartServer}" Key="F5" Modifiers="Ctrl"></KeyBinding>
+    </Window.InputBindings>
     <md:DialogHost CloseOnClickAway="True" Identifier="MainWindowDialogHost">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <Menu>
                     <MenuItem Header="文件">
-                        <MenuItem Command="ApplicationCommands.New" Icon="{md:PackIcon Kind=FileOutline}" />
+                        <MenuItem Header="新建" Command="{Binding ProjectVM.NewProjectCommand}" InputGestureText="Ctrl+N" Icon="{md:PackIcon Kind=FileOutline}" />
                         <MenuItem Header="打开"
                                   Icon="{md:PackIcon Kind=FolderOpenOutline}"
-                                  Command="ApplicationCommands.Open"
+                                  Command="{Binding ProjectVM.LoadProjectCommand}"
+                                  InputGestureText="Ctrl+O"
                                   />
                         <MenuItem Header="打开最近..."
                                   ItemsSource="{Binding ProjectVM.RecentFiles}"
@@ -74,15 +84,16 @@
                         </MenuItem>
                         <MenuItem Header="保存"
                                   Icon="{md:PackIcon Kind=ContentSaveOutline}"
-                                  Command="ApplicationCommands.Save"
+                                  Command="{Binding ProjectVM.SaveProjectCommand}"
+                                  InputGestureText="Ctrl+S"
                                   />
-                        <MenuItem Header="另存为" Command="ApplicationCommands.SaveAs" />
+                        <MenuItem Header="另存为" Command="{Binding ProjectVM.SaveProjectAsCommand}" />
                         <Separator />
                         <MenuItem Header="项目重命名"
                                   Command="{Binding ProjectVM.RenameCommand}"
                                   Icon="{md:PackIcon Kind=FormTextbox}"
                                   />
-                        <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}" Icon="{md:PackIcon Kind=Redo}" />
+                        <MenuItem Header="打开项目文件夹" Command="{Binding ProjectVM.OpenProjectFolderCommand}" Icon="{md:PackIcon Kind=Redo}" />
                     </MenuItem>
                     <Separator />
                     <MenuItem Header="S7服务">
@@ -138,17 +149,17 @@
                                 />
                     </ToolBar>
                     <ToolBar>
-                        <Button Command="ApplicationCommands.New"
+                        <Button Command="{Binding ProjectVM.NewProjectCommand}"
                                 Content="{md:PackIcon Kind=FileOutline}"
                                 Padding="{StaticResource ButtonPadding}"
                                 shared:RoutedCommandTooltip.Enabled="True"
                                 />
-                        <Button Command="ApplicationCommands.Open"
+                        <Button Command="{Binding ProjectVM.LoadProjectCommand}"
                                 Content="{md:PackIcon Kind=FolderOpenOutline}"
                                 Padding="{StaticResource ButtonPadding}"
                                 shared:RoutedCommandTooltip.Enabled="True"
                                 />
-                        <Button Command="ApplicationCommands.Save"
+                        <Button Command="{Binding ProjectVM.SaveProjectCommand}"
                                 Content="{md:PackIcon Kind=ContentSaveOutline}"
                                 Padding="{StaticResource ButtonPadding}"
                                 shared:RoutedCommandTooltip.Enabled="True"

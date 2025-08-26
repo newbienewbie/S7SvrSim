@@ -33,6 +33,12 @@ namespace S7SvrSim.ViewModels
 
         public bool CanOpenRecent => RecentFiles.Count > 0;
 
+        public ICommand NewProjectCommand { get; }
+        public ICommand LoadProjectCommand { get; }
+        public ICommand SaveProjectCommand { get; }
+        public ICommand SaveProjectAsCommand { get; }
+        public ICommand OpenProjectFolderCommand { get; }
+
         public ICommand RenameCommand { get; }
         public ICommand OpenRecentCommand { get; }
         public ICommand RemoveRecentCommand { get; }
@@ -61,6 +67,12 @@ namespace S7SvrSim.ViewModels
 
             var runningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             var watchRunningStatus = runningVM.WhenAnyValue(vm => vm.RunningStatus).Select(rs => !rs);
+
+            NewProjectCommand = ReactiveCommand.Create(NewProject, watchRunningStatus);
+            LoadProjectCommand = ReactiveCommand.Create(LoadProject, watchRunningStatus);
+            SaveProjectCommand = ReactiveCommand.Create(SaveProject);
+            SaveProjectAsCommand = ReactiveCommand.Create(SaveProjectAs);
+            OpenProjectFolderCommand = ReactiveCommand.Create(OpenProjectFolder);
 
             RenameCommand = ReactiveCommand.CreateFromTask(RenameProject);
             OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile, watchRunningStatus);
