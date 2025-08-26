@@ -15,21 +15,23 @@ namespace S7SvrSim.ViewModels
     {
         private readonly SignalsHelper signalsHelper;
         private readonly SignalsCollection signals;
+        private readonly RunningSnap7ServerVM runningVM;
         private readonly IMemCache<WatchState> watchStateCache;
         private readonly ISaveNotifier saveNotifier;
+        private readonly ISignalAddressUesdCollection signalAddressUesd;
 
         [Reactive]
         public int ScanSpan { get; set; } = 50;
 
-        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache, ISaveNotifier saveNotifier)
+        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache, ISaveNotifier saveNotifier, ISignalAddressUesdCollection signalAddressUesd)
         {
             this.signalsHelper = signalsHelper;
             this.signals = Locator.Current.GetRequiredService<SignalsCollection>();
+            runningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             this.watchStateCache = watchStateCache;
             this.saveNotifier = saveNotifier;
-
-            var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
-            runningModel.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
+            this.signalAddressUesd = signalAddressUesd;
+            runningVM.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
 
             this.WhenAnyValue(vm => vm.ScanSpan).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
         }
@@ -92,7 +94,15 @@ namespace S7SvrSim.ViewModels
         {
             while (!token.IsCancellationRequested)
             {
-                signalsHelper.RefreshValue(signals.Signals.Select(s => s.Value));
+                signalsHelper.RefreshValue(signals.Signals.Where(s =>
+                {
+                    if (signalAddressUesd.TryGetAddressUsed(s.Value, out var addressUsed))
+                    {
+                        var config = runningVM.AreaConfigs.FirstOrDefault(ac => (ac.AreaKind == AreaKind.MB && s.Value.Address?.AreaKind == AreaKind.MB) || (ac.AreaKind == AreaKind.DB && s.Value.Address?.AreaKind == AreaKind.DB && ac.BlockNumber == s.Value.Address?.DbIndex));
+                        return config != null && config.BlockSize > (s.Value.Address?.Index + addressUsed.IndexSize);
+                    }
+                    return false;
+                }).Select(s => s.Value));
                 await Task.Delay(TimeSpan.FromMilliseconds(ScanSpan >= 0 ? ScanSpan : 50), token);
             }
         }
