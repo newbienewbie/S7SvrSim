@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
@@ -11,41 +11,30 @@ using System.Threading.Tasks;
 
 namespace S7SvrSim.ViewModels
 {
-    public partial class SignalWatchVM : ViewModelBase
+    public partial class SignalWatchVM : ReactiveObject
     {
         private readonly SignalsHelper signalsHelper;
         private readonly SignalsCollection signals;
         private readonly IMemCache<WatchState> watchStateCache;
-        private readonly ISaveNotifier saveNotifier;
 
-        [ObservableProperty]
-        private int scanSpan = 50;
+        [Reactive]
+        public int ScanSpan { get; set; } = 50;
 
-        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache, ISaveNotifier saveNotifier)
+        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache)
         {
             this.signalsHelper = signalsHelper;
             this.signals = Locator.Current.GetRequiredService<SignalsCollection>();
             this.watchStateCache = watchStateCache;
-            this.saveNotifier = saveNotifier;
 
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
         }
 
-        #region ScanSpan For UndoRedo
         internal void SetScanSpan(int scanSpan)
         {
-#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-            this.scanSpan = scanSpan;
-#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-            OnPropertyChanged(nameof(ScanSpan));
+            this.ScanSpan = scanSpan;
+            this.RaisePropertyChanged(nameof(ScanSpan));
         }
-
-        partial void OnScanSpanChanged(int oldValue, int newValue)
-        {
-            saveNotifier.NotifyNeedSave();
-        }
-        #endregion
 
         #region Watch Method
         CancellationTokenSource watchCancelSource;

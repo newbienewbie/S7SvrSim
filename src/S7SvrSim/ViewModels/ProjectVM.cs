@@ -49,6 +49,7 @@ namespace S7SvrSim.ViewModels
             this.projectFactory = projectFactory;
             this.recentFiles = recentFilesVM;
             this.mediator = mediator;
+
             logger = Locator.Current.GetRequiredService<MsgLoggerVM>();
 
             OpenDefaultProject();
@@ -82,8 +83,6 @@ namespace S7SvrSim.ViewModels
 
         private void CallbackNeedSave()
         {
-            NeedSave = true;
-            NeedSave = false;
         }
 
         public MessageBoxResult? NotifyIfSave()
@@ -180,7 +179,6 @@ namespace S7SvrSim.ViewModels
         public void SaveProject()
         {
             currentProject.Save();
-            NeedSave = false;
             logger.LogInfo($"保存成功！路径: {currentProject.Path}");
         }
 

@@ -1,7 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using DynamicData;
-using MediatR;
+﻿using DynamicData;
 using ReactiveUI.Fody.Helpers;
 using S7SvrSim.Messages;
 using S7SvrSim.S7Signal;
@@ -24,11 +21,11 @@ using System.Windows.Input;
 
 namespace S7SvrSim.ViewModels.Signals
 {
-    public partial class SignalsCollection : ViewModelBase
+    public partial class SignalsCollection : ReactiveObject
     {
         private readonly IMemCache<WatchState> watchState;
         private readonly SignalsHelper signalsHelper;
-        private readonly IMediator mediator;
+        private readonly MediatR.IMediator mediator;
 
         public DataGrid Grid { get; set; }
 
@@ -41,8 +38,8 @@ namespace S7SvrSim.ViewModels.Signals
 
         public bool IsSignalsNotNull => Signals != null;
 
-        [ObservableProperty]
-        private SignalEditObj selectedEditObj;
+        [Reactive]
+        public SignalEditObj SelectedEditObj { get; set; }
 
         public bool UpdateAddressByDbIndex { get; set; }
 
@@ -50,6 +47,10 @@ namespace S7SvrSim.ViewModels.Signals
         public string NewGroupName { get; set; }
 
         public ICommand AddGroupCommand { get; }
+        public ReactiveCommand<string, Unit> SwitchGroupCommand { get; }
+        public ReactiveCommand<SignalEditGroup, Unit> DeleteGroupCommand { get; }
+        public ReactiveCommand<SignalEditGroup, Unit> RenameGroupCommand { get; }
+        public ReactiveCommand<SignalEditGroup, Unit> CopyGroupCommand { get; }
 
         public ICommand NewSignalCommand { get; }
         public ICommand InsertSignalCommand { get; }
@@ -64,11 +65,12 @@ namespace S7SvrSim.ViewModels.Signals
         public ICommand UpdateAddressFromSelectedItemsCommand { get; }
         public ICommand ClearAddressCommand { get; }
 
-        public SignalsCollection(IMemCache<WatchState> watchState, ISetting<UpdateAddressOptions> setting, SignalsHelper signalsHelper, IMediator mediator)
+        public SignalsCollection(IMemCache<WatchState> watchState, ISetting<UpdateAddressOptions> setting, SignalsHelper signalsHelper, MediatR.IMediator mediator)
         {
             this.watchState = watchState;
             this.signalsHelper = signalsHelper;
             this.mediator = mediator;
+
             setting.Value.Subscribe(options =>
             {
                 UpdateAddressByDbIndex = options.UpdateAddressByDbIndex;
@@ -77,14 +79,18 @@ namespace S7SvrSim.ViewModels.Signals
             var watchGroupName = this.WhenAnyValue(vm => vm.GroupName);
             watchGroupName.Subscribe(_ =>
             {
-                OnPropertyChanged(nameof(GroupName));
-                OnPropertyChanged(nameof(Signals));
+                this.RaisePropertyChanged(nameof(GroupName));
+                this.RaisePropertyChanged(nameof(Signals));
             });
 
             var watchCanEditSignal = watchGroupName.Select(name => !string.IsNullOrEmpty(name));
             var watchCanAddGroup = this.WhenAnyValue(vm => vm.NewGroupName).Select(name => !string.IsNullOrWhiteSpace(name));
 
             AddGroupCommand = ReactiveCommand.Create(AddGroup, watchCanAddGroup);
+            SwitchGroupCommand = ReactiveCommand.Create<string>(SwitchGroup);
+            DeleteGroupCommand = ReactiveCommand.Create<SignalEditGroup>(DeleteGroup);
+            RenameGroupCommand = ReactiveCommand.CreateFromTask<SignalEditGroup>(RenameGroup);
+            CopyGroupCommand = ReactiveCommand.CreateFromTask<SignalEditGroup>(CopyGroup);
 
             NewSignalCommand = ReactiveCommand.Create<Type>(NewSignal, watchCanEditSignal);
             InsertSignalCommand = ReactiveCommand.Create<Type>(InsertSignal, watchCanEditSignal);
@@ -147,16 +153,14 @@ namespace S7SvrSim.ViewModels.Signals
             SignalGroups.Add(new SignalEditGroup(newGroupName, []));
 
             NewGroupName = "";
-            OnPropertyChanged(nameof(NewGroupName));
+            this.RaisePropertyChanged(nameof(NewGroupName));
         }
 
-        [RelayCommand]
         private void SwitchGroup(string name)
         {
             GroupName = name;
         }
 
-        [RelayCommand]
         private void DeleteGroup(SignalEditGroup sg)
         {
             if (MessageBox.Show("是否删除？", "请确认", MessageBoxButton.YesNo) != MessageBoxResult.Yes) return;
@@ -172,7 +176,6 @@ namespace S7SvrSim.ViewModels.Signals
             }
         }
 
-        [RelayCommand]
         private async Task RenameGroup(SignalEditGroup sg)
         {
             if (sg == null) return;
@@ -188,7 +191,6 @@ namespace S7SvrSim.ViewModels.Signals
             sg.Name = newName;
         }
 
-        [RelayCommand]
         private async Task CopyGroup(SignalEditGroup sg)
         {
             if (sg == null) return;

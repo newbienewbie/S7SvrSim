@@ -1,5 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7SvrSim.Project;
 using S7SvrSim.S7Signal;
@@ -13,17 +13,18 @@ using System.Xml.Serialization;
 
 namespace S7SvrSim.ViewModels
 {
-    public partial class SignalEditObj : ObservableObject
+    public partial class SignalEditObj : ReactiveObject
     {
         private readonly IMemCache<SignalType[]> signalTypes;
-        private bool isInit = false;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(SignalType))]
-        private Type other;
+        /// <summary>
+        /// 信号类型对应的实际反射类型
+        /// </summary>
+        [Reactive]
+        public Type Other { get; set; }
 
-        [ObservableProperty]
-        private SignalBase value;
+        [Reactive]
+        public SignalBase Value { get; set; }
 
         public string SignalType
         {
@@ -61,7 +62,7 @@ namespace S7SvrSim.ViewModels
                     }
                 }
 
-                OnPropertyChanged();
+                this.RaisePropertyChanged();
             }
         }
 
@@ -99,17 +100,20 @@ namespace S7SvrSim.ViewModels
             return default;
         }
 
+
         public SignalEditObj(Type type)
         {
             Other = type;
             signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<SignalType[]>>();
 
-            isInit = true;
+            this.WhenAnyValue(vm => vm.Other).Subscribe(OnOtherChanged);
         }
 
         public SignalEditObj(string signalType, string signalName, string formatAddress, string remark)
         {
             signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<SignalType[]>>();
+
+            this.WhenAnyValue(vm => vm.Other).Subscribe(OnOtherChanged);
 
             Other = ParseType(signalType);
 
@@ -121,14 +125,11 @@ namespace S7SvrSim.ViewModels
             {
                 lenSignal.Length = GetLength(signalType);
             }
-
-            isInit = true;
         }
 
-        partial void OnOtherChanged(Type value)
+        private void OnOtherChanged(Type value)
         {
             var newVal = (SignalBase)Activator.CreateInstance(value);
-            var preValue = CloneValue();
 
             if (Value != null)
             {
@@ -142,30 +143,10 @@ namespace S7SvrSim.ViewModels
             newVal.FormatAddress = (string)Value?.FormatAddress?.Clone();
             newVal.Remark = Value?.Remark;
 
-            this.value = newVal;
-            OnPropertyChanged(nameof(Value));
-            OnValueChanged(Value);
-        }
+            Value = newVal;
 
-        private SignalBase CloneValue()
-        {
-            if (Value == null)
-            {
-                return null;
-            }
-
-            var value = (SignalBase)Activator.CreateInstance(Value.GetType());
-            value.Value = Value.Value;
-            value.Address = Value.Address ?? null;
-            value.Name = Value.Name;
-            value.Remark = Value.Remark;
-
-            if (value is S7Signal.SignalWithLengthBase lenSignal && Value is S7Signal.SignalWithLengthBase curLenSignal)
-            {
-                lenSignal.Length = curLenSignal.Length;
-            }
-
-            return value;
+            this.RaisePropertyChanged(nameof(Value));
+            this.RaisePropertyChanged(nameof(SignalType));
         }
     }
 

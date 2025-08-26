@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using S7SvrSim.ViewModels;
+﻿using ReactiveUI.Fody.Helpers;
 using System.Collections.ObjectModel;
 
 namespace S7Svr.Simulator.ViewModels
@@ -7,15 +6,15 @@ namespace S7Svr.Simulator.ViewModels
     /// <summary>
     /// S7 Server 的配置
     /// </summary>
-    public partial class ConfigSnap7ServerVM : ViewModelBase
+    public partial class ConfigSnap7ServerVM : ReactiveObject
     {
         protected bool registCommand = true;
 
         /// <summary>
         /// IP Address
         /// </summary>
-        [ObservableProperty]
-        private string ipAddress = "127.0.0.1";
+        [Reactive]
+        public string IpAddress { get; set; } = "127.0.0.1";
 
         /// <summary>
         /// DB Configs
@@ -33,10 +32,8 @@ namespace S7Svr.Simulator.ViewModels
 
         internal void SetIpAddress(object value)
         {
-#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-            ipAddress = (string)value;
-#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-            OnPropertyChanged(nameof(IpAddress));
+            IpAddress = (string)value;
+            this.RaisePropertyChanged(nameof(IpAddress));
         }
     }
 }
