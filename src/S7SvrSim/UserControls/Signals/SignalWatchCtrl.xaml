@@ -204,7 +204,7 @@
                 <TextBlock Text="扫描间隔: "
                            VerticalAlignment="Center"
                            />
-                <TextBox Text="{Binding WatchVM.ScanSpan}"
+                <TextBox Text="{Binding WatchVM.ScanSpan, UpdateSourceTrigger=PropertyChanged}"
                          Width="80"
                          md:TextFieldAssist.SuffixText="ms"
                          VerticalAlignment="Center"

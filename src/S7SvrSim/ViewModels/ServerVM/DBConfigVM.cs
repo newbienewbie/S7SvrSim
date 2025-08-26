@@ -1,4 +1,6 @@
-﻿using ReactiveUI.Fody.Helpers;
+﻿using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI.Fody.Helpers;
+using S7SvrSim.Services;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -42,11 +44,14 @@ namespace S7Svr.Simulator.ViewModels
 
     public class AreaConfigVM : IEditableObject, INotifyPropertyChanged
     {
+        private readonly ISaveNotifier saveNotifier;
+
         private AreaConfig _currentConfig = new AreaConfig();
         private AreaConfig _bakeup = default;
 
         public AreaConfigVM()
         {
+            saveNotifier = ((App)App.Current).ServiceProvider.GetRequiredService<ISaveNotifier>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -57,6 +62,7 @@ namespace S7Svr.Simulator.ViewModels
             {
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
+            saveNotifier.NotifyNeedSave();
         }
 
         public AreaKind AreaKind
@@ -111,11 +117,6 @@ namespace S7Svr.Simulator.ViewModels
         public void CancelEdit()
         {
             this._currentConfig = this._bakeup;
-        }
-
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(0);
         }
 
         public void EndEdit()

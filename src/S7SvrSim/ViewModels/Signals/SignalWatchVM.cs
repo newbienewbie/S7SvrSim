@@ -16,18 +16,22 @@ namespace S7SvrSim.ViewModels
         private readonly SignalsHelper signalsHelper;
         private readonly SignalsCollection signals;
         private readonly IMemCache<WatchState> watchStateCache;
+        private readonly ISaveNotifier saveNotifier;
 
         [Reactive]
         public int ScanSpan { get; set; } = 50;
 
-        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache)
+        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache, ISaveNotifier saveNotifier)
         {
             this.signalsHelper = signalsHelper;
             this.signals = Locator.Current.GetRequiredService<SignalsCollection>();
             this.watchStateCache = watchStateCache;
+            this.saveNotifier = saveNotifier;
 
             var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             runningModel.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
+
+            this.WhenAnyValue(vm => vm.ScanSpan).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
         }
 
         internal void SetScanSpan(int scanSpan)

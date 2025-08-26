@@ -9,18 +9,21 @@ namespace S7SvrSim.Services.Project
         private readonly IServiceProvider serviceProvider;
         private readonly SignalsHelper signalsHelper;
         private readonly IEnvProvider envProvider;
-        public ProjectFractory(IServiceProvider serviceProvider, SignalsHelper signalsHelper, IEnvProvider envProvider)
+        private readonly ISaveNotifier saveNotifier;
+
+        public ProjectFractory(IServiceProvider serviceProvider, SignalsHelper signalsHelper, IEnvProvider envProvider, ISaveNotifier saveNotifier)
         {
             this.serviceProvider = serviceProvider;
             this.signalsHelper = signalsHelper;
             this.envProvider = envProvider;
+            this.saveNotifier = saveNotifier;
         }
 
         private IProject GetProjectByPath(string path)
         {
             return path == null
-                ? new DefaultProject(serviceProvider, signalsHelper, envProvider)
-                : new SoftwareProject(path, serviceProvider, signalsHelper, envProvider);
+                ? new DefaultProject(serviceProvider, signalsHelper, envProvider, saveNotifier)
+                : new SoftwareProject(path, serviceProvider, signalsHelper, envProvider, saveNotifier);
         }
 
         public IProject CreateProject(string path)

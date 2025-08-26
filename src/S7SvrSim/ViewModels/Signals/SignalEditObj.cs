@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using DynamicData.Binding;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7SvrSim.Project;
@@ -16,6 +17,7 @@ namespace S7SvrSim.ViewModels
     public partial class SignalEditObj : ReactiveObject
     {
         private readonly IMemCache<SignalType[]> signalTypes;
+        private readonly ISaveNotifier saveNotifier;
 
         /// <summary>
         /// 信号类型对应的实际反射类型
@@ -25,6 +27,10 @@ namespace S7SvrSim.ViewModels
 
         [Reactive]
         public SignalBase Value { get; set; }
+
+        private IDisposable valueDisposable;
+        private IDisposable typeDisposable;
+        private IDisposable valueChangedDisposable;
 
         public string SignalType
         {
@@ -100,18 +106,21 @@ namespace S7SvrSim.ViewModels
             return default;
         }
 
-
         public SignalEditObj(Type type)
         {
             Other = type;
             signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<SignalType[]>>();
+            saveNotifier = ((App)App.Current).ServiceProvider.GetRequiredService<ISaveNotifier>();
 
             this.WhenAnyValue(vm => vm.Other).Subscribe(OnOtherChanged);
+
+            ObserverToNeedSave();
         }
 
         public SignalEditObj(string signalType, string signalName, string formatAddress, string remark)
         {
             signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<SignalType[]>>();
+            saveNotifier = ((App)App.Current).ServiceProvider.GetRequiredService<ISaveNotifier>();
 
             this.WhenAnyValue(vm => vm.Other).Subscribe(OnOtherChanged);
 
@@ -124,6 +133,47 @@ namespace S7SvrSim.ViewModels
             if (Value is SignalWithLengthBase lenSignal)
             {
                 lenSignal.Length = GetLength(signalType);
+            }
+
+            ObserverToNeedSave();
+        }
+
+        private void ObserverToNeedSave()
+        {
+            typeDisposable = this.WhenAnyPropertyChanged(nameof(SignalType)).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
+            valueChangedDisposable = this.WhenAnyValue(vm => vm.Value).Subscribe(_ =>
+            {
+                ObserverValueToNeedSave();
+            });
+            ObserverValueToNeedSave();
+        }
+
+        private void ObserverValueToNeedSave()
+        {
+            if (valueDisposable != null)
+            {
+                try
+                {
+                    valueDisposable.Dispose();
+                }
+                catch (Exception)
+                {
+
+                }
+
+                valueDisposable = null;
+            }
+
+            if (Value != null)
+            {
+                if (Value is SignalWithLengthBase signalWithLength)
+                {
+                    valueDisposable = signalWithLength.WhenAnyValue(v => v.Name, v => v.Remark, v => v.FormatAddress, v => v.Length).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
+                }
+                else
+                {
+                    valueDisposable = Value.WhenAnyValue(v => v.Name, v => v.Remark, v => v.FormatAddress).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
+                }
             }
         }
 
@@ -145,8 +195,24 @@ namespace S7SvrSim.ViewModels
 
             Value = newVal;
 
+            ObserverValueToNeedSave();
+
             this.RaisePropertyChanged(nameof(Value));
             this.RaisePropertyChanged(nameof(SignalType));
+        }
+
+        ~SignalEditObj()
+        {
+            try
+            {
+                valueDisposable?.Dispose();
+                valueChangedDisposable?.Dispose();
+                typeDisposable?.Dispose();
+            }
+            catch (Exception)
+            {
+
+            }
         }
     }
 

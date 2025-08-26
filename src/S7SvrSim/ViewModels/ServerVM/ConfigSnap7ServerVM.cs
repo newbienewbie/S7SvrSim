@@ -1,4 +1,6 @@
 ﻿using ReactiveUI.Fody.Helpers;
+using S7SvrSim.Services;
+using System;
 using System.Collections.ObjectModel;
 
 namespace S7Svr.Simulator.ViewModels
@@ -6,7 +8,7 @@ namespace S7Svr.Simulator.ViewModels
     /// <summary>
     /// S7 Server 的配置
     /// </summary>
-    public partial class ConfigSnap7ServerVM : ReactiveObject
+    public class ConfigSnap7ServerVM : ReactiveObject
     {
         protected bool registCommand = true;
 
@@ -28,6 +30,12 @@ namespace S7Svr.Simulator.ViewModels
         {
             this.CmdAddArea = ReactiveCommand.Create<Unit>(_ => AreaConfigs.Add(new AreaConfigVM()));
             this.CmdRemoveArea = ReactiveCommand.Create<AreaConfigVM>(area => AreaConfigs.Remove(area));
+        }
+
+        public ConfigSnap7ServerVM(ISaveNotifier saveNotifier) : this()
+        {
+            this.WhenAnyValue(vm => vm.IpAddress).Subscribe(_ => saveNotifier.NotifyNeedSave());
+            AreaConfigs.CollectionChanged += (_, _) => saveNotifier.NotifyNeedSave();
         }
 
         internal void SetIpAddress(object value)

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Commands;
+using S7SvrSim.Services;
 using Splat;
 using System;
 using System.ComponentModel;
@@ -22,7 +23,6 @@ namespace S7Svr.Simulator
             {
                 this.ViewModel = Locator.Current.GetRequiredService<MainVM>();
                 this.DataContext = this.ViewModel;
-                this.OneWayBind(ViewModel, vm => vm.ProjectVM.NeedSave, w => w.Title, GetTitle).DisposeWith(d);
                 this.OneWayBind(ViewModel, vm => vm.RunningVM.RunningStatus, w => w.activeBlock.Visibility, isRun => isRun ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
 
                 this.CommandBindings.Add(new CommandBinding(ApplicationCommands.New, (_, _) => ViewModel.ProjectVM.NewProject(), NotRunningStatus_CanExecute));
@@ -33,6 +33,14 @@ namespace S7Svr.Simulator
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdStartServer, new KeyGesture(Key.F5)));
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdStopServer, new KeyGesture(Key.F5, ModifierKeys.Shift)));
                 this.InputBindings.Add(new KeyBinding(ViewModel.CmdRestartServer, new KeyGesture(Key.F5, ModifierKeys.Control)));
+
+                var saveNotify = ((App)Application.Current).ServiceProvider.GetRequiredService<ISaveNotifier>();
+                saveNotify.NeedSaveChanged += (sender, _) =>
+                {
+                    var notify = (ISaveNotifier)sender;
+                    Title = GetTitle(notify.NeedSave);
+                };
+                Title = GetTitle(saveNotify.NeedSave);
             });
         }
 

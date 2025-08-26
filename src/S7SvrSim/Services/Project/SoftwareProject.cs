@@ -25,12 +25,18 @@ namespace S7SvrSim.Services.Project
         private readonly IServiceProvider serviceProvider;
         private readonly SignalsHelper signalsHelper;
         private readonly IEnvProvider envProvider;
+        private readonly ISaveNotifier saveNotifier;
         private readonly IMemCache<SignalType[]> signalTypes;
 
         public ProjectFile ProjectFile { get; private set; }
         public string Path { get; private set; }
 
-        public SoftwareProject(string path, IServiceProvider serviceProvider, SignalsHelper signalsHelper, IEnvProvider envProvider)
+        public SoftwareProject(
+            string path,
+            IServiceProvider serviceProvider,
+            SignalsHelper signalsHelper,
+            IEnvProvider envProvider,
+            ISaveNotifier saveNotifier)
         {
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -40,6 +46,7 @@ namespace S7SvrSim.Services.Project
             this.serviceProvider = serviceProvider;
             this.signalsHelper = signalsHelper;
             this.envProvider = envProvider;
+            this.saveNotifier = saveNotifier;
             Path = path;
 
             signalTypes = serviceProvider.GetRequiredService<IMemCache<SignalType[]>>();
@@ -63,6 +70,7 @@ namespace S7SvrSim.Services.Project
         {
             ProjectFile = BuildFromApp();
             ProjectFile.Save(Path);
+            saveNotifier.NotifyNeedSave(false);
         }
 
         public void SaveAs(string path)
@@ -70,6 +78,7 @@ namespace S7SvrSim.Services.Project
             var project = BuildFromApp();
             project.Save(path);
             envProvider.Set(DefaultEnvConsts.PROJECT_DIR, IOPath.GetDirectoryName(path));
+            saveNotifier.NotifyNeedSave(false);
         }
 
         public void Load()
@@ -159,6 +168,8 @@ namespace S7SvrSim.Services.Project
             signalsCollection.SignalGroups.AddRange(MergeGroup(defaultGroup != null ? defaultGroup.Concat(groups) : groups));
             signalsCollection.GroupName = null;
             signalsCollection.GroupName = signalsCollection.SignalGroups.FirstOrDefault()?.Name;
+
+            saveNotifier.NotifyNeedSave(false);
         }
 
         /// <summary>

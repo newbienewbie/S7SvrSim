@@ -2,7 +2,6 @@
 using DynamicData.Binding;
 using MediatR;
 using Microsoft.Win32;
-using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Messages;
 using S7SvrSim.Services;
@@ -26,11 +25,9 @@ namespace S7SvrSim.ViewModels
         private readonly IProjectFactory projectFactory;
         private readonly RecentFilesCollection recentFiles;
         private readonly IMediator mediator;
+        private readonly ISaveNotifier saveNotifier;
         private readonly MsgLoggerVM logger;
         private IProject currentProject;
-
-        [Reactive]
-        public bool NeedSave { get; set; }
 
         public ReadOnlyObservableCollection<RecentFile> RecentFiles { get; }
 
@@ -44,11 +41,12 @@ namespace S7SvrSim.ViewModels
         /// </summary>
         public string ProjectName => Path.GetFileName(currentProject.Path);
 
-        public ProjectVM(IProjectFactory projectFactory, RecentFilesCollection recentFilesVM, IMediator mediator)
+        public ProjectVM(IProjectFactory projectFactory, RecentFilesCollection recentFilesVM, IMediator mediator, ISaveNotifier saveNotifier)
         {
             this.projectFactory = projectFactory;
             this.recentFiles = recentFilesVM;
             this.mediator = mediator;
+            this.saveNotifier = saveNotifier;
 
             logger = Locator.Current.GetRequiredService<MsgLoggerVM>();
 
@@ -83,11 +81,13 @@ namespace S7SvrSim.ViewModels
 
         private void CallbackNeedSave()
         {
+            saveNotifier.NotifyNeedSave(true);
+            saveNotifier.NotifyNeedSave(false);
         }
 
         public MessageBoxResult? NotifyIfSave()
         {
-            if (NeedSave)
+            if (saveNotifier.NeedSave)
             {
                 var result = MessageBox.Show("当前项目未保存，是否保存？", "未保存项目", MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.Yes)
@@ -126,7 +126,6 @@ namespace S7SvrSim.ViewModels
 
             currentProject = projectFactory.CreateProject(saveFileDialog.FileName);
             recentFiles.AddFile(new RecentFile(currentProject.Path, DateTime.Now));
-            NeedSave = false;
 
             logger.LogInfo($"已新建项目: {currentProject.Path}");
         }

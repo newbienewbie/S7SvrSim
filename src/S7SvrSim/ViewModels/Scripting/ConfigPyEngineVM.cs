@@ -16,7 +16,7 @@ namespace S7SvrSim.ViewModels
         private readonly PyScriptRunner _pyRunner;
         private readonly IPyPathService pyPathService;
 
-        public ConfigPyEngineVM(PyScriptRunner pyRunner, IPyPathService pyPathService)
+        public ConfigPyEngineVM(PyScriptRunner pyRunner, IPyPathService pyPathService, ISaveNotifier saveNotifier)
         {
             this._pyRunner = pyRunner;
             this.pyPathService = pyPathService;
@@ -53,6 +53,7 @@ namespace S7SvrSim.ViewModels
             PyEngineSearchPaths.CollectionChanged += (_, _) =>
             {
                 SetSearchPaths(_pyRunner.PyEngine);
+                saveNotifier.NotifyNeedSave();
             };
         }
 

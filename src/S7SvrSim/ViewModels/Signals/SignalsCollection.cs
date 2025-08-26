@@ -26,6 +26,7 @@ namespace S7SvrSim.ViewModels.Signals
         private readonly IMemCache<WatchState> watchState;
         private readonly SignalsHelper signalsHelper;
         private readonly MediatR.IMediator mediator;
+        private readonly ISaveNotifier saveNotifier;
 
         public DataGrid Grid { get; set; }
 
@@ -46,12 +47,15 @@ namespace S7SvrSim.ViewModels.Signals
         [Reactive]
         public string NewGroupName { get; set; }
 
+        #region GroupCommand
         public ICommand AddGroupCommand { get; }
         public ReactiveCommand<string, Unit> SwitchGroupCommand { get; }
         public ReactiveCommand<SignalEditGroup, Unit> DeleteGroupCommand { get; }
         public ReactiveCommand<SignalEditGroup, Unit> RenameGroupCommand { get; }
         public ReactiveCommand<SignalEditGroup, Unit> CopyGroupCommand { get; }
+        #endregion
 
+        #region SignalCommand
         public ICommand NewSignalCommand { get; }
         public ICommand InsertSignalCommand { get; }
         public ICommand RemoveSelectedSignalsCommand { get; }
@@ -59,18 +63,21 @@ namespace S7SvrSim.ViewModels.Signals
         public ICommand ClearSignalsCommand { get; }
         public ICommand CopySignalsCommand { get; }
         public ICommand PasteSignalsCommand { get; }
+        #endregion
 
+        #region AddressCommand
         public ICommand UpdateAddressFromFirstCommand { get; }
         public ICommand UpdateAddressFromFirstSelectedCommand { get; }
         public ICommand UpdateAddressFromSelectedItemsCommand { get; }
         public ICommand ClearAddressCommand { get; }
+        #endregion
 
-        public SignalsCollection(IMemCache<WatchState> watchState, ISetting<UpdateAddressOptions> setting, SignalsHelper signalsHelper, MediatR.IMediator mediator)
+        public SignalsCollection(IMemCache<WatchState> watchState, ISetting<UpdateAddressOptions> setting, SignalsHelper signalsHelper, MediatR.IMediator mediator, ISaveNotifier saveNotifier)
         {
             this.watchState = watchState;
             this.signalsHelper = signalsHelper;
             this.mediator = mediator;
-
+            this.saveNotifier = saveNotifier;
             setting.Value.Subscribe(options =>
             {
                 UpdateAddressByDbIndex = options.UpdateAddressByDbIndex;
@@ -104,6 +111,13 @@ namespace S7SvrSim.ViewModels.Signals
             UpdateAddressFromFirstSelectedCommand = ReactiveCommand.Create(UpdateAddressFromFirstSelected, watchCanEditSignal);
             UpdateAddressFromSelectedItemsCommand = ReactiveCommand.Create(UpdateAddressFromSelectedItems, watchCanEditSignal);
             ClearAddressCommand = ReactiveCommand.Create(ClearAddress, watchCanEditSignal);
+
+            SignalGroups.CollectionChanged += SignalGroups_CollectionChanged;
+        }
+
+        private void SignalGroups_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            saveNotifier.NotifyNeedSave(true);
         }
 
         private void SetGridSelectedItems(IEnumerable<SignalEditObj> signals)
