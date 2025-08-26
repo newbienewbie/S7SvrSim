@@ -241,7 +241,7 @@
                          VerticalAlignment="Center"
                          >
                     <TextBox.Text>
-                        <Binding Path="Signals.NewGroupName">
+                        <Binding Path="Signals.NewGroupName" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <lu:EventValidation ValidateEvent="NewGroupName_ValidateEvent" />
                             </Binding.ValidationRules>

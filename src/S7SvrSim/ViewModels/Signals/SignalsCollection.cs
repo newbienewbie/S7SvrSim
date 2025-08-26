@@ -48,8 +48,10 @@ namespace S7SvrSim.ViewModels.Signals
 
         public bool UpdateAddressByDbIndex { get; set; }
 
-        [ObservableProperty]
-        private string newGroupName;
+        [Reactive]
+        public string NewGroupName { get; set; }
+
+        public ICommand AddGroupCommand { get; }
 
         public ICommand NewSignalCommand { get; }
         public ICommand InsertSignalCommand { get; }
@@ -83,6 +85,9 @@ namespace S7SvrSim.ViewModels.Signals
             });
 
             var watchCanEditSignal = watchGroupName.Select(name => !string.IsNullOrEmpty(name));
+            var watchCanAddGroup = this.WhenAnyValue(vm => vm.NewGroupName).Select(name => !string.IsNullOrWhiteSpace(name));
+
+            AddGroupCommand = ReactiveCommand.Create(AddGroup, watchCanAddGroup);
 
             NewSignalCommand = ReactiveCommand.Create<Type>(NewSignal, watchCanEditSignal);
             InsertSignalCommand = ReactiveCommand.Create<Type>(InsertSignal, watchCanEditSignal);
@@ -147,7 +152,6 @@ namespace S7SvrSim.ViewModels.Signals
             return renameResult;
         }
 
-        [RelayCommand]
         private void AddGroup()
         {
             if (string.IsNullOrEmpty(NewGroupName) || SignalGroups.Any(sg => sg.Name == NewGroupName)) return;
@@ -162,6 +166,7 @@ namespace S7SvrSim.ViewModels.Signals
             UndoRedoManager.Run(command);
 
             NewGroupName = "";
+            OnPropertyChanged(nameof(NewGroupName));
         }
 
         [RelayCommand]
