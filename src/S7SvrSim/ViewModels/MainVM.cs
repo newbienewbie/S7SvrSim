@@ -14,7 +14,6 @@ namespace S7Svr.Simulator.ViewModels
     {
         private readonly IS7ServerService _server;
 
-        public ISaveNotifier SaveNotifier { get; }
         public ConfigSnap7ServerVM ConfigVM { get; }
         public MsgLoggerVM LoggerVM { get; }
         public ConfigPyEngineVM ConfigPyEngineVM { get; }
@@ -31,13 +30,10 @@ namespace S7Svr.Simulator.ViewModels
         public MainVM(IS7ServerService server, IProjectFactory projectFactory, ISaveNotifier saveNotifier)
         {
             this._server = server;
-            SaveNotifier = saveNotifier;
 
             this.NeedSaveChangedEventObservable = Observable.FromEventPattern<NeedSaveChangedEventArgs>(
                  h => saveNotifier.NeedSaveChanged += h,
-                 h => saveNotifier.NeedSaveChanged -= h
-                 );
-                
+                 h => saveNotifier.NeedSaveChanged -= h);
 
             this.LoggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>();
             this.ConfigPyEngineVM = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
