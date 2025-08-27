@@ -1,4 +1,5 @@
 ﻿using S7Server.Simulator.ViewModels;
+using S7SvrSim.Services;
 using S7SvrSim.Services.Project;
 using S7SvrSim.ViewModels;
 using Splat;
@@ -13,6 +14,7 @@ namespace S7Svr.Simulator.ViewModels
     {
         private readonly IS7ServerService _server;
 
+        public ISaveNotifier SaveNotifier { get; }
         public ConfigSnap7ServerVM ConfigVM { get; }
         public MsgLoggerVM LoggerVM { get; }
         public ConfigPyEngineVM ConfigPyEngineVM { get; }
@@ -21,9 +23,10 @@ namespace S7Svr.Simulator.ViewModels
         public SignalPageVM SignalPageVM { get; }
         public ProjectVM ProjectVM { get; }
 
-        public MainVM(IS7ServerService server, IProjectFactory projectFactory)
+        public MainVM(IS7ServerService server, IProjectFactory projectFactory, ISaveNotifier saveNotifier)
         {
             this._server = server;
+            SaveNotifier = saveNotifier;
 
             this.LoggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>();
             this.ConfigPyEngineVM = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
@@ -85,6 +88,7 @@ namespace S7Svr.Simulator.ViewModels
         /// 停止服务器
         /// </summary>
         public ReactiveCommand<Unit, Unit> CmdRestartServer { get; }
+
         private async Task CmdRestartServer_Impl()
         {
             await CmdStopServer_Impl();

@@ -1,7 +1,6 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using ReactiveUI.Fody.Helpers;
 using S7SvrSim.Project;
 using S7SvrSim.Services.S7Blocks;
-using S7SvrSim.Shared;
 using System;
 
 namespace S7SvrSim.S7Signal
@@ -26,37 +25,29 @@ namespace S7SvrSim.S7Signal
         string Remark { get; set; }
     }
 
-    public abstract partial class SignalBase : ObservableObject, ISignal, IEquatable<SignalBase>
+    public abstract partial class SignalBase : ReactiveObject, ISignal, IEquatable<SignalBase>
     {
-        [ObservableProperty]
-        private object value;
+        [Reactive]
+        public object Value { get; set; }
 
-        [ObservableProperty]
-        private string name;
+        [Reactive]
+        public string Name { get; set; }
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(FormatAddress))]
-        private SignalAddress address;
+        [Reactive]
+        public SignalAddress Address { get; set; }
 
-        [ObservableProperty]
-        private string remark;
+        [Reactive]
+        public string Remark { get; set; }
 
-        public event PropertyChanged<string> FormatAddressChanged;
-        protected void InvokeFormatAddressEvent(string oldAddress, string newAddress)
-        {
-            FormatAddressChanged?.Invoke(oldAddress, newAddress);
-        }
         public virtual string FormatAddress
         {
             get => Address?.ToString();
             set
             {
-                if (Address?.ToString() == value)
+                if (FormatAddress == value)
                 {
                     return;
                 }
-
-                var oldAddress = Address?.ToString();
 
                 if (string.IsNullOrEmpty(value))
                 {
@@ -66,9 +57,13 @@ namespace S7SvrSim.S7Signal
                 {
                     Address = new SignalAddress(value);
                 }
-                OnPropertyChanged();
-                InvokeFormatAddressEvent(oldAddress, Address?.ToString());
+                this.RaisePropertyChanged();
             }
+        }
+
+        public SignalBase()
+        {
+            this.WhenAnyValue(vm => vm.Address).Subscribe(_ => this.RaisePropertyChanged(nameof(FormatAddress)));
         }
 
         public abstract void Refresh(IS7Block block);
@@ -79,18 +74,6 @@ namespace S7SvrSim.S7Signal
             Name = signal.Name;
             FormatAddress = signal.FormatAddress;
             Remark = signal.Remark;
-        }
-
-        public event PropertyChanged<string> NameChanged;
-        partial void OnNameChanged(string oldValue, string newValue)
-        {
-            NameChanged?.Invoke(oldValue, newValue);
-        }
-
-        public event PropertyChanged<string> RemarkChanged;
-        partial void OnRemarkChanged(string oldValue, string newValue)
-        {
-            RemarkChanged?.Invoke(oldValue, newValue);
         }
 
         public virtual SignalItem ToSignalItem()
@@ -139,18 +122,12 @@ namespace S7SvrSim.S7Signal
 
     public abstract partial class SignalWithLengthBase : SignalBase
     {
-        [ObservableProperty]
-        private int length;
-
-        public event PropertyChanged<int> LengthChanged;
-        partial void OnLengthChanged(int oldValue, int newValue)
-        {
-            LengthChanged?.Invoke(oldValue, newValue);
-        }
+        [Reactive]
+        public int Length { get; set; }
 
         public void NotifyLengthChanged()
         {
-            OnPropertyChanged(nameof(Length));
+            this.RaisePropertyChanged(nameof(Length));
         }
 
         public override void CopyFromSignalItem(SignalItem signal)

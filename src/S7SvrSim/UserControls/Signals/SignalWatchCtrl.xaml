@@ -164,29 +164,6 @@
                                   />
                     </MenuItem>
                 </MenuItem>
-                <MenuItem Header="排序">
-                    <MenuItem Header="根据地址"
-                              Command="{Binding Signals.OrderByCommand}"
-                              >
-                        <MenuItem.CommandParameter>
-                            <vm:SignalSortBy>Address</vm:SignalSortBy>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
-                    <MenuItem Header="根据信号名"
-                              Command="{Binding Signals.OrderByCommand}"
-                              >
-                        <MenuItem.CommandParameter>
-                            <vm:SignalSortBy>Name</vm:SignalSortBy>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
-                    <MenuItem Header="根据信号类型"
-                              Command="{Binding Signals.OrderByCommand}"
-                              >
-                        <MenuItem.CommandParameter>
-                            <vm:SignalSortBy>Type</vm:SignalSortBy>
-                        </MenuItem.CommandParameter>
-                    </MenuItem>
-                </MenuItem>
                 <MenuItem Header="Excel">
                     <MenuItem Header="导出"
                               Command="{Binding SignalExcelVM.ExportSignalsCommand}"
@@ -227,7 +204,7 @@
                 <TextBlock Text="扫描间隔: "
                            VerticalAlignment="Center"
                            />
-                <TextBox Text="{Binding WatchVM.ScanSpan}"
+                <TextBox Text="{Binding WatchVM.ScanSpan, UpdateSourceTrigger=PropertyChanged}"
                          Width="80"
                          md:TextFieldAssist.SuffixText="ms"
                          VerticalAlignment="Center"
@@ -241,7 +218,7 @@
                          VerticalAlignment="Center"
                          >
                     <TextBox.Text>
-                        <Binding Path="Signals.NewGroupName">
+                        <Binding Path="Signals.NewGroupName" UpdateSourceTrigger="PropertyChanged">
                             <Binding.ValidationRules>
                                 <lu:EventValidation ValidateEvent="NewGroupName_ValidateEvent" />
                             </Binding.ValidationRules>

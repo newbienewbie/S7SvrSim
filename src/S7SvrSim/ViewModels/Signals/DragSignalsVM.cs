@@ -1,32 +1,61 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using S7Svr.Simulator;
-using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
+﻿using DynamicData;
+using ReactiveUI.Fody.Helpers;
+using S7SvrSim.Shared;
 using Splat;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Windows.Input;
 
 namespace S7SvrSim.ViewModels.Signals
 {
-    public partial class DragSignalsVM : ViewModelBase
+    public partial class DragSignalsVM : ReactiveObject
     {
         private readonly SignalsCollection signalsCollection;
         private IList<SignalEditObj> Signals => signalsCollection.Signals;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(CanMoveAfter))]
-        [NotifyPropertyChangedFor(nameof(CanMoveBefore))]
-        private SignalEditObj dragTargetSignal;
+        [Reactive]
+        public SignalEditObj DragTargetSignal { get; set; }
 
-        [ObservableProperty]
-        private bool isDragSignals;
+        [Reactive]
+        public bool IsDragSignals { get; set; }
+
+        [ObservableAsProperty]
+        public bool DragSignalsIsOne { get; }
+
+        public bool CanMoveBefore
+        {
+            get
+            {
+                if (DragTargetSignal == null || DragSignals.Count == 0)
+                {
+                    return false;
+                }
+                return !IsDragsContinuous() || (Signals.IndexOf(DragTargetSignal) - Signals.IndexOf(DragSignals.OrderBy(Signals.IndexOf).Last())) != 1;
+            }
+        }
+
+        public bool CanMoveAfter
+        {
+            get
+            {
+                if (DragTargetSignal == null || DragSignals.Count == 0)
+                {
+                    return false;
+                }
+                return !IsDragsContinuous() || (Signals.IndexOf(DragSignals.OrderBy(Signals.IndexOf).First()) - Signals.IndexOf(DragTargetSignal)) != 1;
+            }
+        }
 
         public ObservableCollection<SignalEditObj> DragSignals { get; } = [];
 
         public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;
+
+        public ICommand ReplaceSignalCommand { get; }
+        public ICommand MoveSignlsBeforeCommand { get; }
+        public ICommand MoveSignalsAfterCommand { get; }
 
         public DragSignalsVM()
         {
@@ -34,26 +63,29 @@ namespace S7SvrSim.ViewModels.Signals
 
             DragSignals.CollectionChanged += (_, _) =>
             {
-                OnPropertyChanged(nameof(DragSignalsIsOne));
-                OnPropertyChanged(nameof(CanMoveAfter));
-                OnPropertyChanged(nameof(CanMoveBefore));
+                this.RaisePropertyChanged(nameof(CanMoveAfter));
+                this.RaisePropertyChanged(nameof(CanMoveBefore));
             };
+
+            this.WhenAnyValue(vm => vm.DragTargetSignal).Subscribe(_ =>
+            {
+                this.RaisePropertyChanged(nameof(CanMoveAfter));
+                this.RaisePropertyChanged(nameof(CanMoveBefore));
+            });
+
+            DragSignals.WhenAnyValue(signals => signals.Count)
+                       .Select(count => count == 1)
+                       .ToPropertyEx(this, vm => vm.DragSignalsIsOne, scheduler: RxApp.MainThreadScheduler);
+
+            var watchDragSignalsIsOne = this.WhenAnyValue(vm => vm.DragSignalsIsOne);
+            var watchCanMoveBefore = this.WhenAnyValue(vm => vm.CanMoveBefore);
+            var watchCanMoveAfter = this.WhenAnyValue(vm => vm.CanMoveAfter);
+
+            ReplaceSignalCommand = ReactiveCommand.Create(ReplaceSignal, watchDragSignalsIsOne);
+            MoveSignlsBeforeCommand = ReactiveCommand.Create(MoveSignlsBefore, watchCanMoveBefore);
+            MoveSignalsAfterCommand = ReactiveCommand.Create(MoveSignalsAfter, watchCanMoveAfter);
         }
 
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
-        }
-
-        private void RegistCommandEventHandle(IHistoryCommand command)
-        {
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
-        }
-
-        public bool DragSignalsIsOne => DragSignals.Count == 1;
-
-        [RelayCommand(CanExecute = nameof(DragSignalsIsOne))]
         private void ReplaceSignal()
         {
             if (DragSignals.Count != 1)
@@ -73,20 +105,7 @@ namespace S7SvrSim.ViewModels.Signals
 
             if (oldIndex != newIndex)
             {
-                var command = ListChangedCommand.Replace(Signals, [(oldItem, newItem), (newItem, oldItem)]);
-                RegistCommandEventHandle(command);
-                if (AfterDragEvent != null)
-                {
-                    command.AfterExecute += (_, _) =>
-                    {
-                        AfterDragEvent?.Invoke([newItem]);
-                    };
-                    command.AfterUndo += (_, _) =>
-                    {
-                        AfterDragEvent?.Invoke([newItem]);
-                    };
-                }
-                UndoRedoManager.Run(command);
+                Signals.Swap(oldItem, newItem);
             }
         }
 
@@ -116,38 +135,11 @@ namespace S7SvrSim.ViewModels.Signals
             });
         }
 
-        public bool CanMoveBefore
-        {
-            get
-            {
-                if (DragTargetSignal == null || DragSignals.Count == 0)
-                {
-                    return false;
-                }
-                return !IsDragsContinuous() || (Signals.IndexOf(DragTargetSignal) - Signals.IndexOf(DragSignals.OrderBy(Signals.IndexOf).Last())) != 1;
-            }
-        }
-
-        [RelayCommand(CanExecute = nameof(CanMoveBefore))]
         private void MoveSignlsBefore()
         {
             MoveSignals(DragTargetSignal, DragSignals.ToArray());
         }
 
-        public bool CanMoveAfter
-        {
-            get
-            {
-                if (DragTargetSignal == null || DragSignals.Count == 0)
-                {
-                    return false;
-                }
-                return !IsDragsContinuous() || (Signals.IndexOf(DragSignals.OrderBy(Signals.IndexOf).First()) - Signals.IndexOf(DragTargetSignal)) != 1;
-            }
-        }
-
-
-        [RelayCommand(CanExecute = nameof(CanMoveAfter))]
         private void MoveSignalsAfter()
         {
             var dragItems = DragSignals.ToArray();
@@ -168,20 +160,9 @@ namespace S7SvrSim.ViewModels.Signals
                 return;
             }
 
-            var command = ListChangedCommand.Move(Signals, signal, moved);
-            RegistCommandEventHandle(command);
-            if (AfterDragEvent != null)
-            {
-                command.AfterExecute += (_, _) =>
-                {
-                    AfterDragEvent?.Invoke(moved);
-                };
-                command.AfterUndo += (_, _) =>
-                {
-                    AfterDragEvent?.Invoke(moved);
-                };
-            }
-            UndoRedoManager.Run(command);
+            var indexOfSignal = Signals.IndexOf(signal);
+            Signals.RemoveMany(moved);
+            Signals.AddOrInsertRange(moved, indexOfSignal);
         }
     }
 }

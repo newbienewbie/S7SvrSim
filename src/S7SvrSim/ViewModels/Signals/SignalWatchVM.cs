@@ -1,9 +1,7 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using S7Svr.Simulator;
+﻿using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using S7SvrSim.ViewModels.Signals;
 using Splat;
 using System;
@@ -13,52 +11,36 @@ using System.Threading.Tasks;
 
 namespace S7SvrSim.ViewModels
 {
-    public partial class SignalWatchVM : ViewModelBase
+    public partial class SignalWatchVM : ReactiveObject
     {
         private readonly SignalsHelper signalsHelper;
         private readonly SignalsCollection signals;
+        private readonly RunningSnap7ServerVM runningVM;
         private readonly IMemCache<WatchState> watchStateCache;
+        private readonly ISaveNotifier saveNotifier;
+        private readonly ISignalAddressUesdCollection signalAddressUesd;
 
-        [ObservableProperty]
-        private int scanSpan = 50;
+        [Reactive]
+        public int ScanSpan { get; set; } = 50;
 
-        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache)
+        public SignalWatchVM(SignalsHelper signalsHelper, IMemCache<WatchState> watchStateCache, ISaveNotifier saveNotifier, ISignalAddressUesdCollection signalAddressUesd)
         {
             this.signalsHelper = signalsHelper;
             this.signals = Locator.Current.GetRequiredService<SignalsCollection>();
+            runningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             this.watchStateCache = watchStateCache;
+            this.saveNotifier = saveNotifier;
+            this.signalAddressUesd = signalAddressUesd;
+            runningVM.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
 
-            var runningModel = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
-            runningModel.WhenAnyValue(rm => rm.RunningStatus).Subscribe(RunningStatusChanged);
+            this.WhenAnyValue(vm => vm.ScanSpan).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
         }
 
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
-        }
-
-        private void RegistCommandEventHandle(IHistoryCommand command)
-        {
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
-        }
-
-        #region ScanSpan For UndoRedo
         internal void SetScanSpan(int scanSpan)
         {
-#pragma warning disable MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-            this.scanSpan = scanSpan;
-#pragma warning restore MVVMTK0034 // Direct field reference to [ObservableProperty] backing field
-            OnPropertyChanged(nameof(ScanSpan));
+            this.ScanSpan = scanSpan;
+            this.RaisePropertyChanged(nameof(ScanSpan));
         }
-
-        partial void OnScanSpanChanged(int oldValue, int newValue)
-        {
-            var command = new ValueChangedCommand<int>(SetScanSpan, oldValue, newValue);
-            RegistCommandEventHandle(command);
-            UndoRedoManager.Run(command);
-        }
-        #endregion
 
         #region Watch Method
         CancellationTokenSource watchCancelSource;
@@ -112,7 +94,15 @@ namespace S7SvrSim.ViewModels
         {
             while (!token.IsCancellationRequested)
             {
-                signalsHelper.RefreshValue(signals.Signals.Select(s => s.Value));
+                signalsHelper.RefreshValue(signals.Signals.Where(s =>
+                {
+                    if (signalAddressUesd.TryGetAddressUsed(s.Value, out var addressUsed))
+                    {
+                        var config = runningVM.AreaConfigs.FirstOrDefault(ac => (ac.AreaKind == AreaKind.MB && s.Value.Address?.AreaKind == AreaKind.MB) || (ac.AreaKind == AreaKind.DB && s.Value.Address?.AreaKind == AreaKind.DB && ac.BlockNumber == s.Value.Address?.DbIndex));
+                        return config != null && config.BlockSize > (s.Value.Address?.Index + addressUsed.IndexSize);
+                    }
+                    return false;
+                }).Select(s => s.Value));
                 await Task.Delay(TimeSpan.FromMilliseconds(ScanSpan >= 0 ? ScanSpan : 50), token);
             }
         }

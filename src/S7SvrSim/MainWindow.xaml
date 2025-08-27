@@ -23,16 +23,31 @@
     <Window.Resources>
         <shared:IsTypeValueConverter x:Key="IsAreaConfigVM" Type="{x:Type viewmodels:AreaConfigVM}" />
         <lu:BindingProxy x:Key="DataContextProxy" Data="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}, Path=DataContext}" />
+        <ObjectDataProvider x:Key="AreaKinds" ObjectType="{x:Type sys:Enum}" MethodName="GetValues">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="viewmodels:AreaKind" />
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding ProjectVM.NewProjectCommand}" Key="N" Modifiers="Ctrl"></KeyBinding>
+        <KeyBinding Command="{Binding ProjectVM.LoadProjectCommand}" Key="O" Modifiers="Ctrl"></KeyBinding>
+        <KeyBinding Command="{Binding ProjectVM.SaveProjectCommand}" Key="S" Modifiers="Ctrl"></KeyBinding>
+
+        <KeyBinding Command="{Binding CmdStartServer}" Key="F5"></KeyBinding>
+        <KeyBinding Command="{Binding CmdStopServer}" Key="F5" Modifiers="Shift"></KeyBinding>
+        <KeyBinding Command="{Binding CmdRestartServer}" Key="F5" Modifiers="Ctrl"></KeyBinding>
+    </Window.InputBindings>
     <md:DialogHost CloseOnClickAway="True" Identifier="MainWindowDialogHost">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top">
                 <Menu>
                     <MenuItem Header="文件">
-                        <MenuItem Command="ApplicationCommands.New" Icon="{md:PackIcon Kind=FileOutline}" />
+                        <MenuItem Header="新建" Command="{Binding ProjectVM.NewProjectCommand}" InputGestureText="Ctrl+N" Icon="{md:PackIcon Kind=FileOutline}" />
                         <MenuItem Header="打开"
                                   Icon="{md:PackIcon Kind=FolderOpenOutline}"
-                                  Command="ApplicationCommands.Open"
+                                  Command="{Binding ProjectVM.LoadProjectCommand}"
+                                  InputGestureText="Ctrl+O"
                                   />
                         <MenuItem Header="打开最近..."
                                   ItemsSource="{Binding ProjectVM.RecentFiles}"
@@ -69,29 +84,18 @@
                         </MenuItem>
                         <MenuItem Header="保存"
                                   Icon="{md:PackIcon Kind=ContentSaveOutline}"
-                                  Command="ApplicationCommands.Save"
+                                  Command="{Binding ProjectVM.SaveProjectCommand}"
+                                  InputGestureText="Ctrl+S"
                                   />
-                        <MenuItem Header="另存为" Command="ApplicationCommands.SaveAs" />
+                        <MenuItem Header="另存为" Command="{Binding ProjectVM.SaveProjectAsCommand}" />
                         <Separator />
                         <MenuItem Header="项目重命名"
                                   Command="{Binding ProjectVM.RenameCommand}"
                                   Icon="{md:PackIcon Kind=FormTextbox}"
                                   />
-                        <MenuItem Command="{x:Static commands:AppCommands.OpenFolder}" Icon="{md:PackIcon Kind=Redo}" />
+                        <MenuItem Header="打开项目文件夹" Command="{Binding ProjectVM.OpenProjectFolderCommand}" Icon="{md:PackIcon Kind=Redo}" />
                     </MenuItem>
                     <Separator />
-                    <MenuItem Header="编辑">
-                        <MenuItem Command="{Binding ProjectVM.UndoCommand}"
-                                  Icon="{md:PackIcon Kind=UndoVariant}"
-                                  Header="撤回"
-                                  InputGestureText="Ctrl+Z"
-                                  />
-                        <MenuItem Command="{Binding ProjectVM.RedoCommand}"
-                                  Icon="{md:PackIcon Kind=RedoVariant}"
-                                  Header="重做"
-                                  InputGestureText="Ctrl+Y"
-                                  />
-                    </MenuItem>
                     <MenuItem Header="S7服务">
                         <MenuItem Icon="{md:PackIcon Kind=Play}"
                                   Header="开启"
@@ -145,39 +149,21 @@
                                 />
                     </ToolBar>
                     <ToolBar>
-                        <Button Command="ApplicationCommands.New"
+                        <Button Command="{Binding ProjectVM.NewProjectCommand}"
                                 Content="{md:PackIcon Kind=FileOutline}"
                                 Padding="{StaticResource ButtonPadding}"
                                 shared:RoutedCommandTooltip.Enabled="True"
                                 />
-                        <Button Command="ApplicationCommands.Open"
+                        <Button Command="{Binding ProjectVM.LoadProjectCommand}"
                                 Content="{md:PackIcon Kind=FolderOpenOutline}"
                                 Padding="{StaticResource ButtonPadding}"
                                 shared:RoutedCommandTooltip.Enabled="True"
                                 />
-                        <Button Command="ApplicationCommands.Save"
+                        <Button Command="{Binding ProjectVM.SaveProjectCommand}"
                                 Content="{md:PackIcon Kind=ContentSaveOutline}"
                                 Padding="{StaticResource ButtonPadding}"
                                 shared:RoutedCommandTooltip.Enabled="True"
                                 />
-                    </ToolBar>
-                    <ToolBar ClipToBounds="False">
-                        <md:Badged x:Name="undoBadged">
-                            <Button Content="{md:PackIcon Kind=UndoVariant}"
-                                    Command="{Binding ProjectVM.UndoCommand}"
-                                    Padding="{StaticResource ButtonPadding}"
-                                    shared:RoutedCommandTooltip.Enabled="True"
-                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                    />
-                        </md:Badged>
-                        <md:Badged x:Name="redoBadged">
-                            <Button Content="{md:PackIcon Kind=RedoVariant}"
-                                    Command="{Binding ProjectVM.RedoCommand}"
-                                    Padding="{StaticResource ButtonPadding}"
-                                    shared:RoutedCommandTooltip.Enabled="True"
-                                    Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"
-                                    />
-                        </md:Badged>
                     </ToolBar>
                     <ToolBar>
                         <Button Content="{md:PackIcon Kind=LanguagePython}"
@@ -212,7 +198,7 @@
                                            VerticalAlignment="Center"
                                            DockPanel.Dock="Left"
                                            />
-                                    <TextBox Text="{Binding ConfigVM.IpAddress}"
+                                    <TextBox Text="{Binding ConfigVM.IpAddress, UpdateSourceTrigger=PropertyChanged}"
                                              Width="160"
                                              VerticalAlignment="Center"
                                              >
@@ -237,7 +223,7 @@
                             <DataGrid ItemsSource="{Binding ConfigVM.AreaConfigs}"
                                       CanUserAddRows="False"
                                       CanUserDeleteRows="False"
-                                      InitializingNewItem="AreaConfigGrid_InitializingNewItem"
+                                      AutoGenerateColumns="False"
                                       >
                                 <DataGrid.Columns>
                                     <DataGridTemplateColumn Header="删除">
@@ -256,6 +242,9 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
+                                    <md:DataGridComboBoxColumn Header="AreaKind" ItemsSource="{Binding Source={StaticResource AreaKinds}}" SelectedItemBinding="{Binding AreaKind, UpdateSourceTrigger=PropertyChanged}"></md:DataGridComboBoxColumn>
+                                    <DataGridTextColumn Header="BlockNumber" EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" Binding="{Binding BlockNumber, UpdateSourceTrigger=PropertyChanged}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="BlockSize" EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" Binding="{Binding BlockSize, UpdateSourceTrigger=PropertyChanged}"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
@@ -278,7 +267,7 @@
                                    Grid.Row="0"
                                    Grid.Column="0"
                                    />
-                            <TextBlock Text="{Binding ConfigVM.IpAddress}"
+                            <TextBlock Text="{Binding ConfigVM.IpAddress, Mode=OneWay}"
                                        Margin="0 4 0 4"
                                        Grid.Row="0"
                                        Grid.Column="1"

@@ -1,12 +1,8 @@
 ﻿using DynamicData;
 using Microsoft.Scripting.Hosting;
 using ReactiveUI.Fody.Helpers;
-using S7Svr.Simulator;
 using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using S7SvrSim.Services.Project;
-using S7SvrSim.Shared;
-using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
@@ -20,7 +16,7 @@ namespace S7SvrSim.ViewModels
         private readonly PyScriptRunner _pyRunner;
         private readonly IPyPathService pyPathService;
 
-        public ConfigPyEngineVM(PyScriptRunner pyRunner, IPyPathService pyPathService)
+        public ConfigPyEngineVM(PyScriptRunner pyRunner, IPyPathService pyPathService, ISaveNotifier saveNotifier)
         {
             this._pyRunner = pyRunner;
             this.pyPathService = pyPathService;
@@ -51,31 +47,19 @@ namespace S7SvrSim.ViewModels
             this.CmdSubmitSelectPath = ReactiveCommand.Create(CmdSubmitSelectPath_Impl, canSubmitSelectPath);
             this.CmdDeletePath = ReactiveCommand.Create<string>(path =>
             {
-                var command = ListChangedCommand<string>.Remove(PyEngineSearchPaths, [path]);
-                CommandEventRegist(command);
-                UndoRedoManager.Run(command);
+                PyEngineSearchPaths.Remove(path);
             });
 
             PyEngineSearchPaths.CollectionChanged += (_, _) =>
             {
                 SetSearchPaths(_pyRunner.PyEngine);
+                saveNotifier.NotifyNeedSave();
             };
         }
 
         internal void SetSearchPaths(ScriptEngine engine)
         {
             engine.SetSearchPaths(PyEngineSearchPaths.Select(pyPathService.ReplaceEnv).Distinct().ToArray());
-        }
-
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(3);
-        }
-
-        private void CommandEventRegist(IHistoryCommand command)
-        {
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
         }
 
         public ObservableCollection<string> PyEngineSearchPaths { get; } = new ObservableCollection<string>();
@@ -100,11 +84,10 @@ namespace S7SvrSim.ViewModels
                 MessageBox.Show($"当前所选择的路径已经在检索路径中！无需重复添加");
                 return;
             }
-            var command = ListChangedCommand<string>.Add(PyEngineSearchPaths, [this.SelectedModulePath]);
-            CommandEventRegist(command);
-            UndoRedoManager.Run(command);
+            PyEngineSearchPaths.Add(SelectedModulePath);
         }
         #endregion
+
         /// <summary>
         /// 删除路径
         /// </summary>

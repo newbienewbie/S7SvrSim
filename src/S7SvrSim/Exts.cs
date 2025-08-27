@@ -51,6 +51,7 @@ namespace S7SvrSim
                 return envPro;
             });
             services.AddTransient<IPyPathService, PyPathService>();
+            services.AddSingleton<ISaveNotifier, SaveNotifier>();
 
             return services;
         }
@@ -61,7 +62,7 @@ namespace S7SvrSim
             Locator.CurrentMutable.RegisterLazySingletonEx<MsgLoggerVM>(sp);
 
             Locator.CurrentMutable.RegisterLazySingletonEx<ConfigPyEngineVM>(sp);
-            Locator.CurrentMutable.RegisterLazySingletonEx<ConfigSnap7ServerVM>(sp);
+            Locator.CurrentMutable.RegisterLazySingletonEx<ConfigSnap7ServerVM>(sp, sp.GetRequiredService<ISaveNotifier>());
 
             Locator.CurrentMutable.RegisterLazySingletonEx<RunningSnap7ServerVM>(sp);
             Locator.CurrentMutable.RegisterLazySingletonEx<RwTargetVM>(sp);

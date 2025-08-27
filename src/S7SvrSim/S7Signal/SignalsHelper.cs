@@ -1,6 +1,5 @@
 ﻿using S7SvrSim.Project;
 using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using S7SvrSim.Services.S7Blocks;
 using S7SvrSim.Services.Settings;
 using S7SvrSim.Shared;
@@ -172,11 +171,7 @@ namespace S7SvrSim.S7Signal
 
                     if (newAddress != signal.Address)
                     {
-                        var command = new ValueChangedCommand<SignalAddress>(address =>
-                        {
-                            signal.Address = address;
-                        }, signal.Address, newAddress);
-                        UndoRedoManager.Run(command);
+                        signal.Address = newAddress;
                     }
 
                     preSignal = signal;

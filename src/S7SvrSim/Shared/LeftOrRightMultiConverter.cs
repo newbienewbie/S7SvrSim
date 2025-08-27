@@ -6,11 +6,16 @@ namespace S7SvrSim.Shared
 {
     public class LeftOrRightMultiConverter : IMultiValueConverter
     {
+        public bool ThrowException { get; set; }
+
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             if (values == null) return null;
             if (values.Length == 0) return null;
-            if (values[0] is not bool) throw new ArgumentException("First binding is condition and need be Boolean!");
+            if (values[0] is not bool)
+            {
+                return ThrowException ? throw new ArgumentException("First binding is condition and need be Boolean!") : null;
+            }
 
             var condition = (bool)values[0];
             // left

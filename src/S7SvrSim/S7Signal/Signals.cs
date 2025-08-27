@@ -27,8 +27,7 @@ namespace S7SvrSim.S7Signal
                 {
                     Address = new SignalAddress(value) { HideOffset = false };
                 }
-                OnPropertyChanged();
-                InvokeFormatAddressEvent(oldAddress, Address?.ToString());
+                this.RaisePropertyChanged();
             }
         }
 

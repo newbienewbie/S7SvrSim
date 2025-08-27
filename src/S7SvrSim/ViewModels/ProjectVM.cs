@@ -2,7 +2,6 @@
 using DynamicData.Binding;
 using MediatR;
 using Microsoft.Win32;
-using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator.ViewModels;
 using S7SvrSim.Messages;
 using S7SvrSim.Services;
@@ -26,24 +25,20 @@ namespace S7SvrSim.ViewModels
         private readonly IProjectFactory projectFactory;
         private readonly RecentFilesCollection recentFiles;
         private readonly IMediator mediator;
+        private readonly ISaveNotifier saveNotifier;
         private readonly MsgLoggerVM logger;
         private IProject currentProject;
-
-        [Reactive]
-        public bool NeedSave { get; set; }
-
-        [Reactive]
-        public int UndoCount { get; set; }
-
-        [Reactive]
-        public int RedoCount { get; set; }
 
         public ReadOnlyObservableCollection<RecentFile> RecentFiles { get; }
 
         public bool CanOpenRecent => RecentFiles.Count > 0;
 
-        public ICommand UndoCommand { get; }
-        public ICommand RedoCommand { get; }
+        public ICommand NewProjectCommand { get; }
+        public ICommand LoadProjectCommand { get; }
+        public ICommand SaveProjectCommand { get; }
+        public ICommand SaveProjectAsCommand { get; }
+        public ICommand OpenProjectFolderCommand { get; }
+
         public ICommand RenameCommand { get; }
         public ICommand OpenRecentCommand { get; }
         public ICommand RemoveRecentCommand { get; }
@@ -52,21 +47,16 @@ namespace S7SvrSim.ViewModels
         /// </summary>
         public string ProjectName => Path.GetFileName(currentProject.Path);
 
-        public ProjectVM(IProjectFactory projectFactory, RecentFilesCollection recentFilesVM, IMediator mediator)
+        public ProjectVM(IProjectFactory projectFactory, RecentFilesCollection recentFilesVM, IMediator mediator, ISaveNotifier saveNotifier)
         {
             this.projectFactory = projectFactory;
             this.recentFiles = recentFilesVM;
             this.mediator = mediator;
+            this.saveNotifier = saveNotifier;
+
             logger = Locator.Current.GetRequiredService<MsgLoggerVM>();
 
             OpenDefaultProject();
-
-            UndoRedoManager.UndoRedoChanged += () =>
-            {
-                UndoCount = UndoRedoManager.UndoCount;
-                RedoCount = UndoRedoManager.RedoCount;
-                NeedSave = true;
-            };
 
             recentFiles.Files.Connect()
                 .Sort(SortExpressionComparer<RecentFile>.Descending(file => file.OpenTime))
@@ -78,8 +68,12 @@ namespace S7SvrSim.ViewModels
             var runningVM = Locator.Current.GetRequiredService<RunningSnap7ServerVM>();
             var watchRunningStatus = runningVM.WhenAnyValue(vm => vm.RunningStatus).Select(rs => !rs);
 
-            UndoCommand = ReactiveCommand.Create(UndoRedoManager.Undo, this.WhenAnyValue(vm => vm.UndoCount).Select(c => c > 0));
-            RedoCommand = ReactiveCommand.Create(UndoRedoManager.Redo, this.WhenAnyValue(vm => vm.RedoCount).Select(c => c > 0));
+            NewProjectCommand = ReactiveCommand.Create(NewProject, watchRunningStatus);
+            LoadProjectCommand = ReactiveCommand.Create(LoadProject, watchRunningStatus);
+            SaveProjectCommand = ReactiveCommand.Create(SaveProject);
+            SaveProjectAsCommand = ReactiveCommand.Create(SaveProjectAs);
+            OpenProjectFolderCommand = ReactiveCommand.Create(OpenProjectFolder);
+
             RenameCommand = ReactiveCommand.CreateFromTask(RenameProject);
             OpenRecentCommand = ReactiveCommand.Create<RecentFile>(OpenRecentFile, watchRunningStatus);
             RemoveRecentCommand = ReactiveCommand.Create<RecentFile>(RemoveRecentFile);
@@ -99,13 +93,13 @@ namespace S7SvrSim.ViewModels
 
         private void CallbackNeedSave()
         {
-            NeedSave = true;
-            NeedSave = false;
+            saveNotifier.NotifyNeedSave(true);
+            saveNotifier.NotifyNeedSave(false);
         }
 
         public MessageBoxResult? NotifyIfSave()
         {
-            if (NeedSave)
+            if (saveNotifier.NeedSave)
             {
                 var result = MessageBox.Show("当前项目未保存，是否保存？", "未保存项目", MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.Yes)
@@ -144,8 +138,6 @@ namespace S7SvrSim.ViewModels
 
             currentProject = projectFactory.CreateProject(saveFileDialog.FileName);
             recentFiles.AddFile(new RecentFile(currentProject.Path, DateTime.Now));
-            UndoRedoManager.Reset();
-            NeedSave = false;
 
             logger.LogInfo($"已新建项目: {currentProject.Path}");
         }
@@ -165,8 +157,6 @@ namespace S7SvrSim.ViewModels
             }
 
             currentProject = project;
-            UndoRedoManager.Reset();
-
             CallbackNeedSave();
 
             logger.LogInfo($"已加载项目: {currentProject.Path}");
@@ -200,7 +190,6 @@ namespace S7SvrSim.ViewModels
         public void SaveProject()
         {
             currentProject.Save();
-            NeedSave = false;
             logger.LogInfo($"保存成功！路径: {currentProject.Path}");
         }
 

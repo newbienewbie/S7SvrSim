@@ -1,40 +1,20 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
+﻿using ReactiveUI.Fody.Helpers;
 
 namespace S7SvrSim.Shared
 {
-    public partial class ObjectWithBool<T> : ObservableObject
+    public class ObjectWithBool<T> : ReactiveObject
     {
-        [ObservableProperty]
-        private T value;
-        [ObservableProperty]
-        private bool boolean;
-
-        public event Action<bool> BooleanChanged;
-        partial void OnBooleanChanged(bool value)
-        {
-            BooleanChanged?.Invoke(value);
-        }
+        [Reactive]
+        public T Value { get; set; }
+        [Reactive]
+        public bool Boolean { get; set; }
     }
 
-    public partial class ObjectWith<T, S> : ObservableObject
+    public partial class ObjectWith<T, S> : ReactiveObject
     {
-        [ObservableProperty]
-        private T value;
-        [ObservableProperty]
-        private S other;
-
-        public event PropertyChanged<T> ValueChanged;
-        public event PropertyChanged<S> OtherChanged;
-
-        partial void OnValueChanged(T oldValue, T newValue)
-        {
-            ValueChanged?.Invoke(oldValue, newValue);
-        }
-
-        partial void OnOtherChanged(S oldValue, S newValue)
-        {
-            OtherChanged?.Invoke(oldValue, newValue);
-        }
+        [Reactive]
+        public T Value { get; set; }
+        [Reactive]
+        public S Other { get; set; }
     }
 }

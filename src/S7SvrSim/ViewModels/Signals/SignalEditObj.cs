@@ -1,10 +1,10 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using DynamicData.Binding;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI.Fody.Helpers;
 using S7Svr.Simulator;
 using S7SvrSim.Project;
 using S7SvrSim.S7Signal;
 using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,17 +14,23 @@ using System.Xml.Serialization;
 
 namespace S7SvrSim.ViewModels
 {
-    public partial class SignalEditObj : ObservableObject
+    public partial class SignalEditObj : ReactiveObject
     {
         private readonly IMemCache<SignalType[]> signalTypes;
-        private bool isInit = false;
+        private readonly ISaveNotifier saveNotifier;
 
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(SignalType))]
-        private Type other;
+        /// <summary>
+        /// 信号类型对应的实际反射类型
+        /// </summary>
+        [Reactive]
+        public Type Other { get; set; }
 
-        [ObservableProperty]
-        private SignalBase value;
+        [Reactive]
+        public SignalBase Value { get; set; }
+
+        private IDisposable valueDisposable;
+        private IDisposable typeDisposable;
+        private IDisposable valueChangedDisposable;
 
         public string SignalType
         {
@@ -39,35 +45,30 @@ namespace S7SvrSim.ViewModels
             }
             set
             {
-                if (!UndoRedoManager.IsInUndoRedo)
+                if (string.IsNullOrEmpty(value))
                 {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    if (SignalType?.Equals(value, StringComparison.OrdinalIgnoreCase) == true)
-                    {
-                        return;
-                    }
+                if (SignalType?.Equals(value, StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    return;
+                }
 
-                    var tyStr = value.Split('[')[0];
-                    var len = GetLength(value);
+                var tyStr = value.Split('[')[0];
+                var len = GetLength(value);
 
-                    var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase) || ty.Type.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
-                    if (typeQuery.Any())
+                var typeQuery = signalTypes.Value.Where(ty => ty.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase) || ty.Type.Name.Equals(tyStr, StringComparison.OrdinalIgnoreCase));
+                if (typeQuery.Any())
+                {
+                    Other = typeQuery.First().Type;
+                    if (Value is SignalWithLengthBase lengthValue)
                     {
-                        UndoRedoManager.StartTransaction();
-                        Other = typeQuery.First().Type;
-                        if (Value is SignalWithLengthBase lengthValue)
-                        {
-                            lengthValue.Length = len;
-                        }
-                        UndoRedoManager.EndTransaction();
+                        lengthValue.Length = len;
                     }
                 }
 
-                OnPropertyChanged();
+                this.RaisePropertyChanged();
             }
         }
 
@@ -109,13 +110,19 @@ namespace S7SvrSim.ViewModels
         {
             Other = type;
             signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<SignalType[]>>();
+            saveNotifier = ((App)App.Current).ServiceProvider.GetRequiredService<ISaveNotifier>();
 
-            isInit = true;
+            this.WhenAnyValue(vm => vm.Other).Subscribe(OnOtherChanged);
+
+            ObserverToNeedSave();
         }
 
         public SignalEditObj(string signalType, string signalName, string formatAddress, string remark)
         {
             signalTypes = ((App)App.Current).ServiceProvider.GetRequiredService<IMemCache<SignalType[]>>();
+            saveNotifier = ((App)App.Current).ServiceProvider.GetRequiredService<ISaveNotifier>();
+
+            this.WhenAnyValue(vm => vm.Other).Subscribe(OnOtherChanged);
 
             Other = ParseType(signalType);
 
@@ -128,42 +135,51 @@ namespace S7SvrSim.ViewModels
                 lenSignal.Length = GetLength(signalType);
             }
 
-            isInit = true;
+            ObserverToNeedSave();
         }
 
-        partial void OnValueChanged(SignalBase value)
+        private void ObserverToNeedSave()
         {
-            Value.NameChanged += OnNameChanged;
-            Value.RemarkChanged += OnRemarkChanged;
-            Value.FormatAddressChanged += OnFormtAddressChanged;
-            if (Value is SignalWithLengthBase lengthValue)
+            typeDisposable = this.WhenAnyPropertyChanged(nameof(SignalType)).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
+            valueChangedDisposable = this.WhenAnyValue(vm => vm.Value).Subscribe(_ =>
             {
-                lengthValue.LengthChanged += OnSignalLengthChanged;
-                lengthValue.NotifyLengthChanged();
+                ObserverValueToNeedSave();
+            });
+            ObserverValueToNeedSave();
+        }
+
+        private void ObserverValueToNeedSave()
+        {
+            if (valueDisposable != null)
+            {
+                try
+                {
+                    valueDisposable.Dispose();
+                }
+                catch (Exception)
+                {
+
+                }
+
+                valueDisposable = null;
+            }
+
+            if (Value != null)
+            {
+                if (Value is SignalWithLengthBase signalWithLength)
+                {
+                    valueDisposable = signalWithLength.WhenAnyValue(v => v.Name, v => v.Remark, v => v.FormatAddress, v => v.Length).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
+                }
+                else
+                {
+                    valueDisposable = Value.WhenAnyValue(v => v.Name, v => v.Remark, v => v.FormatAddress).Subscribe(_ => saveNotifier.NotifyNeedSave(true));
+                }
             }
         }
 
-        void ReleaseBind()
+        private void OnOtherChanged(Type value)
         {
-            Value.NameChanged -= OnNameChanged;
-            Value.RemarkChanged -= OnRemarkChanged;
-            Value.FormatAddressChanged -= OnFormtAddressChanged;
-            if (Value is SignalWithLengthBase lengthValue)
-            {
-                lengthValue.LengthChanged -= OnSignalLengthChanged;
-                lengthValue.NotifyLengthChanged();
-            }
-        }
-
-        partial void OnOtherChanged(Type value)
-        {
-            if (UndoRedoManager.IsInUndoRedo)
-            {
-                return;
-            }
-
             var newVal = (SignalBase)Activator.CreateInstance(value);
-            var preValue = CloneValue();
 
             if (Value != null)
             {
@@ -177,103 +193,26 @@ namespace S7SvrSim.ViewModels
             newVal.FormatAddress = (string)Value?.FormatAddress?.Clone();
             newVal.Remark = Value?.Remark;
 
-            this.value = newVal;
-            OnPropertyChanged(nameof(Value));
-            OnValueChanged(Value);
+            Value = newVal;
 
-            if (isInit)
+            ObserverValueToNeedSave();
+
+            this.RaisePropertyChanged(nameof(Value));
+            this.RaisePropertyChanged(nameof(SignalType));
+        }
+
+        ~SignalEditObj()
+        {
+            try
             {
-                var command = new ValueChangedCommand<SignalEditObj>(signal =>
-                {
-                    Other = signal.Other;
-                    ReleaseBind();
-                    this.value = signal.Value;
-                    OnPropertyChanged(nameof(Value));
-                    OnPropertyChanged(nameof(SignalType));
-                }, new SignalEditObj(preValue.GetType()) { Value = preValue }, CloneCurrent());
-                command.AfterExecute += CommandEventHandle;
-                command.AfterUndo += CommandEventHandle;
-                UndoRedoManager.Regist(command);
+                valueDisposable?.Dispose();
+                valueChangedDisposable?.Dispose();
+                typeDisposable?.Dispose();
             }
-        }
-
-        private void OnSignalLengthChanged(int oldValue, int newValue)
-        {
-            RegistValueChangedCommand(val =>
+            catch (Exception)
             {
-                if (Value is SignalWithLengthBase lengthSignal)
-                {
-                    lengthSignal.Length = val;
-                    OnPropertyChanged(nameof(SignalType));
-                }
-            }, oldValue, newValue);
 
-        }
-
-        private void OnFormtAddressChanged(string oldValue, string newValue)
-        {
-            RegistValueChangedCommand(val => Value.FormatAddress = val, oldValue, newValue);
-        }
-
-        private void OnRemarkChanged(string oldValue, string newValue)
-        {
-            RegistValueChangedCommand(val => Value.Remark = val, oldValue, newValue);
-        }
-
-        private void OnNameChanged(string oldValue, string newValue)
-        {
-            RegistValueChangedCommand(val => Value.Name = val, oldValue, newValue);
-        }
-
-        private void RegistValueChangedCommand<T>(Action<T> update, T oldValue, T newValue)
-        {
-            if (UndoRedoManager.IsInUndoRedo || !isInit || EqualityComparer<T>.Default.Equals(oldValue, newValue))
-            {
-                return;
             }
-
-            var command = new ValueChangedCommand<T>(val =>
-            {
-                update?.Invoke(val);
-            }, oldValue, newValue);
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
-            UndoRedoManager.Regist(command);
-        }
-
-        private SignalBase CloneValue()
-        {
-            if (Value == null)
-            {
-                return null;
-            }
-
-            var value = (SignalBase)Activator.CreateInstance(Value.GetType());
-            value.Value = Value.Value;
-            value.Address = Value.Address ?? null;
-            value.Name = Value.Name;
-            value.Remark = Value.Remark;
-
-            if (value is S7Signal.SignalWithLengthBase lenSignal && Value is S7Signal.SignalWithLengthBase curLenSignal)
-            {
-                lenSignal.Length = curLenSignal.Length;
-            }
-
-            return value;
-        }
-
-        private SignalEditObj CloneCurrent()
-        {
-            return new SignalEditObj(Other)
-            {
-                Other = Other,
-                Value = CloneValue()
-            };
-        }
-
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
         }
     }
 

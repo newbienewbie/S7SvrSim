@@ -7,12 +7,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="uc:CustomTag">
                     <StackPanel Orientation="Horizontal" Margin="2 0">
-                        <Label Content="#"
-                               Foreground="{TemplateBinding uc:CustomTag.MarkForeground}"
+                        <Label Content="{TemplateBinding Mark}"
+                               Foreground="{TemplateBinding MarkForeground}"
                                Padding="2 0 2 0"
                                />
                         <Border BorderThickness="0 0 0 1"
-                                BorderBrush="{TemplateBinding uc:CustomTag.MarkForeground}"
+                                BorderBrush="{TemplateBinding MarkForeground}"
                                 VerticalAlignment="Center"
                                 Name="PART_UnderlineBorder"
                                 >
@@ -36,11 +36,12 @@
                             </ContentPresenter>
                         </Border>
                         <Label x:Name="PART_Suffix"
-                               Content="{TemplateBinding uc:CustomTag.Suffix}"
+                               Content="{TemplateBinding Suffix}"
                                Padding="0"
                                Margin="1 0 0 0"
                                VerticalAlignment="Bottom"
-                               Foreground="Gray"
+                               Foreground="{TemplateBinding SuffixForeground}"
+                               Visibility="{TemplateBinding SuffixVisibility}"
                                />
                     </StackPanel>
                     <ControlTemplate.Triggers>

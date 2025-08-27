@@ -4,9 +4,6 @@ using Microsoft.Win32;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using ReactiveUI.Fody.Helpers;
-using S7Svr.Simulator;
-using S7SvrSim.Services;
-using S7SvrSim.Services.Command;
 using S7SvrSim.Services.Settings;
 using Splat;
 using System;
@@ -46,17 +43,6 @@ namespace S7SvrSim.ViewModels.Signals
                 {
                     setting.Write(new SignalExcelOption(SameGroupImportRule));
                 });
-        }
-
-        private void CommandEventHandle(object _object, EventArgs _args)
-        {
-            ((MainWindow)System.Windows.Application.Current.MainWindow).SwitchTab(2);
-        }
-
-        private void RegistCommandEventHandle(IHistoryCommand command)
-        {
-            command.AfterExecute += CommandEventHandle;
-            command.AfterUndo += CommandEventHandle;
         }
 
         private void SetSameGroupRule(SameGroupImportRule rule)
@@ -150,7 +136,6 @@ namespace S7SvrSim.ViewModels.Signals
                 return;
             var groupName = signals.GroupName;
 
-            UndoRedoManager.StartTransaction();
             try
             {
                 using var package = new ExcelPackage(openFileDialog.FileName);
@@ -169,11 +154,11 @@ namespace S7SvrSim.ViewModels.Signals
                         {
                             case SameGroupImportRule.ReplaceGroup:
                                 var signalGroup = new SignalEditGroup(sheet.Name, signals);
-                                UndoRedoManager.Run(ListChangedCommand.Replace(this.signals.SignalGroups, [(OldItem: this.signals.SignalGroups.First(sg => sg.Name == signalGroup.Name), NewItem: signalGroup)]));
+                                this.signals.SignalGroups.Replace(this.signals.SignalGroups.First(sg => sg.Name == signalGroup.Name), signalGroup);
                                 break;
                             case SameGroupImportRule.ExtendGroup:
                                 var first = this.signals.SignalGroups.First(sg => sg.Name == sheet.Name);
-                                UndoRedoManager.Run(ListChangedCommand.Add(first.Signals, signals));
+                                first.Signals.Add(signals);
                                 break;
                             case SameGroupImportRule.None:
                             default:
@@ -182,13 +167,12 @@ namespace S7SvrSim.ViewModels.Signals
                     }
                     else
                     {
-                        UndoRedoManager.Run(ListChangedCommand.Add(this.signals.SignalGroups, [new SignalEditGroup(sheet.Name, signals)]));
+                        this.signals.SignalGroups.Add(new SignalEditGroup(sheet.Name, signals));
                     }
                 }
             }
             catch (Exception ex)
             {
-                UndoRedoManager.RollbackTransaction();
                 MessageBox.Show(ex.Message);
                 return;
             }
@@ -196,22 +180,6 @@ namespace S7SvrSim.ViewModels.Signals
             {
                 signals.GroupName = groupName;
             }
-            var command = UndoRedoManager.EndTransaction();
-            RegistCommandEventHandle(command);
-            command.AfterExecute += (_, _) =>
-            {
-                if (string.IsNullOrEmpty(signals.GroupName))
-                {
-                    signals.GroupName = groupName;
-                }
-            };
-            command.AfterUndo += (_, _) =>
-            {
-                if (string.IsNullOrEmpty(signals.GroupName))
-                {
-                    signals.GroupName = groupName;
-                }
-            };
             MessageBox.Show("导入成功！");
         }
     }
