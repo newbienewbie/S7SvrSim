@@ -23,10 +23,21 @@ namespace S7Svr.Simulator.ViewModels
         public SignalPageVM SignalPageVM { get; }
         public ProjectVM ProjectVM { get; }
 
+        #region
+        public IObservable<EventPattern<NeedSaveChangedEventArgs>> NeedSaveChangedEventObservable { get; }
+        #endregion
+
+
         public MainVM(IS7ServerService server, IProjectFactory projectFactory, ISaveNotifier saveNotifier)
         {
             this._server = server;
             SaveNotifier = saveNotifier;
+
+            this.NeedSaveChangedEventObservable = Observable.FromEventPattern<NeedSaveChangedEventArgs>(
+                 h => saveNotifier.NeedSaveChanged += h,
+                 h => saveNotifier.NeedSaveChanged -= h
+                 );
+                
 
             this.LoggerVM = Locator.Current.GetRequiredService<MsgLoggerVM>();
             this.ConfigPyEngineVM = Locator.Current.GetRequiredService<ConfigPyEngineVM>();

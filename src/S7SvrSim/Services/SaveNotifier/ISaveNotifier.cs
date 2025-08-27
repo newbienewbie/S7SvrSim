@@ -1,11 +1,16 @@
 ﻿using System;
 
-namespace S7SvrSim.Services
+namespace S7SvrSim.Services;
+
+public interface ISaveNotifier
 {
-    public interface ISaveNotifier
-    {
-        bool NeedSave { get; }
-        event EventHandler NeedSaveChanged;
-        void NotifyNeedSave(bool needSave = true);
-    }
+    bool NeedSave { get; }
+    event EventHandler<NeedSaveChangedEventArgs> NeedSaveChanged;
+    internal void NotifyNeedSave(bool needSave = true);
+}
+
+
+public class NeedSaveChangedEventArgs: EventArgs
+{
+    public bool NeedSave { get; set; }
 }
