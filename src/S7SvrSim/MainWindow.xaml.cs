@@ -27,7 +27,7 @@ namespace S7Svr.Simulator
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(evt => Title = GetTitle(evt.EventArgs.NeedSave))
                     .DisposeWith(d);
-                Title = GetTitle(ViewModel.SaveNotifier.NeedSave);
+                Title = GetTitle(false);
             });
         }
 
