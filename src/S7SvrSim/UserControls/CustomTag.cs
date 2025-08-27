@@ -6,10 +6,18 @@ namespace S7SvrSim.UserControls
 {
     public class CustomTag : ContentControl
     {
-        public static DependencyProperty MarkForegroundProperty = DependencyProperty.Register("MarkForeground", typeof(Brush), typeof(CustomTag), new PropertyMetadata(Brushes.DodgerBlue));
-        public static DependencyProperty SuffixProperty = DependencyProperty.Register("Suffix", typeof(object), typeof(CustomTag), new PropertyMetadata(null));
-        public static DependencyProperty SuffixForegroundProperty = DependencyProperty.Register("SuffixForeground", typeof(Brush), typeof(CustomTag), new PropertyMetadata(Brushes.DodgerBlue));
-        public static DependencyProperty UnderlineProperty = DependencyProperty.Register("Underline", typeof(bool), typeof(CustomTag), new PropertyMetadata(true));
+        public static readonly DependencyProperty MarkProperty = DependencyProperty.Register("Mark", typeof(object), typeof(CustomTag), new PropertyMetadata("#"));
+        public static readonly DependencyProperty MarkForegroundProperty = DependencyProperty.Register("MarkForeground", typeof(Brush), typeof(CustomTag), new PropertyMetadata(Brushes.DodgerBlue));
+        public static readonly DependencyProperty SuffixProperty = DependencyProperty.Register("Suffix", typeof(object), typeof(CustomTag), new PropertyMetadata(null));
+        public static readonly DependencyProperty SuffixVisibilityProperty = DependencyProperty.Register("SuffixVisibility", typeof(Visibility), typeof(CustomTag), new PropertyMetadata(Visibility.Visible));
+        public static readonly DependencyProperty SuffixForegroundProperty = DependencyProperty.Register("SuffixForeground", typeof(Brush), typeof(CustomTag), new PropertyMetadata(Brushes.Gray));
+        public static readonly DependencyProperty UnderlineProperty = DependencyProperty.Register("Underline", typeof(bool), typeof(CustomTag), new PropertyMetadata(true));
+
+        public object Mark
+        {
+            get => GetValue(MarkProperty);
+            set => SetValue(MarkProperty, value);
+        }
 
         public Brush MarkForeground
         {
@@ -21,6 +29,12 @@ namespace S7SvrSim.UserControls
         {
             get => GetValue(SuffixProperty);
             set => SetValue(SuffixProperty, value);
+        }
+
+        public Visibility SuffixVisibility
+        {
+            get => (Visibility)GetValue(SuffixVisibilityProperty);
+            set => SetValue(SuffixVisibilityProperty, value);
         }
 
         public Brush SuffixForeground

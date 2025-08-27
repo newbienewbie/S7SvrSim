@@ -6,12 +6,27 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vm="clr-namespace:S7Svr.Simulator.ViewModels"
+             xmlns:shared="clr-namespace:S7SvrSim.Shared"
              d:Background="White"
              d:DataContext="{d:DesignInstance Type=vm:RunningSnap7ServerVM}"
              d:DesignHeight="250"
              d:DesignWidth="400"
              mc:Ignorable="d"
              >
+    <UserControl.Resources>
+        <shared:EqualToBooleanConverter x:Key="EqualToBooleanConverter"></shared:EqualToBooleanConverter>
+        <shared:LeftOrRightMultiConverter x:Key="LeftOrRightMultiConverter"></shared:LeftOrRightMultiConverter>
+        <ObjectDataProvider x:Key="Visibillity.Visible" >
+            <ObjectDataProvider.ObjectInstance>
+                <Visibility>Visible</Visibility>
+            </ObjectDataProvider.ObjectInstance>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="Visibillity.Collapsed" >
+            <ObjectDataProvider.ObjectInstance>
+                <Visibility>Collapsed</Visibility>
+            </ObjectDataProvider.ObjectInstance>
+        </ObjectDataProvider>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -32,7 +47,17 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:RunningServerItem">
-                        <local:CustomTag Content="{Binding AreaKind}" Suffix="{Binding BlockNumber}" />
+                        <local:CustomTag Content="{Binding AreaKind}" Suffix="{Binding BlockNumber}">
+                            <local:CustomTag.SuffixVisibility>
+                                <MultiBinding Converter="{StaticResource LeftOrRightMultiConverter}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Path="AreaKind" Converter="{StaticResource EqualToBooleanConverter}" ConverterParameter="{x:Static vm:AreaKind.DB}"></Binding>
+                                        <Binding Source="{StaticResource Visibillity.Visible}" Path="."></Binding>
+                                        <Binding Source="{StaticResource Visibillity.Collapsed}" Path="."></Binding>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </local:CustomTag.SuffixVisibility>
+                        </local:CustomTag>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
