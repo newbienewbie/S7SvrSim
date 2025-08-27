@@ -243,8 +243,8 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
                                     <md:DataGridComboBoxColumn Header="AreaKind" ItemsSource="{Binding Source={StaticResource AreaKinds}}" SelectedItemBinding="{Binding AreaKind, UpdateSourceTrigger=PropertyChanged}"></md:DataGridComboBoxColumn>
-                                    <md:DataGridTextColumn Header="BlockNumber" Binding="{Binding BlockNumber, UpdateSourceTrigger=PropertyChanged}"></md:DataGridTextColumn>
-                                    <md:DataGridTextColumn Header="BlockSize" Binding="{Binding BlockSize, UpdateSourceTrigger=PropertyChanged}"></md:DataGridTextColumn>
+                                    <DataGridTextColumn Header="BlockNumber" EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" Binding="{Binding BlockNumber, UpdateSourceTrigger=PropertyChanged}"></DataGridTextColumn>
+                                    <DataGridTextColumn Header="BlockSize" EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnEditingStyle}" Binding="{Binding BlockSize, UpdateSourceTrigger=PropertyChanged}"></DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </DockPanel>
