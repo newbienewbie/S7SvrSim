@@ -23,17 +23,14 @@ namespace S7Svr.Simulator
                 this.ViewModel = Locator.Current.GetRequiredService<MainVM>();
                 this.DataContext = this.ViewModel;
                 this.OneWayBind(ViewModel, vm => vm.RunningVM.RunningStatus, v => v.activeBlock.Visibility, isRun => isRun ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
-                Observable.FromEventPattern(ViewModel.SaveNotifier, nameof(ISaveNotifier.NeedSaveChanged)).Select(e =>
-                {
-                    if (e.Sender is ISaveNotifier notifier)
-                    {
-                        return notifier;
-                    }
-                    return null;
-                }).Subscribe(notifier => Title = GetTitle(notifier.NeedSave)).DisposeWith(d);
+                this.ViewModel.NeedSaveChangedEventObservable
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(evt => Title = GetTitle(evt.EventArgs.NeedSave))
+                    .DisposeWith(d);
                 Title = GetTitle(ViewModel.SaveNotifier.NeedSave);
             });
         }
+
 
         #region
         public MainVM ViewModel
@@ -49,9 +46,9 @@ namespace S7Svr.Simulator
             DependencyProperty.Register("ViewModel", typeof(MainVM), typeof(MainWindow), new PropertyMetadata(null));
         #endregion
 
-        private string GetTitle(bool needSave)
+        private string GetTitle(bool? needSave)
         {
-            if (needSave)
+            if (needSave== true)
             {
                 return $"* {ViewModel.ProjectVM.ProjectName} - Siemens PLC 通讯模拟器";
             }
