@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Windows.Input;
 
 namespace S7SvrSim.ViewModels.Signals
@@ -21,7 +22,8 @@ namespace S7SvrSim.ViewModels.Signals
         [Reactive]
         public bool IsDragSignals { get; set; }
 
-        public bool DragSignalsIsOne => DragSignals.Count == 1;
+        [ObservableAsProperty]
+        public bool DragSignalsIsOne { get; }
 
         public bool CanMoveBefore
         {
@@ -61,7 +63,6 @@ namespace S7SvrSim.ViewModels.Signals
 
             DragSignals.CollectionChanged += (_, _) =>
             {
-                this.RaisePropertyChanged(nameof(DragSignalsIsOne));
                 this.RaisePropertyChanged(nameof(CanMoveAfter));
                 this.RaisePropertyChanged(nameof(CanMoveBefore));
             };
@@ -71,6 +72,10 @@ namespace S7SvrSim.ViewModels.Signals
                 this.RaisePropertyChanged(nameof(CanMoveAfter));
                 this.RaisePropertyChanged(nameof(CanMoveBefore));
             });
+
+            DragSignals.WhenAnyValue(signals => signals.Count)
+                       .Select(count => count == 1)
+                       .ToPropertyEx(this, vm => vm.DragSignalsIsOne, scheduler: RxApp.MainThreadScheduler);
 
             var watchDragSignalsIsOne = this.WhenAnyValue(vm => vm.DragSignalsIsOne);
             var watchCanMoveBefore = this.WhenAnyValue(vm => vm.CanMoveBefore);

@@ -44,12 +44,10 @@ namespace S7SvrSim.S7Signal
             get => Address?.ToString();
             set
             {
-                if (Address?.ToString() == value)
+                if (FormatAddress == value)
                 {
                     return;
                 }
-
-                var oldAddress = Address?.ToString();
 
                 if (string.IsNullOrEmpty(value))
                 {
