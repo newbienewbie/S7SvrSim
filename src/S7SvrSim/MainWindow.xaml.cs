@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using S7Svr.Simulator.ViewModels;
-using S7SvrSim.Commands;
 using S7SvrSim.Services;
 using Splat;
 using System;
 using System.ComponentModel;
+using System.Reactive.Linq;
 using System.Windows;
-using System.Windows.Input;
 
 namespace S7Svr.Simulator
 {
@@ -23,15 +22,16 @@ namespace S7Svr.Simulator
             {
                 this.ViewModel = Locator.Current.GetRequiredService<MainVM>();
                 this.DataContext = this.ViewModel;
-                this.OneWayBind(ViewModel, vm => vm.RunningVM.RunningStatus, w => w.activeBlock.Visibility, isRun => isRun ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
-
-                var saveNotify = ((App)Application.Current).ServiceProvider.GetRequiredService<ISaveNotifier>();
-                saveNotify.NeedSaveChanged += (sender, _) =>
+                this.OneWayBind(ViewModel, vm => vm.RunningVM.RunningStatus, v => v.activeBlock.Visibility, isRun => isRun ? Visibility.Visible : Visibility.Collapsed).DisposeWith(d);
+                Observable.FromEventPattern(ViewModel.SaveNotifier, nameof(ISaveNotifier.NeedSaveChanged)).Select(e =>
                 {
-                    var notify = (ISaveNotifier)sender;
-                    Title = GetTitle(notify.NeedSave);
-                };
-                Title = GetTitle(saveNotify.NeedSave);
+                    if (e.Sender is ISaveNotifier notifier)
+                    {
+                        return notifier;
+                    }
+                    return null;
+                }).Subscribe(notifier => Title = GetTitle(notifier.NeedSave)).DisposeWith(d);
+                Title = GetTitle(ViewModel.SaveNotifier.NeedSave);
             });
         }
 
