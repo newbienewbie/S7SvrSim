@@ -166,15 +166,6 @@ namespace S7SvrSim.UserControls
             ViewModel.DragSignalsVM.IsDragSignals = false;
         }
 
-        private void ComboBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (sender is ComboBox box)
-            {
-                var binding = BindingOperations.GetBindingExpression(box, ComboBox.TextProperty);
-                binding?.UpdateSource();
-            }
-        }
-
         private ValidationResult NewGroupName_ValidateEvent(object value, System.Globalization.CultureInfo cultureInfo)
         {
             if (value == null) return null;
