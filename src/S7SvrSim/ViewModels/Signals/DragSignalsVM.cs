@@ -51,8 +51,6 @@ namespace S7SvrSim.ViewModels.Signals
 
         public ObservableCollection<SignalEditObj> DragSignals { get; } = [];
 
-        public event Action<IEnumerable<SignalEditObj>> AfterDragEvent;
-
         public ICommand ReplaceSignalCommand { get; }
         public ICommand MoveSignlsBeforeCommand { get; }
         public ICommand MoveSignalsAfterCommand { get; }
@@ -149,7 +147,7 @@ namespace S7SvrSim.ViewModels.Signals
             }
             else
             {
-                MoveSignals(Signals[(int)(Signals.IndexOf((SignalEditObj)this.DragTargetSignal) + 1)], dragItems);
+                MoveSignals(Signals[Signals.IndexOf(DragTargetSignal) + 1], dragItems);
             }
         }
 

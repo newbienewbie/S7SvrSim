@@ -31,7 +31,6 @@ namespace S7SvrSim.UserControls
             {
                 ViewModel = Locator.Current.GetRequiredService<SignalPageVM>();
                 ViewModel.Signals.Grid = signalGrid;
-                ViewModel.DragSignalsVM.AfterDragEvent += ViewModel_AfterDragEvent;
             });
         }
 
@@ -77,17 +76,6 @@ namespace S7SvrSim.UserControls
             {
                 ViewModel.Signals.OpenValueSet();
             }
-        }
-
-        private void ViewModel_AfterDragEvent(IEnumerable<SignalEditObj> dragObjs)
-        {
-            signalGrid.UnselectAll();
-            foreach (var item in dragObjs)
-            {
-                signalGrid.SelectedItems.Add(item);
-            }
-            ViewModel.DragSignalsVM.IsDragSignals = false;
-            signalGrid.ContextMenu.IsOpen = false;
         }
 
         private void DataGridRow_DragOver(object sender, DragEventArgs e)
