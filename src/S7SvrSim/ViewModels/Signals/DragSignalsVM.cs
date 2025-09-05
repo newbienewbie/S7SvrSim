@@ -135,12 +135,13 @@ namespace S7SvrSim.ViewModels.Signals
 
         private void MoveSignlsBefore()
         {
-            MoveSignals(DragTargetSignal, DragSignals.ToArray());
+            var dragItems = DragSignals.OrderBy(Signals.IndexOf).ToArray();
+            MoveSignals(DragTargetSignal, dragItems);
         }
 
         private void MoveSignalsAfter()
         {
-            var dragItems = DragSignals.ToArray();
+            var dragItems = DragSignals.OrderBy(Signals.IndexOf).ToArray();
             if (Signals.Last() == DragTargetSignal)
             {
                 MoveSignals(null, dragItems);
@@ -158,8 +159,9 @@ namespace S7SvrSim.ViewModels.Signals
                 return;
             }
 
-            var indexOfSignal = Signals.IndexOf(signal);
             Signals.RemoveMany(moved);
+
+            var indexOfSignal = Signals.IndexOf(signal);
             Signals.AddOrInsertRange(moved, indexOfSignal);
         }
     }
