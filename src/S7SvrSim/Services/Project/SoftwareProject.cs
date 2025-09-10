@@ -21,12 +21,9 @@ namespace S7SvrSim.Services.Project
         private readonly ConfigPyEngineVM pyConfigModel;
         private readonly SignalWatchVM signalWatchModel;
         private readonly SignalsCollection signalsCollection;
-        private readonly MsgLoggerVM msgLoggerVM;
-        private readonly IServiceProvider serviceProvider;
         private readonly SignalsHelper signalsHelper;
         private readonly IEnvProvider envProvider;
         private readonly ISaveNotifier saveNotifier;
-        private readonly IMemCache<SignalType[]> signalTypes;
 
         public ProjectFile ProjectFile { get; private set; }
         public string Path { get; private set; }
@@ -43,13 +40,10 @@ namespace S7SvrSim.Services.Project
                 throw new ArgumentNullException(nameof(path));
             }
 
-            this.serviceProvider = serviceProvider;
             this.signalsHelper = signalsHelper;
             this.envProvider = envProvider;
             this.saveNotifier = saveNotifier;
             Path = path;
-
-            signalTypes = serviceProvider.GetRequiredService<IMemCache<SignalType[]>>();
 
             configS7Model = Locator.Current.GetRequiredService<ConfigSnap7ServerVM>();
             pyConfigModel = Locator.Current.GetRequiredService<ConfigPyEngineVM>();
