@@ -179,6 +179,11 @@ namespace S7SvrSim.ViewModels
 
         private void OnOtherChanged(Type value)
         {
+            if (value == null)
+            {
+                return;
+            }
+
             var newVal = (SignalBase)Activator.CreateInstance(value);
 
             if (Value != null)

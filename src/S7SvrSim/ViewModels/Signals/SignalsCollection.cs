@@ -212,7 +212,11 @@ namespace S7SvrSim.ViewModels.Signals
             var renameResult = await GetNewGroupName("Rename Group", sg.Name, true);
             if (renameResult.IsCancel || string.IsNullOrEmpty(renameResult.Result)) return;
 
-            var newSg = new SignalEditGroup(renameResult.Result, sg.Signals);
+            // 对组内每个信号进行深拷贝
+            var copiedSignals = sg.Signals.Select(s => {
+                return new SignalEditObj(s.SignalType, s.Value.Name, s.Value.FormatAddress, s.Value.Remark);
+            });
+            var newSg = new SignalEditGroup(renameResult.Result, copiedSignals);
             SignalGroups.Insert(SignalGroups.IndexOf(sg) + 1, newSg);
         }
         #endregion
