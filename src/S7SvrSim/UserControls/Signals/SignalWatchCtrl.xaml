@@ -375,8 +375,7 @@
                                 <ComboBox ItemsSource="{Binding Data.SignalTypes, Source={StaticResource DataContextProxy}}"
                                           SelectedValuePath="Name"
                                           DisplayMemberPath="Name"
-                                          Text="{Binding SignalType, UpdateSourceTrigger=Explicit}"
-                                          LostFocus="ComboBox_LostFocus"
+                                          Text="{Binding SignalType, UpdateSourceTrigger=LostFocus}"
                                           IsEditable="True"
                                           />
                             </DataTemplate>

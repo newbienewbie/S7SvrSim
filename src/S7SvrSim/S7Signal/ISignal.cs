@@ -25,7 +25,7 @@ namespace S7SvrSim.S7Signal
         string Remark { get; set; }
     }
 
-    public abstract partial class SignalBase : ReactiveObject, ISignal, IEquatable<SignalBase>
+    public abstract partial class SignalBase : ReactiveObject, ISignal
     {
         [Reactive]
         public object Value { get; set; }
@@ -86,38 +86,6 @@ namespace S7SvrSim.S7Signal
                 Type = GetType().Name
             };
         }
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Name, Address, Remark);
-        }
-
-        public virtual bool Equals(SignalBase other)
-        {
-            return this == other;
-        }
-
-        public static bool operator ==(SignalBase lhs, SignalBase rhs)
-        {
-            if (lhs is null || rhs is null)
-            {
-                return lhs is null && rhs is null;
-            }
-
-            return lhs.Name == rhs.Name &&
-                lhs.Address == rhs.Address &&
-                lhs.Remark == rhs.Remark;
-        }
-
-        public static bool operator !=(SignalBase lhs, SignalBase rhs)
-        {
-            return !(lhs == rhs);
-        }
     }
 
     public abstract partial class SignalWithLengthBase : SignalBase
@@ -145,30 +113,6 @@ namespace S7SvrSim.S7Signal
             var item = base.ToSignalItem();
             item.Length = Length;
             return item;
-        }
-
-        public override bool Equals(object obj)
-        {
-            return base.Equals(obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return System.HashCode.Combine(base.GetHashCode(), Length);
-        }
-
-        public static bool operator ==(SignalWithLengthBase lhs, SignalWithLengthBase rhs)
-        {
-            if (lhs is null || rhs is null)
-            {
-                return lhs is null && rhs is null;
-            }
-            return lhs.Length == rhs.Length && lhs == (SignalBase)rhs;
-        }
-
-        public static bool operator !=(SignalWithLengthBase lhs, SignalWithLengthBase rhs)
-        {
-            return !(lhs == rhs);
         }
     }
 }
